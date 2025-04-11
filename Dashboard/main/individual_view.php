@@ -6,9 +6,62 @@ require_once 'approve/config.php'; // Database connection
 $staff_query = $conn->query("SELECT s.staff_id, s.first_name, s.last_name, d.department_name
                            FROM staff s
                            JOIN departments d ON s.department_id = d.department_id
-                           
                            ORDER BY s.last_name, s.first_name");
 $staff_list = $staff_query->fetch_all(MYSQLI_ASSOC);
+
+// Get top performing staff (default view)
+$top_performers_query = $conn->query("SELECT s.staff_id, s.first_name, s.last_name, d.department_name, 
+                                     s.performance_score, s.years_of_experience, r.role_name,
+                                     (SELECT COUNT(*) FROM publications p WHERE p.staff_id = s.staff_id) as publication_count,
+                                     (SELECT COUNT(*) FROM grants g WHERE g.staff_id = s.staff_id) as grant_count
+                                     FROM staff s
+                                     JOIN departments d ON s.department_id = d.department_id
+                                     JOIN roles r ON s.role_id = r.role_id
+                                     ORDER BY s.performance_score DESC
+                                     LIMIT 10");
+$top_performing_staff = $top_performers_query->fetch_all(MYSQLI_ASSOC);
+
+// Get department performance stats for chart
+$dept_performance_query = $conn->query("SELECT d.department_name, AVG(s.performance_score) as avg_score
+                                      FROM staff s
+                                      JOIN departments d ON s.department_id = d.department_id
+                                      GROUP BY d.department_name
+                                      ORDER BY avg_score DESC");
+$department_stats = $dept_performance_query->fetch_all(MYSQLI_ASSOC);
+
+// Get recent achievements across all staff
+$recent_achievements_query = $conn->query("SELECT 
+                                          'Publication' as achievement_type, 
+                                          CONCAT(s.first_name, ' ', s.last_name) as staff_name,
+                                          d.department_name,
+                                          p.publication_type as detail,
+                                          NULL as date
+                                          FROM publications p
+                                          JOIN staff s ON p.staff_id = s.staff_id
+                                          JOIN departments d ON s.department_id = d.department_id
+                                          UNION ALL
+                                          SELECT 
+                                          'Grant' as achievement_type,
+                                          CONCAT(s.first_name, ' ', s.last_name) as staff_name,
+                                          d.department_name,
+                                          CONCAT('UGX ', FORMAT(g.grant_amount, 2)) as detail,
+                                          NULL as date
+                                          FROM grants g
+                                          JOIN staff s ON g.staff_id = s.staff_id
+                                          JOIN departments d ON s.department_id = d.department_id
+                                          UNION ALL
+                                          SELECT 
+                                          'Innovation' as achievement_type,
+                                          CONCAT(s.first_name, ' ', s.last_name) as staff_name,
+                                          d.department_name,
+                                          i.innovation_type as detail,
+                                          NULL as date
+                                          FROM innovations i
+                                          JOIN staff s ON i.staff_id = s.staff_id
+                                          JOIN departments d ON s.department_id = d.department_id
+                                          ORDER BY date DESC
+                                          LIMIT 5");
+$recent_achievements = $recent_achievements_query->fetch_all(MYSQLI_ASSOC);
 
 // Initialize variables
 $selected_staff = null;
@@ -24,15 +77,16 @@ $achievements = [
 ];
 
 // Handle staff selection/search
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $staff_id = $_POST['staff_id'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['staff_id'])) {
+    $staff_id = $_POST['staff_id'];
 
     if ($staff_id) {
         // Get staff details
-        $stmt = $conn->prepare("SELECT s.*, d.department_name, r.role_name 
+        $stmt = $conn->prepare("SELECT s.*, d.department_name, r.role_name, u.photo_path 
                               FROM staff s
                               JOIN departments d ON s.department_id = d.department_id
                               JOIN roles r ON s.role_id = r.role_id
+                              LEFT JOIN users u ON s.staff_id = u.staff_id
                               WHERE s.staff_id = ?");
         $stmt->bind_param("i", $staff_id);
         $stmt->execute();
@@ -101,14 +155,35 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles/individual_style.css">
+    <style>
+        .performance-badge {
+            font-size: 0.9rem;
+            padding: 0.35rem 0.6rem;
+        }
+        .department-chart-container {
+            position: relative;
+            height: 250px;
+        }
+        .achievement-card {
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .achievement-icon {
+            font-size: 1.5rem;
+            color: #2e3192;
+        }
+    </style>
 </head>
 
 <body>
-
     <!-- navigation bar -->
     <?php include 'bars/nav_bar.php'; ?>
 
-    <!--  sidebar -->
+    <!-- sidebar -->
     <?php include 'bars/side_bar.php'; ?>
 
     <!-- Content Wrapper -->
@@ -157,7 +232,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         </div>
 
         <?php if ($staff_details): ?>
-            <!-- Results Section -->
+            <!-- Results Section for Selected Staff -->
             <div class="container">
                 <!-- Profile Summary -->
                 <div class="row mb-4">
@@ -398,6 +473,103 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </div>
                 </div>
             </div>
+        <?php else: ?>
+            <!-- Default View - Top Performing Staff -->
+            <div class="container">
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Top Performing Staff</h4>
+                        <p class="text-muted mb-0">Ranked by performance score</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Staff Member</th>
+                                        <th>Department</th>
+                                        <th>Performance Score</th>
+                                        <th>Publications</th>
+                                        <th>Grants</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($top_performing_staff as $index => $staff): ?>
+                                        <tr>
+                                            <td><?= $index + 1 ?></td>
+                                            <td>
+                                                <?= htmlspecialchars($staff['last_name']) ?>, <?= htmlspecialchars($staff['first_name']) ?>
+                                            </td>
+                                            <td><?= htmlspecialchars($staff['department_name']) ?></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" 
+                                                         role="progressbar" 
+                                                         style="width: <?= min(100, $staff['performance_score']) ?>%" 
+                                                         aria-valuenow="<?= $staff['performance_score'] ?>" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        <?= round($staff['performance_score'], 1) ?>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><?= $staff['publication_count'] ?? 0 ?></td>
+                                            <td><?= $staff['grant_count'] ?? 0 ?></td>
+                                            <td>
+                                                <form method="POST" class="d-inline">
+                                                    <input type="hidden" name="staff_id" value="<?= $staff['staff_id'] ?>">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                        View Details
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Department-wise Performance -->
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Top Departments by Performance</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="department-chart-container">
+                                    <canvas id="departmentChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0">Recent Achievements</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <?php foreach ($recent_achievements as $achievement): ?>
+                                        <div class="list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1"><?= htmlspecialchars($achievement['achievement_type']) ?></h6>
+                                                <small class="text-muted"><?= date('M d, Y', strtotime($achievement['date'] ?? 'now')) ?></small>
+                                            </div>
+                                            <p class="mb-1"><?= htmlspecialchars($achievement['staff_name']) ?></p>
+                                            <small class="text-muted"><?= htmlspecialchars($achievement['department_name']) ?></small>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         <?php endif; ?>
     </div>
 
@@ -415,7 +587,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             });
 
             <?php if ($staff_details): ?>
-                // Initialize Performance Chart
+                // Initialize Performance Chart for individual staff
                 const ctx = document.getElementById('performanceChart').getContext('2d');
                 const performanceChart = new Chart(ctx, {
                     type: 'bar',
@@ -474,9 +646,49 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         }
                     }
                 });
+            <?php else: ?>
+                // Initialize Department Performance Chart for default view
+                const deptCtx = document.getElementById('departmentChart').getContext('2d');
+                const departmentChart = new Chart(deptCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [<?= implode(',', array_map(function($dept) { return "'" . htmlspecialchars($dept['department_name']) . "'"; }, $department_stats)) ?>],
+                        datasets: [{
+                            label: 'Average Performance Score',
+                            data: [<?= implode(',', array_map(function($dept) { return $dept['avg_score']; }, $department_stats)) ?>],
+                            backgroundColor: '#2e3192',
+                            borderColor: '#1A237E',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Department Performance Comparison',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 10
+                                }
+                            }
+                        }
+                    }
+                });
             <?php endif; ?>
         });
     </script>
 </body>
-
 </html>
