@@ -1,0 +1,388 @@
+
+    /* Navigation Bar Styles */
+    .nav-container {
+        background-color: #2e3192;
+        /* Dark blue-gray background */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        position: fixed;
+        top: 0;
+        left: 240px;
+        /* Matches sidebar width */
+        width: calc(100% - 240px);
+        height: 60px;
+        transition: left 0.3s ease, width 0.3s ease;
+    }
+
+    /* When sidebar is collapsed */
+    .sidebar.collapsed+.nav-container {
+        left: 80px;
+        width: calc(100% - 80px);
+    }
+
+    /* Navigation Tabs Container */
+    .nav-tabs {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0 20px;
+        height: 100%;
+        position: relative;
+    }
+
+    /* Hamburger Menu Icon */
+    .hamburger {
+        position: absolute;
+        left: 15px;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 1001;
+        transition: transform 0.3s ease;
+    }
+
+    .hamburger:hover {
+        color: #FFEB3B;
+        /* Yellow hover */
+    }
+
+    /* Navigation Links */
+    .nav-link {
+        background-color: transparent;
+        border: none;
+        padding: 10px 20px;
+        margin: 0 5px;
+        cursor: pointer;
+        font-size: 16px;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+    }
+
+
+    /* Active Navigation Link Styling */
+    .nav-link.active {
+        background-color: #4CAF50;
+        /* Green background */
+        color: white !important;
+        border-bottom: 3px solid #FFEB3B;
+        /* Yellow underline */
+        font-weight: bold;
+        transform: scale(1.05);
+        transition: all 0.3s ease;
+    }
+
+    /* Hover effect for nav links */
+    .nav-link:not(.active):hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #FFEB3B;
+        /* Yellow text on hover */
+    }
+
+    /* Logout Button Special Styling */
+    .nav-link.logout {
+        color: #e74c3c;
+        /* Red color for logout */
+        font-weight: bold;
+    }
+
+    .nav-link.logout:hover {
+        background-color: rgba(231, 76, 60, 0.1);
+    }
+
+    /* Role Indicator */
+    .role-indicator {
+        position: absolute;
+        top: 70px;
+        right: 20px;
+        background-color: #4CAF50;
+        /* Green background */
+        color: white;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+        .nav-container {
+            left: 0;
+            width: 100%;
+        }
+
+        .sidebar.show+.nav-container {
+            left: 240px;
+            width: calc(100% - 240px);
+        }
+
+        .sidebar.collapsed.show+.nav-container {
+            left: 80px;
+            width: calc(100% - 80px);
+        }
+
+        /* Adjust nav links for mobile */
+        .nav-tabs {
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding-left: 50px;
+        }
+
+        .nav-link {
+            padding: 10px 15px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+    }
+
+    /* Animation for active state */
+    @keyframes navLinkPulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .nav-link.active {
+        animation: navLinkPulse 0.5s ease;
+    }
+</style>
+
+<>
+    /* Sidebar Styles */
+    .main-sidebar {
+        background-color: #4caf50;
+        /* Green background for sidebar */
+        color: #ffffff;
+        /* White text color */
+        width: 250px;
+        /* Fixed width for sidebar */
+        height: 100vh;
+        /* Full height */
+        position: fixed;
+        /* Fixed position */
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        /* Scrollable if content overflows */
+        transition: width 0.3s, margin-left 0.3s;
+        /* Smooth transition for width and margin */
+        z-index: 1000;
+        /* Ensure it is above other content */
+    }
+
+    .main-sidebar.collapsed {
+        width: 80px;
+        /* Reduced width when collapsed */
+    }
+
+    /* Content Wrapper */
+    .content-wrapper {
+        margin-left: 250px;
+        /* Space for sidebar */
+        transition: margin-left 0.3s;
+        /* Smooth transition for margin */
+    }
+
+    .content-wrapper.collapsed {
+        margin-left: 80px;
+        /* Adjusted margin when sidebar is collapsed */
+    }
+
+    /* Logo Box */
+    .logo-box {
+        display: flex;
+        /* Flexbox for alignment */
+        justify-content: space-between;
+        /* Space between logo and hamburger */
+        align-items: center;
+        /* Center items vertically */
+        padding: 15px;
+        /* Padding around the logo box */
+        background-color: #388e3c;
+        /* Darker green for logo area */
+    }
+
+    .logo img {
+        max-height: 40px;
+        /* Logo size */
+    }
+
+    /* Hamburger Button */
+    .hamburger {
+        background: none;
+        /* No background */
+        border: none;
+        /* No border */
+        color: #ffffff;
+        /* White color for icon */
+        cursor: pointer;
+        /* Pointer cursor */
+        font-size: 24px;
+        /* Icon size */
+    }
+
+    /* Sidebar Menu */
+    .sidebar-menu {
+        list-style: none;
+        /* Remove default list styles */
+        padding: 0;
+        /* Remove padding */
+        margin: 0;
+        /* Remove margin */
+    }
+
+    .sidebar-menu>li {
+        position: relative;
+        /* Position relative for dropdowns */
+    }
+
+    .sidebar-menu>li>a {
+        display: flex;
+        /* Flexbox for alignment */
+        align-items: center;
+        /* Center items vertically */
+        padding: 15px 20px;
+        /* Padding for links */
+        color: #ffffff;
+        /* White text color */
+        text-decoration: none;
+        /* Remove underline */
+        transition: background 0.3s;
+        /* Smooth background transition */
+    }
+
+    .collapsed .sidebar-menu>li>a {
+        justify-content: center;
+        /* Center icons when collapsed */
+    }
+
+    .collapsed .sidebar-menu>li>a span {
+        display: none;
+        /* Hide text when collapsed */
+    }
+
+    .sidebar-menu>li>a:hover {
+        background-color: #388e3c;
+        /* Darker green background on hover */
+    }
+
+    /* Submenu Styles */
+    .treeview-menu {
+        display: none;
+        /* Hide dropdowns by default */
+        list-style: none;
+        /* Remove list styles */
+        padding-left: 20px;
+        /* Indent dropdown items */
+        transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        /* Smooth transition */
+        max-height: 0;
+        /* Start with max-height of 0 */
+        overflow: hidden;
+        /* Hide overflow */
+    }
+
+    .treeview.active .treeview-menu {
+        display: block;
+        /* Show dropdown when active */
+        max-height: 300px;
+        /* Set a max-height for the dropdown */
+        opacity: 1;
+        /* Make it fully visible */
+    }
+
+    .treeview-menu li {
+        background-color: #4caf50;
+        /* Match sidebar background */
+        border-radius: 4px;
+        /* Rounded corners */
+        margin: 5px 0;
+        /* Spacing between items */
+        transition: background 0.3s;
+        /* Smooth background transition */
+        transform: translateY(20px);
+        /* Start from below */
+        opacity: 0;
+        /* Start as invisible */
+        animation: slideIn 0.5s forwards;
+        /* Animation for sliding in */
+    }
+
+    .treeview.active .treeview-menu li {
+        opacity: 1;
+        /* Make it fully visible */
+    }
+
+    .treeview-menu li a {
+        display: flex;
+        /* Flexbox for alignment */
+        align-items: center;
+        /* Center items vertically */
+        padding: 10px 15px;
+        /* Padding for links */
+        color: #ffffff;
+        /* White text color */
+        text-decoration: none;
+        /* Remove underline */
+        border-radius: 4px;
+        /* Rounded corners */
+    }
+
+    .treeview-menu li a:hover {
+        background-color: #388e3c;
+        /* Darker green on hover */
+    }
+
+    .treeview>a .pull-right-container {
+        margin-left: auto;
+        /* Push right icon to the end */
+        transition: transform 0.3s ease;
+        /* Smooth rotation */
+    }
+
+    .treeview.active>a .pull-right-container {
+        transform: rotate(90deg);
+        /* Rotate icon when active */
+    }
+
+    /* Keyframe Animation for Slide In */
+    @keyframes slideIn {
+        0% {
+            transform: translateY(20px);
+            /* Start from below */
+            opacity: 0;
+            /* Start as invisible */
+        }
+
+        100% {
+            transform: translateY(0);
+            /* End at original position */
+            opacity: 1;
+            /* End as visible */
+        }
+    }
+
+    /* Adjust spacing between icons and text */
+    .treeview-menu li a i {
+        margin-right: 10px;
+        /* Space between icon and text */
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .main-sidebar {
+            width: 200px;
+            /* Adjust width for smaller screens */
+        }
+    }

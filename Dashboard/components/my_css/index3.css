@@ -1,0 +1,265 @@
+/* MAIN CONTENT STYLES */
+.main-content {
+  margin-left: 240px;
+  margin-top: 60px;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+  background-color: rgb(202, 241, 226);
+  min-height: calc(100vh - 60px);
+}
+
+.sidebar.collapsed + .nav-container + .main-content {
+  margin-left: 80px;
+}
+
+/* STAFF DASHBOARD STYLES */
+.staff-dashboard {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  padding: 20px 0;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stats-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1;
+  min-width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-top: 4px solid #ffb703;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #4caf50;
+  margin: 10px 0;
+}
+
+.stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.search-filter {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 15px 10px 40px;
+  border: 1px solid #dee2e6;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+}
+
+.search-box i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.filter-dropdown {
+  padding: 10px 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+}
+
+th {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+  padding: 15px;
+  text-align: left;
+  position: sticky;
+  top: 60px;
+}
+
+th:first-child {
+  border-top-left-radius: 8px;
+}
+
+th:last-child {
+  border-top-right-radius: 8px;
+}
+
+td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.department-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 5px;
+}
+
+.pagination button,
+.pagination a {
+  padding: 8px 15px;
+  border: 1px solid #dee2e6;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: #212529;
+}
+
+.pagination button:hover,
+.pagination a:hover {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+
+.pagination .active {
+  background: #4caf50;
+  color: white;
+  border-color: #4caf50;
+}
+
+.pagination .disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE STYLES */
+@media (max-width: 992px) {
+  .sidebar {
+    left: -240px;
+  }
+
+  .sidebar.show {
+    left: 0;
+  }
+
+  .sidebar.collapsed {
+    left: -80px;
+  }
+
+  .sidebar.collapsed.show {
+    left: 0;
+    width: 80px;
+  }
+
+  .nav-container {
+    left: 0;
+    width: 100%;
+  }
+
+  .sidebar.show + .nav-container {
+    left: 240px;
+    width: calc(100% - 240px);
+  }
+
+  .sidebar.collapsed.show + .nav-container {
+    left: 80px;
+    width: calc(100% - 80px);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .sidebar.show + .nav-container + .main-content {
+    margin-left: 240px;
+  }
+
+  .sidebar.collapsed.show + .nav-container + .main-content {
+    margin-left: 80px;
+  }
+
+  .nav-tabs {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-left: 50px;
+  }
+
+  .nav-link {
+    padding: 10px 15px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .stats-container {
+    flex-direction: column;
+  }
+
+  th,
+  td {
+    padding: 10px 8px;
+    font-size: 0.9rem;
+  }
+}

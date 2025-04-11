@@ -1,0 +1,118 @@
+
+/* Content Area */
+.content {
+    margin-left: 250px; /* Same as sidebar width */
+    margin-top: 60px; /* Height of nav */
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px); /* Full height minus nav */
+}
+
+/* Form Styles */
+form {
+    background: #b8f8df;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(14, 13, 13, 0.1);
+    width: 500px;
+    max-width: 100%;
+    text-align: center;
+}
+
+h2 {
+    color: #00796b;
+    text-align: center;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+}
+
+select, input[type="file"], input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s;
+    box-sizing: border-box;
+}
+
+select:focus, input[type="file"]:focus {
+    border-color: #00796b;
+    outline: none;
+}
+
+input[type="submit"] {
+    background-color: #29b6f6;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+input[type="submit"]:hover {
+    background-color: #0288d1;
+}
+
+/* Notification and Error Styles */
+.alert {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: rgb(209, 207, 208);
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    position: relative;
+    text-align: left;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin: -10px 0 15px 0;
+    text-align: left;
+}
+
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 18px;
+    cursor: pointer;
+    color: #721c24;
+    font-weight: bold;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: static;
+        height: auto;
+    }
+    
+    .content {
+        margin-left: 0;
+        padding: 20px;
+    }
+    
+    .nav-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .nav-link {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}

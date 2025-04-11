@@ -1,0 +1,62 @@
+[
+    {
+        "date": "2024-10-29 11:43:51",
+        "teaching": {
+            "outputs": [
+                "1",
+                "1"
+            ],
+            "indicators": [
+                "1",
+                "1"
+            ],
+            "targets": [
+                "1",
+                "1"
+            ]
+        },
+        "research": {
+            "outputs": [
+                "1",
+                "1"
+            ],
+            "indicators": [
+                "1",
+                "1"
+            ],
+            "targets": [
+                "1",
+                "1"
+            ]
+        },
+        "community": {
+            "outputs": [
+                "1",
+                "1"
+            ],
+            "indicators": [
+                "1",
+                "1"
+            ],
+            "targets": [
+                "1",
+                "1"
+            ]
+        },
+        "governance": {
+            "outputs": [
+                "1",
+                "1"
+            ],
+            "indicators": [
+                "1",
+                "1"
+            ],
+            "targets": [
+                "1",
+                "1"
+            ]
+        },
+        "action": "submit"
+    }
+]

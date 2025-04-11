@@ -1,0 +1,26 @@
+[
+    {
+        "professional_body_id": "1",
+        "staff_name": "Byaruhanga Isamel",
+        "body_name": "IEEE",
+        "points": "1"
+    },
+    {
+        "professional_body_id": "2",
+        "staff_name": "Mugabi Praise",
+        "body_name": "ACM",
+        "points": "1"
+    },
+    {
+        "professional_body_id": "3",
+        "staff_name": "Mutungi Felix",
+        "body_name": "ISTE",
+        "points": "1"
+    },
+    {
+        "professional_body_id": "4",
+        "staff_name": "Atwiine Achiever",
+        "body_name": "National Engineers Society",
+        "points": "1"
+    }
+]

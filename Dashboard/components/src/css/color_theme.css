@@ -1,0 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+/*---Warning Button---*/
+.theme-primary .btn-warning {
+  background-color: #fec801;
+  border-color: #fec801;
+  color: #ffffff; }
+  .theme-primary .btn-warning:hover, .theme-primary .btn-warning:active, .theme-primary .btn-warning:focus, .theme-primary .btn-warning.active {
+    background-color: #f0bd01 !important;
+    border-color: #f0bd01 !important;
+    color: #ffffff !important; }
+  .theme-primary .btn-warning:disabled {
+    background-color: #f0bd01;
+    border-color: #f0bd01;
+    opacity: 0.5; }
+  .theme-primary .btn-warning.disabled {
+    background-color: #f0bd01;
+    border-color: #f0bd01;
+    opacity: 0.5; }
+.theme-primary .show > .btn-warning.dropdown-toggle {
+  background-color: #f0bd01 !important;
+  border-color: #f0bd01 !important;
+  color: #ffffff; }
+.theme-primary .btn-outline.btn-warning {
+  color: #fec801;
+  background-color: transparent;
+  border-color: #fec801 !important; }
+  .theme-primary .btn-outline.btn-warning:hover, .theme-primary .btn-outline.btn-warning:active, .theme-primary .btn-outline.btn-warning.active {
+    background-color: #f0bd01 !important;
+    border-color: #f0bd01 !important;
+    color: #ffffff !important; }
+.theme-primary .show > .btn-outline.btn-warning.dropdown-toggle {
+  background-color: #f0bd01 !important;
+  border-color: #f0bd01 !important;
+  color: #ffffff; }
+.theme-primary .btn-flat.btn-warning {
+  color: #fec801 !important;
+  background-color: #f0f3f6;
+  border-color: transparent; }
+  .theme-primary .btn-flat.btn-warning:hover, .theme-primary .btn-flat.btn-warning:active, .theme-primary .btn-flat.btn-warning.active {
+    background-color: #f0bd01 !important;
+    border-color: #f0bd01 !important;
+    color: #ffffff !important; }
+
+/*---Background---*/
+.theme-primary .bg-primary {
+  background-color: #4d7cff !important;
+  color: #ffffff; }
+.theme-primary .bg-primary-light {
+  background-color: #e6f0ff !important;
+  color: #4d7cff !important; }
+  .theme-primary .bg-primary-light h1, .theme-primary .bg-primary-light h2, .theme-primary .bg-primary-light h3, .theme-primary .bg-primary-light h4, .theme-primary .bg-primary-light h5, .theme-primary .bg-primary-light h6 {
+    color: #4d7cff !important; }
+.theme-primary .bg-info {
+  background-color: #733aeb !important;
+  color: #ffffff; }
+.theme-primary .bg-info-light {
+  background-color: #f4efff !important;
+  color: #733aeb !important; }
+  .theme-primary .bg-info-light h1, .theme-primary .bg-info-light h2, .theme-primary .bg-info-light h3, .theme-primary .bg-info-light h4, .theme-primary .bg-info-light h5, .theme-primary .bg-info-light h6 {
+    color: #733aeb !important; }
+.theme-primary .bg-success {
+  background-color: #51ce8a !important;
+  color: #ffffff; }
+.theme-primary .bg-success-light {
+  background-color: #defded !important;
+  color: #51ce8a !important; }
+  .theme-primary .bg-success-light h1, .theme-primary .bg-success-light h2, .theme-primary .bg-success-light h3, .theme-primary .bg-success-light h4, .theme-primary .bg-success-light h5, .theme-primary .bg-success-light h6 {
+    color: #51ce8a !important; }
+.theme-primary .bg-danger {
+  background-color: #f2426d !important;
+  color: #ffffff; }
+.theme-primary .bg-danger-light {
+  background-color: #fcecf1 !important;
+  color: #f2426d !important; }
+  .theme-primary .bg-danger-light h1, .theme-primary .bg-danger-light h2, .theme-primary .bg-danger-light h3, .theme-primary .bg-danger-light h4, .theme-primary .bg-danger-light h5, .theme-primary .bg-danger-light h6 {
+    color: #f2426d !important; }
+.theme-primary .bg-warning {
+  background-color: #fec801 !important;
+  color: #ffffff; }
+.theme-primary .bg-warning-light {
+  background-color: #fef5d4 !important;
+  color: #fec801 !important; }
+  .theme-primary .bg-warning-light h1, .theme-primary .bg-warning-light h2, .theme-primary .bg-warning-light h3, .theme-primary .bg-warning-light h4, .theme-primary .bg-warning-light h5, .theme-primary .bg-warning-light h6 {
+    color: #fec801 !important; }
+
+@media (max-width: 767px) {
+  .theme-warning .wizard-content .wizard > .steps > ul > li:last-child:after {
+    background-color: #fec801; } }
+@media (max-width: 575px) {
+  .theme-warning .wizard-content .wizard > .steps > ul > li.current:after {
+    background-color: #fec801; } }
+

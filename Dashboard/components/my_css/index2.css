@@ -1,0 +1,297 @@
+:root {
+  --primary-color: #48c78e;
+  --secondary-color: #32a87d;
+  --success-color: #48c78e;
+  --warning-color: #f6c23e;
+  --danger-color: #f72585;
+  --dark-color: #212529;
+  --light-color: #f8f9fa;
+  --light-black: #6c757d;
+  /* Define light black color */
+}
+
+/* Body Styling */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: white;
+  /* Set background to white */
+  color: var(--dark-color);
+  margin: 0;
+  padding: 0;
+}
+
+.container-fluid {
+  margin-left: 230px;
+  /* Same as sidebar width */
+  margin-top: 50px;
+  /* Same as navbar height */
+  padding: 10px;
+  transition: margin-left 0.3s ease;
+  min-height: calc(100vh - 60px);
+  /* Full height minus navbar */
+  background-color: #e6e8f4;
+  /* Set container background to white */
+}
+
+.dashboard-header {
+  background: rgb(251, 252, 252);
+  color: black;
+  /* Set heading text color to black */
+  padding: 25px 0;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.dashboard-header h3 {
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 2.2rem;
+  color: black;
+  /* Ensure h3 heading is black */
+}
+
+.stat-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border-left: 4px solid var(--primary-color);
+  height: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.academic {
+  border-left-color: var(--primary-color);
+}
+
+.stat-card.research {
+  border-left-color: var(--success-color);
+}
+
+.stat-card.innovation {
+  border-left-color: rgb(202, 241, 226);
+  /* deeper green */
+}
+
+.stat-card.community {
+  border-left-color: var(--warning-color);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: var(--primary-color);
+}
+
+.stat-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--dark-color);
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: var(--light-black);
+  /* Set subheading text color to light black */
+  margin-bottom: 5px;
+}
+
+.stat-description {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 10px;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.chart-header {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.chart-header h4 {
+  font-weight: 600;
+  color: var(--light-black);
+  /* Set chart subheading color to light black */
+}
+
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-left: 10px;
+  color: rgb(42, 34, 255) !important;
+}
+
+.trend-up {
+  color: #28a745;
+}
+
+.trend-down {
+  color: #dc3545;
+}
+
+.info-box {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.info-box-icon {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+}
+
+.progress {
+  height: 8px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  background-color: var(--warning-color);
+}
+
+.highlight-card {
+  background: rgb(251, 252, 252);
+  color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.highlight-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: rgb(8, 9, 9);
+}
+
+.highlight-label {
+  font-size: 1rem;
+  opacity: 0.9;
+  color: #212529;
+}
+
+.section-divider {
+  margin: 10px 0;
+  text-align: center;
+  position: relative;
+}
+
+.section-divider:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #dee2e6;
+  z-index: -1;
+}
+
+.section-title {
+  display: inline-block;
+
+  padding: 0 20px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: black;
+}
+
+.content-wrapper {
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-header h3 {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+}
+/* Add these media queries at the end of your existing CSS */
+
+@media (max-width: 992px) {
+  .container-fluid {
+    margin-left: 0;
+    /* Remove sidebar space */
+    padding: 10px 15px;
+    /* Adjust padding for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-header h3 {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 15px;
+    /* Reduce padding on cards */
+  }
+
+  .chart-container,
+  .info-box,
+  .highlight-card {
+    padding: 15px;
+    /* Reduce padding on containers */
+  }
+}
+
+@media (max-width: 576px) {
+  .container-fluid {
+    margin-top: 60px;
+    /* Adjust for navbar height on mobile */
+    padding: 10px;
+  }
+
+  .dashboard-header {
+    padding: 15px 0;
+    /* Reduce header padding */
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+    /* Reduce icon size */
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    /* Further reduce stat value size */
+  }
+}

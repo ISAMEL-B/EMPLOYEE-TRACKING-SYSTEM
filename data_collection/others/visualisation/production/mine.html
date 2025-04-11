@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/favicon.ico" type="image/ico" />
+    <title>Community Service Dashboard</title>
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="../build/css/custom.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #343a40;
+            padding-top: 20px;
+            transition: width 0.3s;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+        }
+        .sidebar .nav-link:hover {
+            background-color: #495057;
+        }
+
+        /* Styles for the dropdown menu container */
+        .submenu {
+            background-color: #495057; /* Background color for submenu */
+            padding: 5px 10px; /* Add some padding for spacing */
+            border-radius: 5px; /* Rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+        }
+
+        /* Styles for each dropdown item */
+        .submenu li {
+            margin: 5px 0; /* Space between each item */
+        }
+
+        .submenu li a {
+            color: #ffffff; /* Text color */
+            font-weight: 500;
+            display: block; /* Ensure full clickable area */
+            padding: 8px 12px; /* Add padding around the text */
+            border-radius: 4px; /* Slight rounding for links */
+            text-decoration: none; /* Remove underline */
+            transition: background 0.3s; /* Smooth transition on hover */
+        }
+
+        /* Hover effect for each dropdown item */
+        .submenu li a:hover {
+            background-color: #6c757d; /* Slightly lighter background on hover */
+            color: #ffffff; /* Keep text white */
+        }
+
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        .main-content {
+            margin-left: 250px; /* Adjust based on sidebar width */
+            padding: 20px;
+        }
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .card-title {
+            background-color: #007bff;
+            color: white;
+            margin-top: 0;
+            padding: 10px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+        /* ----budge style------*/
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .badge-image {
+            width: 100px; /* Adjust the size as needed */
+            height: auto;
+            border-radius: 50%; /* Makes it circular if the image is square */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: -10px; /* Adjust position above title */
+        }
+        /* //----budge style------*/
+
+    </style>
+</head>
+<body class="nav-md">
+    <div class="sidebar">
+        <div class="navbar nav_title" style="border: 0;">
+            <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>ScoreCard</span></a>
+        </div>
+        <div class="clearfix"></div>
+        <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+            <div class="menu_section">
+                <h3>General</h3>
+                <ul class="nav side-menu">
+                    <li>
+                        <a href="index.html" class="icon"><i class="fa fa-home"></i> Home</a>
+                    </li>
+                
+                    <!-- First Reports Dropdown -->
+                    <li>
+                        <a href="#reportsDropdown1" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle icon">
+                            <i class="fa fa-chart-bar"></i> Reports <span class="fa fa-chevron-down"></span>
+                        </a>
+                        <ul class="collapse list-unstyled submenu" id="reportsDropdown1">
+                            <li><a href="monthly_reports1.html" class="icon"><i class="fa fa-file"></i> Monthly Reports</a></li>
+                            <li><a href="annual_reports1.html" class="icon"><i class="fa fa-calendar"></i> Annual Reports</a></li>
+                        </ul>
+                    </li>
+                
+                    <!-- Second Reports Dropdown -->
+                    <li>
+                        <a href="#reportsDropdown2" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle icon">
+                            <i class="fa fa-tasks"></i> Financial Reports <span class="fa fa-chevron-down"></span>
+                        </a>
+                        <ul class="collapse list-unstyled submenu" id="reportsDropdown2">
+                            <li><a href="quarterly_reports.html" class="icon"><i class="fa fa-calendar-check"></i> Quarterly Reports</a></li>
+                            <li><a href="annual_financial.html" class="icon"><i class="fa fa-dollar-sign"></i> Annual Financials</a></li>
+                        </ul>
+                    </li>
+                
+                    <!-- Third Reports Dropdown -->
+                    <li>
+                        <a href="#reportsDropdown3" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle icon">
+                            <i class="fa fa-folder-open"></i> Project Reports <span class="fa fa-chevron-down"></span>
+                        </a>
+                        <ul class="collapse list-unstyled submenu" id="reportsDropdown3">
+                            <li><a href="project_status.html" class="icon"><i class="fa fa-tasks"></i> Project Status</a></li>
+                            <li><a href="completion_reports.html" class="icon"><i class="fa fa-check-circle"></i> Completion Reports</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Badge Image -->
+        <div class="badge-container text-center mb-3">
+            <img src="images/mustlogo.png" alt="Badge" class="badge-image">
+        </div>
+
+        <h1 class="text-center my-4">Expert Score - Dashboard</h1>
+
+        <!-- Top Tiles Start -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <span class="count_top"><i class="fa fa-user"></i> Total Employees</span>
+                            <div class="count">2500</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <span class="count_top"><i class="fa fa-clock-o"></i> Average Time</span>
+                            <div class="count">123.50</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <span class="count_top"><i class="fa fa-user"></i> Total Males</span>
+                            <div class="count">2,500</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <span class="count_top"><i class="fa fa-user"></i> Total Females</span>
+                            <div class="count">4,567</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Top Tiles End -->
+
+        <br>
+
+        <!-- Graphs Section Start -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <h2 class="card-title">Community Service Points</h2>
+                        <div class="chart-container">
+                            <canvas id="communityServiceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card">
+                        <h2 class="card-title">Professional Bodies Points</h2>
+                        <div class="chart-container">
+                            <canvas id="professionalBodiesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-4">
+                    <div class="card">
+                        <h2 class="card-title">Staff Services</h2>
+                        <div class="chart-container">
+                            <canvas id="staffServicesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="card">
+                        <h2 class="card-title">Grants</h2>
+                        <div class="chart-container">
+                            <canvas id="grantsGauge"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="grantsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Graphs Section End -->
+
+    <script src="../vendors/jquery/dist/jquery.min.js"></script>
+    <script src="../bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+    <script>
+        Promise.all([
+            fetch('json_data/community_service_data.json').then(res => res.json()),
+            fetch('json_data/grants_data.json').then(res => res.json()),
+            fetch('json_data/service_data.json').then(res => res.json()),
+            fetch('json_data/professional_bodies_data.json').then(res => res.json())
+        ])
+        .then(([communityServiceData, grantsData, serviceData, professionalBodiesData]) => {
+            
+            // --- Community Service Points Chart Start ---
+            const communityServiceCtx = document.getElementById('communityServiceChart').getContext('2d');
+            new Chart(communityServiceCtx, {
+                type: 'bar',
+                data: {
+                    labels: communityServiceData.map(item => item.staff_name),
+                    datasets: [{
+                        label: 'Points',
+                        data: communityServiceData.map(item => parseInt(item.points)),
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    }]
+                }
+            });
+            // --- Community Service Points Chart End ---
+    
+            // --- Grants Chart Start ---
+            const grantsCtx = document.getElementById('grantsChart').getContext('2d');
+            new Chart(grantsCtx, {
+                type: 'bar',
+                data: {
+                    labels: grantsData.map(item => item.staff_name),
+                    datasets: [{
+                        label: 'Grant Amount (UGX)',
+                        data: grantsData.map(item => item.grant_amount),
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    }]
+                }
+            });
+            // --- Grants Chart End ---
+    
+            // --- Staff Services Chart Start ---
+            const serviceCtx = document.getElementById('staffServicesChart').getContext('2d');
+            new Chart(serviceCtx, {
+                type: 'line',
+                data: {
+                    labels: serviceData.map(item => item.staff_name),
+                    datasets: [{
+                        label: 'Service Points',
+                        data: serviceData.map(item => parseInt(item.points)),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                        ]
+                    }]
+                }
+            });
+            // --- Staff Services Chart End ---
+    
+            // --- Grants Gauge Start ---
+            const gaugeCtx = document.getElementById('grantsGauge').getContext('2d');
+            const totalGrants = grantsData.reduce((total, item) => total + item.grant_amount, 0);
+            const goal = 1000000000; // Goal for grants (10 billion)
+            new Chart(gaugeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Current Total', 'Remaining'],
+                    datasets: [{
+                        data: [totalGrants, goal - totalGrants],
+                        backgroundColor: ['#4caf50', '#e0e0e0'],
+                    }]
+                }
+            });
+            // --- Grants Gauge End ---
+    
+            // --- Professional Bodies Points Chart Start ---
+            const professionalBodiesCtx = document.getElementById('professionalBodiesChart').getContext('2d');
+            new Chart(professionalBodiesCtx, {
+                type: 'bar',
+                data: {
+                    labels: professionalBodiesData.map(item => item.staff_name),
+                    datasets: [{
+                        label: 'Points',
+                        data: professionalBodiesData.map(item => parseInt(item.points)),
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    }]
+                }
+            });
+            // --- Professional Bodies Points Chart End ---
+            
+        })
+        .catch(error => console.error('Error fetching JSON data:', error));
+    </script>
+    
+</body>
+</html>

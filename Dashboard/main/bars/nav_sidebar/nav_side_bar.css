@@ -1,0 +1,245 @@
+/* ===== BASE STYLES ===== */
+body {
+  background-color: rgb(202, 241, 226);
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== SIDEBAR STYLES ===== */
+.sidebar {
+  width: 240px;
+  background-color: #4CAF50;
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo-container {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 50%;
+  background-image: url("/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 3px solid white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-title {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.sidebar-menu {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.sidebar-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  color: white;
+  text-decoration: none;
+}
+
+.sidebar-menu li.active a {
+  background-color: #FFEB3B;
+  color: #333;
+  font-weight: bold;
+}
+
+.sidebar-menu li a:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li a i {
+  font-size: 1.2rem;
+  margin-right: 15px;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ===== NAVIGATION BAR STYLES ===== */
+.nav-container {
+  background-color: #2e3192;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 240px;
+  right: 0;
+  height: 60px;
+  transition: left 0.3s ease;
+}
+
+.nav-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+  height: 100%;
+  position: relative;
+}
+
+.hamburger {
+  position: absolute;
+  left: 15px;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1001;
+  display: none;
+}
+
+.nav-link {
+  padding: 10px 20px;
+  margin: 0 5px;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.nav-link.active {
+  background-color: #4CAF50;
+  color: white;
+  border-bottom: 3px solid #FFEB3B;
+  font-weight: bold;
+}
+
+.nav-link:not(.active):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #FFEB3B;
+}
+
+.nav-link[style*="color:red"] {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.nav-link[style*="color:red"]:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+.role-indicator {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== CONTENT AREA ===== */
+.main-content {
+  margin-left: 240px;
+  padding-top: 60px;
+  transition: margin-left 0.3s ease;
+}
+
+/* ===== COLLAPSED STATES ===== */
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebar.collapsed .sidebar-title,
+.sidebar.collapsed .menu-text {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  width: 50px;
+  height: 50px;
+  background-size: 80%;
+}
+
+.sidebar.collapsed + .nav-container,
+.sidebar.collapsed + .nav-container + .main-content {
+  left: 80px;
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+@media (max-width: 992px) {
+  .hamburger {
+    display: block;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .sidebar.collapsed {
+    width: 240px;
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.collapsed.show {
+    transform: translateX(0);
+  }
+  
+  .nav-container {
+    left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+  }
+  
+  .nav-tabs {
+    justify-content: flex-start;
+    padding-left: 50px;
+    overflow-x: auto;
+  }
+  
+  .nav-link {
+    padding: 10px 15px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+}
+
+/* ===== ANIMATIONS ===== */
+.nav-link.active {
+  animation: navLinkPulse 0.5s ease;
+}
+
+@keyframes navLinkPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}

@@ -1,0 +1,11 @@
+staff_id,first_name,last_name,scholar_type,role_name,department_name,years_of_experience,performance_score
+1,John,Aine,Full_Time,Professor,Computer Science,10,85
+2,Akanyoreka,Smith,Part_Time,Associate Professor,Information Technology,5,90
+3,Michael,Johnson,Visiting,Sr Lecturer,Electrical Engineering,3,80
+4,Emily,Davidson,Adjunct,Lecturer,Mechanical Engineerings,15,88
+5,David,Wilson,Full_Time,Assistant Lecturer,Civil Engineering,8,75
+6,Sarah,Connor,Part_Time,Teaching Assistant,Human Resource Management,2,70
+7,Robert,Brown,Visiting,Lecturer,Computer Science,6,82
+8,Alice,Williams,Adjunct,Associate Professor,Information Technology,12,89
+9,James,Anderson,Full_Time,Professor,Electrical Engineering,11,86
+10,Linda,Taylor,Part_Time,Senior Lecturer,Mechanical Engineerings,7,78

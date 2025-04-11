@@ -1,0 +1,345 @@
+/* ============================================= */
+/* MAIN CONTENT AREA STYLING */
+/* ============================================= */
+
+/* Main Content Container */
+.content {
+    margin-left: 240px; /* Matches sidebar width */
+    margin-top: 60px; /* Matches nav bar height */
+    padding: 25px;
+    min-height: calc(100vh - 60px);
+    background-color: rgb(202, 241, 226);
+    transition: margin-left 0.3s ease;
+    z-index: 1;
+    position: relative;
+  }
+  .btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-approve {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-approve:hover {
+    background: #3e8e41;
+}
+
+.btn-reject {
+    background: #f44336;
+    color: white;
+}
+
+.btn-reject:hover {
+    background: #d32f2f;
+}
+
+.btn-view {
+    background: #2196F3;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #0b7dda;
+}
+  
+  /* Adjust when sidebar is collapsed */
+  .sidebar.collapsed ~ .content {
+    margin-left: 80px;
+  }
+  
+  /* Content Cards/Containers */
+  .content-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin-bottom: 25px;
+  }
+  
+  .content-card h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50;
+  }
+  
+  /* Form Styling */
+  .form-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    font-size: 15px;
+    transition: all 0.3s;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+  }
+  
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    text-align: center;
+  }
+  
+  .btn-primary {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3e8e41;
+    transform: translateY(-2px);
+  }
+  
+  .btn-secondary {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #2980b9;
+  }
+  
+  .btn-danger {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Tables */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .data-table th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: 500;
+  }
+  
+  .data-table tr:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+  }
+  
+  /* Alerts & Notifications */
+  .alert {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.5s;
+  }
+  
+  .alert-success {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .alert-info {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .alert-warning {
+    background-color: #f39c12;
+    color: white;
+  }
+  
+  .alert-danger {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .close-btn {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 15px;
+  }
+  
+  /* File Upload Specific */
+  .file-upload-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .file-upload-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px dashed #4CAF50;
+    border-radius: 4px;
+    background-color: rgba(76, 175, 80, 0.05);
+    transition: all 0.3s;
+  }
+  
+  .file-upload-input:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+  }
+  
+  /* Verification Interface Specific */
+  .approval-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+    transition: all 0.3s;
+  }
+  
+  .approval-item:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .approval-info h4 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+  }
+  
+  .approval-info p {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 14px;
+  }
+  
+  /* Filter Controls */
+  .filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filter-controls select,
+  .filter-controls input {
+    padding: 10px 15px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    min-width: 200px;
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .empty-state i {
+    font-size: 50px;
+    color: #bdc3c7;
+    margin-bottom: 15px;
+  }
+  
+  .empty-state h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+  
+  .empty-state p {
+    color: #7f8c8d;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .content {
+      margin-left: 0;
+      padding: 15px;
+    }
+    
+    .sidebar.show ~ .content {
+      margin-left: 240px;
+    }
+    
+    .sidebar.collapsed.show ~ .content {
+      margin-left: 80px;
+    }
+    
+    .form-container {
+      padding: 15px;
+    }
+    
+    .filter-controls {
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .filter-controls select,
+    .filter-controls input {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .approval-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .approval-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }

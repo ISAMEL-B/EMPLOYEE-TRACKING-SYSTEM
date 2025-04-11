@@ -1,0 +1,26 @@
+[
+    {
+        "supervision_id": 1,
+        "staff_id": "Byaruhanga Isamel",
+        "student_level": "PhD",
+        "points": 6
+    },
+    {
+        "supervision_id": 2,
+        "staff_id": "Mugabi Praise",
+        "student_level": "Masters",
+        "points": 2
+    },
+    {
+        "supervision_id": 3,
+        "staff_id": "Mutungi Felix",
+        "student_level": "PhD",
+        "points": 6
+    },
+    {
+        "supervision_id": 4,
+        "staff_id": "Atwiine Achiever",
+        "student_level": "Masters",
+        "points": 2
+    }
+]
