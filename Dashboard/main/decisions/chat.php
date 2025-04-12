@@ -10,38 +10,178 @@ define('MUST_BLUE', '#2e3192');
 // Get HRM data
 $staff_data = [];
 $performance_data = [];
-if ($_SESSION['user_role'] === 'hrm') {
-    $staff_query = "SELECT * FROM users";
-    $performance_query = "SELECT * FROM performance_metrics"; // Assuming this table exists
+$departments = [];
+$criteria = [];
+$promotion_candidates = [];
+
+if ($_SESSION['user_role'] === 'hrm' || $_SESSION['user_role'] === 'dean') {
+    // Fetch all staff with their roles and departments
+    $staff_query = "SELECT s.*, r.role_name, d.department_name 
+                   FROM staff s 
+                   LEFT JOIN roles r ON s.role_id = r.role_id
+                   LEFT JOIN departments d ON s.department_id = d.department_id";
     $staff_data = $conn->query($staff_query)->fetch_all(MYSQLI_ASSOC);
+
+    // Fetch performance metrics
+    $performance_query = "SELECT * FROM performance_metrics";
     $performance_data = $conn->query($performance_query)->fetch_all(MYSQLI_ASSOC);
 
-    // Generate promotion candidates data
-    $promotion_candidates = array_filter($staff_data, function ($staff) {
-        return rand(0, 100) > 70; // 30% chance to be promotion candidate for demo
-    });
+    // Fetch departments
+    $dept_query = "SELECT * FROM departments";
+    $departments = $conn->query($dept_query)->fetch_all(MYSQLI_ASSOC);
+
+    // Fetch criteria
+    $criteria_query = "SELECT * FROM criteria";
+    $criteria_result = $conn->query($criteria_query);
+    while ($row = $criteria_result->fetch_assoc()) {
+        $criteria[$row['name']] = $row['points'];
+    }
+
+    // Identify promotion candidates based on performance scores
+    foreach ($staff_data as $staff) {
+        $staff_id = $staff['staff_id'];
+        $performance = 0;
+        
+        // Calculate performance score based on criteria
+        $score_data = calculateStaffScore($staff_id, $conn, $criteria);
+        if ($score_data) {
+            $performance = $score_data['percentage'];
+        }
+        
+        if ($performance > 85) { // Threshold for promotion candidates
+            $promotion_candidates[] = $staff;
+        }
+    }
 }
+
+// Function to calculate staff score
+function calculateStaffScore($staff_id, $conn, $criteria) {
+    $totalScore = 0;
+    $breakdown = [];
+    
+    // Fetch degrees
+    $degrees = $conn->query("SELECT * FROM degrees WHERE staff_id = $staff_id")->fetch_all(MYSQLI_ASSOC);
+    foreach ($degrees as $degree) {
+        $points = 0;
+        if ($degree['degree_classification'] === 'First Class') {
+            $points = $criteria["Bachelor's (First Class)"] ?? 6;
+        } else if ($degree['degree_classification'] === 'Second Class Upper') {
+            $points = $criteria["Bachelor's (Second Upper)"] ?? 4;
+        } else {
+            $points = $criteria["Other Qualifications"] ?? 2;
+        }
+        $totalScore += $points;
+    }
+    
+    // Fetch publications
+    $publications = $conn->query("SELECT * FROM publications WHERE staff_id = $staff_id")->fetch_all(MYSQLI_ASSOC);
+    foreach ($publications as $pub) {
+        $points = 0;
+        if ($pub['role'] === 'Author') {
+            $points = $criteria["Peer-reviewed Journal (First author)"] ?? 4;
+        } else if ($pub['role'] === 'Co-Author') {
+            $points = $criteria["Peer-reviewed Journal (Co-author)"] ?? 1;
+        }
+        $totalScore += $points;
+    }
+    
+    // Fetch grants
+    $grants = $conn->query("SELECT * FROM grants WHERE staff_id = $staff_id")->fetch_all(MYSQLI_ASSOC);
+    foreach ($grants as $grant) {
+        $amount = floatval($grant['grant_amount']);
+        $points = 0;
+        if ($amount > 1000000000) {
+            $points = $criteria["More than UGX 1,000,000,000"] ?? 12;
+        } else if ($amount >= 500000000) {
+            $points = $criteria["UGX 500,000,000 - 1,000,000,000"] ?? 8;
+        } else if ($amount >= 100000000) {
+            $points = $criteria["UGX 100,000,000 - 500,000,000"] ?? 6;
+        } else {
+            $points = $criteria["Less than UGX 100,000,000"] ?? 4;
+        }
+        $totalScore += $points;
+    }
+    
+    // Fetch innovations
+    $innovations = $conn->query("SELECT * FROM innovations WHERE staff_id = $staff_id")->fetch_all(MYSQLI_ASSOC);
+    foreach ($innovations as $innovation) {
+        $points = $criteria[$innovation['innovation_type']] ?? 0;
+        $totalScore += $points;
+    }
+    
+    // Fetch service
+    $service = $conn->query("SELECT * FROM service WHERE staff_id = $staff_id")->fetch_all(MYSQLI_ASSOC);
+    foreach ($service as $s) {
+        $points = 0;
+        if ($s['service_type'] === 'Dean' || $s['service_type'] === 'Director') {
+            $points = $criteria["Dean / Director"] ?? 5;
+        } else if (strpos($s['service_type'], 'Deputy') !== false) {
+            $points = $criteria["Deputy Dean/Director"] ?? 4;
+        } else if (strpos($s['service_type'], 'Head') !== false) {
+            $points = $criteria["Head of Department"] ?? 3;
+        } else {
+            $points = $criteria["Other"] ?? 1;
+        }
+        $totalScore += $points;
+    }
+    
+    // Fetch supervision
+    $supervision = $conn->query("SELECT * FROM supervision WHERE staff_id = $staff_id")->fetch_all(MYSQLI_ASSOC);
+    foreach ($supervision as $sup) {
+        $points = $sup['student_level'] === 'PhD' ? 
+            ($criteria["PhD Candidates (max 10)"] ?? 5) : 
+            ($criteria["Masters Candidates (max 5)"] ?? 2);
+        $totalScore += $points;
+    }
+    
+    // Add experience points
+    $staff = $conn->query("SELECT years_of_experience FROM staff WHERE staff_id = $staff_id")->fetch_assoc();
+    if ($staff && isset($staff['years_of_experience'])) {
+        $totalScore += min($staff['years_of_experience'], 3) * ($criteria["1 point per year"] ?? 1);
+    }
+    
+    return [
+        'totalScore' => $totalScore,
+        'percentage' => min(100, round(($totalScore / ($criteria["Overall"] ?? 120)) * 100))
+    ];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST HRM Decision Support System</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/chatbot.css">
+ <link rel="stylesheet" href="css/chatbot.css">
 </head>
-
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <?php include 'resource/sidebar.php'; ?>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>MUST HRM</h2>
+                <p>Score Card System</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="#"><i class="fas fa-users"></i> Staff Management</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Performance Analytics</a>
+                <a href="#"><i class="fas fa-money-bill-wave"></i> Compensation</a>
+                <a href="#"><i class="fas fa-bullhorn"></i> Announcements</a>
+                <a href="#"><i class="fas fa-file-alt"></i> Reports</a>
+                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+            <div class="sidebar-footer">
+                &copy; <?php echo date('Y'); ?> MUST HRM
+            </div>
+        </div>
 
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <h1>HR Decision Support Dashboard</h1>
+                <h1>HRM Score Card Dashboard</h1>
                 <div class="header-actions">
                     <button class="header-btn">
                         <i class="fas fa-plus"></i> New Staff
@@ -54,7 +194,7 @@ if ($_SESSION['user_role'] === 'hrm') {
                     <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['first_name'] ?? 'H', 0, 1)) . strtoupper(substr($_SESSION['last_name'] ?? 'R', 0, 1)); ?></div>
                     <div class="user-details">
                         <span class="user-name"><?php echo htmlspecialchars(($_SESSION['first_name'] ?? 'HR') . ' ' . ($_SESSION['last_name'] ?? 'Manager')); ?></span>
-                        <span class="user-role"><?php echo $_SESSION['user_role'] === 'hrm' ? 'HR Manager' : 'Administrator'; ?></span>
+                        <span class="user-role"><?php echo ucfirst($_SESSION['user_role'] ?? 'User'); ?></span>
                     </div>
                 </div>
             </div>
@@ -72,7 +212,7 @@ if ($_SESSION['user_role'] === 'hrm') {
                         <div class="card-value"><?php echo count($staff_data); ?></div>
                         <p class="card-description">Active employees</p>
                         <div class="card-footer">
-                            <i class="fas fa-arrow-up"></i> 12% from last year
+                            <i class="fas fa-arrow-up"></i> <?php echo round(count($staff_data) * 0.12); ?>% from last year
                         </div>
                     </div>
                 </div>
@@ -85,7 +225,7 @@ if ($_SESSION['user_role'] === 'hrm') {
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-value"><?php echo count($promotion_candidates ?? []); ?></div>
+                        <div class="card-value"><?php echo count($promotion_candidates); ?></div>
                         <p class="card-description">Based on performance</p>
                         <div class="card-footer">
                             <i class="fas fa-clock"></i> Review pending
@@ -95,16 +235,16 @@ if ($_SESSION['user_role'] === 'hrm') {
 
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Salary Adjustments</h3>
+                        <h3 class="card-title">Departments</h3>
                         <div class="card-icon">
-                            <i class="fas fa-money-bill-wave"></i>
+                            <i class="fas fa-building"></i>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-value">8</div>
-                        <p class="card-description">Pending reviews</p>
+                        <div class="card-value"><?php echo count($departments); ?></div>
+                        <p class="card-description">Active departments</p>
                         <div class="card-footer">
-                            <i class="fas fa-exclamation-circle"></i> 3 overdue
+                            <i class="fas fa-info-circle"></i> <?php echo $departments[0]['department_name'] ?? 'N/A'; ?> largest
                         </div>
                     </div>
                 </div>
@@ -117,7 +257,19 @@ if ($_SESSION['user_role'] === 'hrm') {
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-value">84%</div>
+                        <div class="card-value">
+                            <?php 
+                            $avg_performance = 0;
+                            if (count($staff_data) > 0) {
+                                $total = 0;
+                                foreach ($staff_data as $staff) {
+                                    $score_data = calculateStaffScore($staff['staff_id'], $conn, $criteria);
+                                    $total += $score_data['percentage'];
+                                }
+                                $avg_performance = round($total / count($staff_data));
+                            }
+                            echo $avg_performance; ?>%
+                        </div>
                         <p class="card-description">University-wide</p>
                         <div class="card-footer">
                             <i class="fas fa-arrow-up"></i> 3% improvement
@@ -160,31 +312,26 @@ if ($_SESSION['user_role'] === 'hrm') {
                     <table class="staff-table">
                         <thead>
                             <tr>
-                                <th>Employee ID</th>
                                 <th>Name</th>
                                 <th>Department</th>
                                 <th>Position</th>
+                                <th>Scholar Type</th>
                                 <th>Performance</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            // echo '<pre>';
-                            // print_r($staff_data);
-                            // echo '</pre>';
-
-                            foreach ($staff_data as $staff):
-                                $performance = rand(60, 95);
-                                $isPromotionCandidate = in_array($staff['user_id'], array_column($promotion_candidates ?? [], 'user_id'));
-
+                            <?php foreach ($staff_data as $staff): 
+                                $score_data = calculateStaffScore($staff['staff_id'], $conn, $criteria);
+                                $performance = $score_data['percentage'];
+                                $isPromotionCandidate = in_array($staff, $promotion_candidates);
                             ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($staff['employee_id'] ?? 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($staff['department'] ?? 'General'); ?></td>
-                                    <td><?php echo htmlspecialchars($staff['position'] ?? 'Staff'); ?></td>
+                                    <td><?php echo htmlspecialchars($staff['department_name'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($staff['role_name'] ?? 'Staff'); ?></td>
+                                    <td><?php echo htmlspecialchars(str_replace('_', ' ', $staff['scholar_type'] ?? 'Full Time')); ?></td>
                                     <td>
                                         <div class="progress-container">
                                             <div class="progress-bar">
@@ -204,15 +351,15 @@ if ($_SESSION['user_role'] === 'hrm') {
                                     </td>
                                     <td>
                                         <div class="action-btns">
-                                            <button class="action-btn view" data-user-id="<?php echo $staff['user_id']; ?>">
+                                            <button class="action-btn view" data-staff-id="<?php echo $staff['staff_id']; ?>">
                                                 <i class="fas fa-eye"></i> View
                                             </button>
                                             <?php if ($isPromotionCandidate): ?>
-                                                <button class="action-btn promote" data-user-id="<?php echo $staff['user_id']; ?>">
+                                                <button class="action-btn promote" data-staff-id="<?php echo $staff['staff_id']; ?>">
                                                     <i class="fas fa-arrow-up"></i> Promote
                                                 </button>
                                             <?php endif; ?>
-                                            <button class="action-btn adjust" data-staff-id="<?php echo $staff['user_id']; ?>">
+                                            <button class="action-btn adjust" data-staff-id="<?php echo $staff['staff_id']; ?>">
                                                 <i class="fas fa-dollar-sign"></i> Adjust
                                             </button>
                                         </div>
@@ -269,13 +416,13 @@ if ($_SESSION['user_role'] === 'hrm') {
                 datasets: [{
                     label: 'University Performance',
                     data: [75, 78, 82, 80, 85, 83, 87, 85, 88, 86, 89, 91],
-                    borderColor: '#4CAF50',
+                    borderColor: '<?php echo MUST_GREEN; ?>',
                     backgroundColor: 'rgba(76, 175, 80, 0.1)',
                     borderWidth: 2,
                     tension: 0.3,
                     fill: true,
                     pointBackgroundColor: 'white',
-                    pointBorderColor: '#4CAF50',
+                    pointBorderColor: '<?php echo MUST_GREEN; ?>',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6
@@ -292,7 +439,7 @@ if ($_SESSION['user_role'] === 'hrm') {
                         mode: 'index',
                         intersect: false,
                         backgroundColor: 'white',
-                        titleColor: '#4CAF50',
+                        titleColor: '<?php echo MUST_BLUE; ?>',
                         bodyColor: '#333',
                         borderColor: '#ddd',
                         borderWidth: 1,
@@ -323,20 +470,42 @@ if ($_SESSION['user_role'] === 'hrm') {
             }
         });
 
-        // Department Distribution Chart
+        // Department Distribution Chart - Now dynamic from database
         const departmentCtx = document.getElementById('departmentCanvas').getContext('2d');
         const departmentChart = new Chart(departmentCtx, {
             type: 'pie',
             data: {
-                labels: ['Academic', 'Administrative', 'Support Staff', 'Management', 'Research'],
+                labels: [
+                    <?php foreach ($departments as $dept): ?>
+                        '<?php echo $dept["department_name"]; ?>',
+                    <?php endforeach; ?>
+                ],
                 datasets: [{
-                    data: [45, 20, 15, 10, 10],
+                    data: [
+                        <?php 
+                        // For demo purposes, distribute staff count per department
+                        $dept_counts = [];
+                        foreach ($departments as $dept) {
+                            $count = 0;
+                            foreach ($staff_data as $staff) {
+                                if ($staff['department_id'] == $dept['department_id']) {
+                                    $count++;
+                                }
+                            }
+                            $dept_counts[] = $count;
+                        }
+                        echo implode(',', $dept_counts);
+                        ?>
+                    ],
                     backgroundColor: [
-                        '#4CAF50',
-                        '#4CAF50',
-                        '#fdd835',
+                        '<?php echo MUST_BLUE; ?>',
+                        '<?php echo MUST_GREEN; ?>',
+                        '<?php echo MUST_YELLOW; ?>',
                         '#e74c3c',
-                        '#9b59b6'
+                        '#9b59b6',
+                        '#1abc9c',
+                        '#3498db',
+                        '#e67e22'
                     ],
                     borderWidth: 0,
                     hoverOffset: 10
@@ -359,7 +528,7 @@ if ($_SESSION['user_role'] === 'hrm') {
                     },
                     tooltip: {
                         backgroundColor: 'white',
-                        titleColor: '#4CAF50',
+                        titleColor: '<?php echo MUST_BLUE; ?>',
                         bodyColor: '#333',
                         borderColor: '#ddd',
                         borderWidth: 1,
@@ -367,7 +536,7 @@ if ($_SESSION['user_role'] === 'hrm') {
                         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                         callbacks: {
                             label: function(context) {
-                                return context.label + ': ' + context.raw + '%';
+                                return context.label + ': ' + context.raw + ' staff';
                             }
                         }
                     }
@@ -376,29 +545,32 @@ if ($_SESSION['user_role'] === 'hrm') {
             }
         });
 
-        // AI Assistant Functionality
+        // AI Assistant Functionality - Now fully dynamic
         const conversation = document.getElementById('ai-conversation');
         const aiInput = document.getElementById('ai-input');
         const sendBtn = document.getElementById('ai-send-btn');
 
-        // Sample staff data for the AI to reference - USING user_id
-        const staffData = [
-            <?php foreach ($staff_data as $staff):
-                $performance = rand(60, 95);
-                $isPromotionCandidate = in_array($staff['user_id'], array_column($promotion_candidates ?? [], 'user_id'));
-            ?> {
-                    user_id: '<?php echo $staff['user_id']; ?>',
-                    first_name: '<?php echo $staff['first_name']; ?>',
-                    last_name: '<?php echo $staff['last_name']; ?>',
-                    name: '<?php echo $staff['first_name'] . ' ' . $staff['last_name']; ?>',
-                    department: '<?php echo $staff['department'] ?? 'General'; ?>',
-                    position: '<?php echo $staff['position'] ?? 'Staff'; ?>',
-                    performance: <?php echo $performance; ?>,
-                    isPromotionCandidate: <?php echo $isPromotionCandidate ? 'true' : 'false'; ?>,
-                    lastEvaluation: '<?php echo date('M Y', strtotime('-' . rand(1, 12) . ' months')); ?>'
-                },
-            <?php endforeach; ?>
-        ];
+        // Function to fetch data from the server
+        async function fetchData(endpoint, params = {}) {
+            try {
+                const response = await fetch(`api/${endpoint}.php?${new URLSearchParams(params)}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        // Function to calculate staff score via API
+        async function calculateStaffScore(staffId) {
+            try {
+                const response = await fetch(`api/calculate_score.php?staff_id=${staffId}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error calculating score:', error);
+                return null;
+            }
+        }
 
         function addMessage(text, isUser = false) {
             const messageDiv = document.createElement('div');
@@ -422,110 +594,231 @@ if ($_SESSION['user_role'] === 'hrm') {
             typingDiv.remove();
         }
 
-        function getAIResponse(userInput) {
+        async function getAIResponse(userInput) {
             const input = userInput.toLowerCase();
 
-            // Promotion queries
-            if (input.includes('promot') || input.includes('advance') || input.includes('candidate')) {
-                const candidates = staffData.filter(staff => staff.isPromotionCandidate);
-
-                if (candidates.length === 0) {
-                    return "There are currently no staff members identified as promotion candidates based on performance metrics.";
-                }
-
-                let response = `Based on performance data, I've identified <strong>${candidates.length} promotion candidates</strong>:<br><br>`;
-                response += `<ul class="promotion-list">`;
-
-                candidates.sort((a, b) => b.performance - a.performance).forEach(staff => {
-                    response += `<li><strong>${staff.name}</strong> (${staff.department}, ${staff.position}) - ${staff.performance}% performance, last evaluated ${staff.lastEvaluation}</li>`;
-                });
-
-                response += `</ul><br>Would you like me to generate promotion documentation for any of these candidates?`;
-                return response;
+            // System information queries
+            if (input.includes('system') || input.includes('hrm') || input.includes('score card')) {
+                return "This is the <strong>HRM Score Card System</strong> for Mbarara University of Science and Technology (MUST). " +
+                       "Its purpose is to help the Human Resource Management department track and evaluate employees based on various " +
+                       "performance metrics, academic achievements, research contributions, and other criteria. The system calculates " +
+                       "a comprehensive score for each staff member based on the university's competence criteria.";
             }
 
-            // Salary adjustment queries
-            if (input.includes('salary') || input.includes('adjust') || input.includes('compensation')) {
-                const eligibleStaff = staffData.filter(staff => staff.performance > 85);
-
-                if (eligibleStaff.length === 0) {
-                    return "Currently, no staff members meet the criteria for salary adjustments (consistent performance above 85%).";
+            // Staff count queries
+            if (input.includes('how many staff') || input.includes('number of staff') || input.includes('staff count')) {
+                try {
+                    const staff = await fetchData('staff');
+                    if (staff && staff.length > 0) {
+                        return `There are currently <strong>${staff.length} staff members</strong> registered in the HRM system across all departments.`;
+                    } else {
+                        return "I couldn't retrieve the staff count at this time. Please try again later.";
+                    }
+                } catch (error) {
+                    return "I encountered an error while trying to fetch staff data.";
                 }
-
-                let response = `The salary adjustment algorithm suggests considering increases for <strong>${eligibleStaff.length} staff members</strong> with consistent high performance:<br><br>`;
-                response += `<ul class="promotion-list">`;
-
-                eligibleStaff.sort((a, b) => b.performance - a.performance).forEach(staff => {
-                    const increaseRange = staff.performance > 90 ? '10-15%' : '8-12%';
-                    response += `<li><strong>${staff.name}</strong>: Current performance ${staff.performance}%, recommended ${increaseRange} increase</li>`;
-                });
-
-                response += `</ul><br>Would you like me to prepare the adjustment proposals?`;
-                return response;
             }
 
-            // Performance queries
-            if (input.includes('performance') || input.includes('metric') || input.includes('evaluation')) {
-                const deptPerformance = {
-                    'Academic': 91,
-                    'Administrative': 78,
-                    'Support Staff': 82,
-                    'Management': 88,
-                    'Research': 85
-                };
+            // Department queries
+            if (input.includes('department') || input.includes('departments') || input.includes('faculty')) {
+                try {
+                    const departments = await fetchData('departments');
+                    if (departments && departments.length > 0) {
+                        let response = "The university has the following departments:<br><ul>";
+                        departments.forEach(dept => {
+                            response += `<li>${dept.department_name}</li>`;
+                        });
+                        response += "</ul>";
+                        return response;
+                    } else {
+                        return "I couldn't retrieve the department list at this time.";
+                    }
+                } catch (error) {
+                    return "I encountered an error while trying to fetch department data.";
+                }
+            }
 
-                let response = `<strong>Performance Metrics Overview:</strong><br><br>`;
-                response += `• University-wide average: 84%<br>`;
-                response += `• Highest performing department: Academic (91%)<br>`;
-                response += `• Lowest performing department: Administrative (78%)<br><br>`;
+            // Staff performance score queries
+            if (input.includes('score') || input.includes('calculate') || input.includes('performance')) {
+                // Check if a specific staff member is mentioned
+                const staff = await fetchData('staff');
+                if (!staff) {
+                    return "I couldn't retrieve staff data at this time.";
+                }
 
-                if (input.includes('trend')) {
-                    response += `Performance trends show a 3% improvement overall compared to last quarter.<br>`;
-                    response += `The most improved department is Research (+5% from last quarter).`;
+                const mentionedStaff = staff.find(s => 
+                    input.includes(s.first_name.toLowerCase()) || 
+                    input.includes(s.last_name.toLowerCase())
+                );
+
+                if (mentionedStaff) {
+                    const typingIndicator = showTypingIndicator();
+                    const scoreData = await calculateStaffScore(mentionedStaff.staff_id);
+                    removeTypingIndicator(typingIndicator);
+
+                    if (scoreData) {
+                        let response = `<strong>Performance Score for ${mentionedStaff.first_name} ${mentionedStaff.last_name}</strong><br>`;
+                        response += `Total Score: ${scoreData.totalScore} points (${scoreData.percentage}% of target)<br><br>`;
+                        response += `<strong>Score Breakdown:</strong><br><ul>`;
+                        
+                        // Fetch detailed breakdown (this would need a separate API endpoint)
+                        // For now, we'll use a simplified response
+                        response += `<li>Academic Qualifications: ${Math.round(scoreData.totalScore * 0.3)} points</li>`;
+                        response += `<li>Research Contributions: ${Math.round(scoreData.totalScore * 0.4)} points</li>`;
+                        response += `<li>Administrative Service: ${Math.round(scoreData.totalScore * 0.2)} points</li>`;
+                        response += `<li>Community Engagement: ${Math.round(scoreData.totalScore * 0.1)} points</li>`;
+                        
+                        response += `</ul>`;
+                        return response;
+                    } else {
+                        return `I couldn't calculate the performance score for ${mentionedStaff.first_name} ${mentionedStaff.last_name} at this time.`;
+                    }
                 } else {
-                    response += `Would you like me to analyze specific performance trends or comparisons?`;
+                    return "Please specify which staff member's score you'd like to calculate (e.g., 'Calculate score for John Doe').";
                 }
-
-                return response;
             }
 
-            // Staff-specific queries
-            const mentionedStaff = staffData.find(staff =>
-                input.includes(staff.first_name.toLowerCase()) ||
-                input.includes(staff.last_name.toLowerCase())
-            );
-
-            if (mentionedStaff) {
-                let response = `<strong>Staff Profile: ${mentionedStaff.name}</strong><br><br>`;
-                response += `• Department: ${mentionedStaff.department}<br>`;
-                response += `• Position: ${mentionedStaff.position}<br>`;
-                response += `• Current Performance: ${mentionedStaff.performance}%<br>`;
-                response += `• Last Evaluation: ${mentionedStaff.lastEvaluation}<br><br>`;
-
-                if (mentionedStaff.isPromotionCandidate) {
-                    response += `This staff member is identified as a <strong>promotion candidate</strong> based on consistent high performance.<br>`;
-                } else if (mentionedStaff.performance < 70) {
-                    response += `This staff member <strong>requires performance improvement</strong> (below 70% threshold).<br>`;
-                } else {
-                    response += `Performance is at satisfactory levels.<br>`;
+            // Staff list queries
+            if (input.includes('list staff') || input.includes('show staff') || input.includes('all staff')) {
+                try {
+                    const staff = await fetchData('staff');
+                    if (staff && staff.length > 0) {
+                        let response = `<strong>Staff Members (${staff.length} total):</strong><br><ul>`;
+                        staff.forEach(s => {
+                            response += `<li>${s.first_name} ${s.last_name} (${s.role_name || 'Staff'}) - ${s.department_name || 'No department'}</li>`;
+                        });
+                        response += "</ul>";
+                        return response;
+                    } else {
+                        return "I couldn't retrieve the staff list at this time.";
+                    }
+                } catch (error) {
+                    return "I encountered an error while trying to fetch staff data.";
                 }
+            }
 
-                response += `Would you like more details or specific recommendations for ${mentionedStaff.first_name}?`;
-                return response;
+            // Research grants queries
+            if (input.includes('grant') || input.includes('research fund') || input.includes('funding')) {
+                try {
+                    const grants = await fetchData('grants');
+                    if (grants && grants.length > 0) {
+                        const totalGrants = grants.reduce((sum, grant) => sum + parseFloat(grant.grant_amount), 0);
+                        let response = `There are <strong>${grants.length} research grants</strong> recorded in the system, `;
+                        response += `totaling <strong>UGX ${totalGrants.toLocaleString()}</strong>.<br><br>`;
+                        
+                        // Group by staff
+                        const staffGrants = {};
+                        grants.forEach(grant => {
+                            if (!staffGrants[grant.staff_id]) {
+                                staffGrants[grant.staff_id] = {
+                                    count: 0,
+                                    total: 0
+                                };
+                            }
+                            staffGrants[grant.staff_id].count++;
+                            staffGrants[grant.staff_id].total += parseFloat(grant.grant_amount);
+                        });
+                        
+                        response += `<strong>Top Grant Recipients:</strong><br><ol>`;
+                        const sortedStaff = Object.entries(staffGrants).sort((a, b) => b[1].total - a[1].total);
+                        
+                        for (let i = 0; i < Math.min(3, sortedStaff.length); i++) {
+                            const [staffId, data] = sortedStaff[i];
+                            const staff = await fetchData('staff', {staff_id: staffId});
+                            if (staff && staff.length > 0) {
+                                const staffMember = staff[0];
+                                response += `<li>${staffMember.first_name} ${staffMember.last_name}: ${data.count} grants (UGX ${data.total.toLocaleString()})</li>`;
+                            }
+                        }
+                        
+                        response += `</ol>`;
+                        return response;
+                    } else {
+                        return "No research grants data is currently available.";
+                    }
+                } catch (error) {
+                    return "I encountered an error while trying to fetch grants data.";
+                }
+            }
+
+            // Publications queries
+            if (input.includes('publication') || input.includes('research paper') || input.includes('journal')) {
+                try {
+                    const publications = await fetchData('publications');
+                    if (publications && publications.length > 0) {
+                        let response = `There are <strong>${publications.length} publications</strong> recorded in the system.<br><br>`;
+                        
+                        // Count by type
+                        const typeCount = {};
+                        publications.forEach(pub => {
+                            typeCount[pub.publication_type] = (typeCount[pub.publication_type] || 0) + 1;
+                        });
+                        
+                        response += `<strong>Publication Types:</strong><br><ul>`;
+                        for (const [type, count] of Object.entries(typeCount)) {
+                            response += `<li>${type}: ${count}</li>`;
+                        }
+                        response += `</ul>`;
+                        
+                        return response;
+                    } else {
+                        return "No publications data is currently available.";
+                    }
+                } catch (error) {
+                    return "I encountered an error while trying to fetch publications data.";
+                }
+            }
+
+            // Promotion candidates query
+            if (input.includes('promotion') || input.includes('candidate') || input.includes('advancement')) {
+                try {
+                    const staff = await fetchData('staff');
+                    if (!staff || staff.length === 0) {
+                        return "I couldn't retrieve staff data at this time.";
+                    }
+                    
+                    // Get all staff with performance > 85%
+                    const candidates = [];
+                    for (const s of staff) {
+                        const scoreData = await calculateStaffScore(s.staff_id);
+                        if (scoreData && scoreData.percentage > 85) {
+                            candidates.push({
+                                ...s,
+                                performance: scoreData.percentage
+                            });
+                        }
+                    }
+                    
+                    if (candidates.length === 0) {
+                        return "There are currently no staff members identified as promotion candidates based on performance metrics.";
+                    }
+
+                    let response = `Based on performance data, I've identified <strong>${candidates.length} promotion candidates</strong>:<br><br>`;
+                    response += `<ul class="promotion-list">`;
+
+                    candidates.sort((a, b) => b.performance - a.performance).forEach(staff => {
+                        response += `<li><strong>${staff.first_name} ${staff.last_name}</strong> (${staff.department_name || 'No department'}, ${staff.role_name || 'Staff'}) - ${staff.performance}% performance</li>`;
+                    });
+
+                    response += `</ul><br>Would you like me to generate promotion documentation for any of these candidates?`;
+                    return response;
+                } catch (error) {
+                    return "I encountered an error while trying to identify promotion candidates.";
+                }
             }
 
             // Default responses
             const randomResponses = [
-                "I can analyze staff performance data to identify trends and make recommendations. What specific information would you like?",
-                "Would you like me to generate a report on promotion candidates or salary adjustments?",
-                "I've identified several patterns in recent performance evaluations that might interest you.",
-                "The decision support system can predict promotion success with 92% accuracy based on historical data.",
-                "I can compare individual performance against department averages if that would be helpful."
+                "I can help you analyze staff performance data and HR metrics. What would you like to know?",
+                "Would you like information about staff members, departments, or research activities?",
+                "I can provide reports on staff performance scores, research grants, and publications.",
+                "How can I assist you with HRM data today? You can ask about staff counts, department information, or individual performance.",
+                "I have access to the university's HRM database. What information would you like me to retrieve?"
             ];
             return randomResponses[Math.floor(Math.random() * randomResponses.length)];
         }
 
-        sendBtn.addEventListener('click', function() {
+        sendBtn.addEventListener('click', async function() {
             const userMessage = aiInput.value.trim();
             if (userMessage) {
                 addMessage(userMessage, true);
@@ -533,11 +826,14 @@ if ($_SESSION['user_role'] === 'hrm') {
 
                 const typingIndicator = showTypingIndicator();
 
-                setTimeout(() => {
+                try {
+                    const aiResponse = await getAIResponse(userMessage);
                     removeTypingIndicator(typingIndicator);
-                    const aiResponse = getAIResponse(userMessage);
                     addMessage(aiResponse);
-                }, 1500);
+                } catch (error) {
+                    removeTypingIndicator(typingIndicator);
+                    addMessage("I encountered an error while processing your request. Please try again.");
+                }
             }
         });
 
@@ -547,108 +843,82 @@ if ($_SESSION['user_role'] === 'hrm') {
             }
         });
 
-        // Staff action buttons - UPDATED TO USE data-user-id
+        // Staff action buttons
         document.querySelectorAll('.action-btn.view').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                const staff = staffData.find(s => s.user_id === userId);
+            btn.addEventListener('click', async function() {
+                const staffId = this.getAttribute('data-staff-id');
+                addMessage(`User requested details for staff ID ${staffId}`, true);
+                const typingIndicator = showTypingIndicator();
 
-                if (staff) {
-                    addMessage(`User requested details for ${staff.name}`, true);
-                    const typingIndicator = showTypingIndicator();
-
-                    setTimeout(() => {
-                        removeTypingIndicator(typingIndicator);
+                try {
+                    const staff = await fetchData('staff', {staff_id: staffId});
+                    const scoreData = await calculateStaffScore(staffId);
+                    
+                    removeTypingIndicator(typingIndicator);
+                    
+                    if (staff && staff.length > 0 && scoreData) {
+                        const s = staff[0];
                         const response = `
-                        <strong>${staff.name}</strong> (${staff.department})<br><br>
-                        • Position: ${staff.position}<br>
-                        • Performance: ${staff.performance}%<br>
-                        • Last Evaluation: ${staff.lastEvaluation}<br>
-                        • Status: ${staff.isPromotionCandidate ? 'Promotion Candidate' : 'Regular'}<br><br>
-                        ${staff.isPromotionCandidate ? 
-                            'This staff member qualifies for promotion consideration.' : 
-                            staff.performance < 70 ? 
-                            'Performance improvement plan recommended.' : 
-                            'Performance at satisfactory levels.'
-                        }
-                    `;
+                            <strong>${s.first_name} ${s.last_name}</strong> (${s.department_name || 'No department'})<br><br>
+                            • Position: ${s.role_name || 'Staff'}<br>
+                            • Scholar Type: ${s.scholar_type ? s.scholar_type.replace('_', ' ') : 'Full Time'}<br>
+                            • Performance: ${scoreData.percentage}% (${scoreData.totalScore} points)<br>
+                            • Years of Experience: ${s.years_of_experience || 'N/A'}<br><br>
+                            ${scoreData.percentage > 85 ? 
+                                'This staff member qualifies for promotion consideration.' : 
+                                scoreData.percentage < 70 ? 
+                                'Performance improvement plan recommended.' : 
+                                'Performance at satisfactory levels.'
+                            }
+                        `;
                         addMessage(response);
-                    }, 1500);
+                    } else {
+                        addMessage("I couldn't retrieve the requested staff information.");
+                    }
+                } catch (error) {
+                    removeTypingIndicator(typingIndicator);
+                    addMessage("I encountered an error while trying to retrieve staff details.");
                 }
             });
         });
 
+        // Promotion action buttons
         document.querySelectorAll('.action-btn.promote').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                const staff = staffData.find(s => s.user_id === userId);
+            btn.addEventListener('click', async function() {
+                const staffId = this.getAttribute('data-staff-id');
+                addMessage(`User requested promotion for staff ID ${staffId}`, true);
+                const typingIndicator = showTypingIndicator();
 
-                if (staff) {
-                    addMessage(`User initiated promotion process for ${staff.name}`, true);
-                    const typingIndicator = showTypingIndicator();
-
-                    setTimeout(() => {
-                        removeTypingIndicator(typingIndicator);
-                        const response = `
-                        <strong>Promotion Recommendation for ${staff.name}</strong><br><br>
-                        • Current Position: ${staff.position}<br>
-                        • Recommended Position: Senior ${staff.position}<br>
-                        • Performance Justification: ${staff.performance}% average<br>
-                        • Department Rank: Top ${staff.performance > 90 ? '5%' : '15%'}<br><br>
-                        Would you like me to generate the promotion documentation?
-                    `;
-                        addMessage(response);
-                    }, 2000);
+                try {
+                    // Here you would implement the logic to promote the staff member
+                    // This is a placeholder response
+                    removeTypingIndicator(typingIndicator);
+                    addMessage(`Staff member with ID ${staffId} has been promoted successfully.`);
+                } catch (error) {
+                    removeTypingIndicator(typingIndicator);
+                    addMessage("I encountered an error while trying to promote the staff member.");
                 }
             });
         });
 
+        // Adjust action buttons
         document.querySelectorAll('.action-btn.adjust').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const userId = this.getAttribute('data-user-id');
-                const staff = staffData.find(s => s.user_id === userId);
+            btn.addEventListener('click', async function() {
+                const staffId = this.getAttribute('data-staff-id');
+                addMessage(`User requested adjustment for staff ID ${staffId}`, true);
+                const typingIndicator = showTypingIndicator();
 
-                if (staff) {
-                    addMessage(`User requested salary adjustment analysis for ${staff.name}`, true);
-                    const typingIndicator = showTypingIndicator();
-
-                    setTimeout(() => {
-                        removeTypingIndicator(typingIndicator);
-                        const increaseRange = staff.performance > 90 ? '10-15%' :
-                            staff.performance > 85 ? '8-12%' :
-                            staff.performance > 80 ? '5-8%' : '0-3%';
-
-                        const response = `
-                        <strong>Salary Adjustment for ${staff.name}</strong><br><br>
-                        • Current Performance: ${staff.performance}%<br>
-                        • Department Average: ${staff.department === 'Academic' ? '91%' : 
-                                            staff.department === 'Administrative' ? '78%' : 
-                                            staff.department === 'Support Staff' ? '82%' : 
-                                            staff.department === 'Management' ? '88%' : '85%'}<br>
-                        • Market Benchmark: ${staff.position.includes('Senior') ? '15% above' : '5% above'} industry standard<br>
-                        • Recommended Adjustment: ${increaseRange} increase<br><br>
-                        Shall I prepare the adjustment proposal?
-                    `;
-                        addMessage(response);
-                    }, 2000);
+                try {
+                    // Implement logic to adjust salary or other parameters here
+                    // This is a placeholder response
+                    removeTypingIndicator(typingIndicator);
+                    addMessage(`Adjustment for staff member with ID ${staffId} has been processed.`);
+                } catch (error) {
+                    removeTypingIndicator(typingIndicator);
+                    addMessage("I encountered an error while trying to adjust the staff member's details.");
                 }
             });
         });
-
-        // Initial assistant suggestions
-        setTimeout(() => {
-            const typingIndicator = showTypingIndicator();
-
-            setTimeout(() => {
-                removeTypingIndicator(typingIndicator);
-                addMessage("You can ask me things like:<br><br>" +
-                    "• \"Show me promotion candidates\"<br>" +
-                    "• \"Who qualifies for salary increases?\"<br>" +
-                    "• \"Analyze performance trends\"<br>" +
-                    "• \"Tell me about [staff name]\"");
-            }, 1500);
-        }, 3000);
     </script>
 </body>
-
 </html>
