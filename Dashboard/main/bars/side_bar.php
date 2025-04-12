@@ -6,7 +6,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
 // Define menu structure with parent-child relationships
 $menu_structure = [
     'Dashboard' => [
-        'pages' => ['index.php', 'index2.php', 'index3.php', 'index4.php'],
+        'pages' => ['index.php', 'index2.php', 'index3.php', 'index4.php', 'hrm_assistant.php'],
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [
@@ -480,6 +480,7 @@ foreach ($menu_structure as $parent => $data) {
                         <li><a href="index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
                         <li><a href="index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
                         <li><a href="index4.php" class="<?= ($current_page == 'index4.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
+                        <li><a href="hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
                     </ul>
                 </li>
                 <li class="treeview <?= ($active_parent === 'Update') ? 'active' : '' ?>">
