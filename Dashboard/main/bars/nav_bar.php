@@ -11,173 +11,182 @@ $user_role = $_SESSION['user_role'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-    /* Navigation Bar Styles */
-    .ets-nav-container {
-        background-color: #2e3192;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        z-index: 1000;
-        position: fixed;
-        top: 0;
-        left: 250px;
-        width: calc(100% - 250px);
-        height: 70px;
-        transition: all 0.3s ease;
-    }
-
-    /* When sidebar is collapsed */
-    .main-sidebar.collapsed~.ets-nav-container {
-        left: 80px;
-        width: calc(100% - 80px);
-    }
-
-    /* Navigation Tabs Container */
-    .ets-nav-tabs {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0 20px;
-        height: 100%;
-        position: relative;
-    }
-
-    /* Hamburger Menu Icon */
-    .ets-hamburger {
-        position: absolute;
-        left: 15px;
-        color: white;
-        background-color:transparent;
-        font-size: 20px;
-        cursor: pointer;
-        z-index: 1001;
-        padding-top: 5%;
-        transition: transform 0.3s ease;
-        display: none;
-        border: none;
-    }
-
-    .ets-hamburger:hover {
-        color: #FFEB3B;
-    }
-
-    /* Navigation Links */
-    .ets-nav-link {
-        background-color: transparent;
-        border: none;
-        padding: 10px 20px;
-        margin: 0 5px;
-        cursor: pointer;
-        font-size: 16px;
-        color: white;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-shrink: 0; /* Prevent items from shrinking */
-    }
-
-    /* Active Navigation Link Styling */
-    .ets-nav-link.active {
-        background-color: #4CAF50;
-        color: white !important;
-        border-bottom: 3px solid #FFEB3B;
-        font-weight: bold;
-    }
-
-    /* Hover effect for nav links */
-    .ets-nav-link:not(.active):hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: #FFEB3B;
-    }
-
-    /* Logout Button Special Styling */
-    .ets-nav-link.ets-logout {
-        color: #e74c3c;
-        font-weight: bold;
-    }
-
-    .ets-nav-link.ets-logout:hover {
-        background-color: rgba(231, 76, 60, 0.1);
-    }
-
-    /* Role Indicator */
-    .ets-role-indicator {
-        position: absolute;
-        top: 70px;
-        right: 20px;
-        background-color: #4CAF50;
-        color: white;
-        padding: 8px 15px;
-        border-radius: 4px;
-        font-size: 14px;
-        z-index: 1000;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 992px) {
+        /* Navigation Bar Styles */
         .ets-nav-container {
-            left: 0;
-            width: 100%;
-            overflow-x: auto; /* Enable horizontal scrolling */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-        }
-
-        .main-sidebar.mobile-show~.ets-nav-container {
+            background-color: #2e3192;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            position: fixed;
+            top: 0;
             left: 250px;
             width: calc(100% - 250px);
+            height: 70px;
+            transition: all 0.3s ease;
         }
 
-        .main-sidebar.collapsed.mobile-show~.ets-nav-container {
+        /* When sidebar is collapsed */
+        .main-sidebar.collapsed~.ets-nav-container {
             left: 80px;
             width: calc(100% - 80px);
         }
 
-        .ets-hamburger {
-            display: block;
-            position: fixed; /* Keep hamburger fixed during scroll */
-            left: 15px;
-            top: 20px;
-        }
-
-        /* Adjust nav tabs container */
+        /* Navigation Tabs Container */
         .ets-nav-tabs {
-            justify-content: flex-start; /* Align items to start */
-            padding-left: 60px; /* Make space for hamburger */
-            padding-right: 20px;
-            width: max-content; /* Allow container to expand beyond viewport */
-            min-width: 100%; /* Ensure it takes full width */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            height: 100%;
+            position: relative;
         }
 
-        /* Keep both icon and text visible */
-        .ets-nav-link span {
-            display: inline !important; /* Force text to be visible */
-        }
-
-        /* Slightly reduce padding on mobile */
-        .ets-nav-link {
-            padding: 10px 15px;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .ets-role-indicator {
+        /* Hamburger Menu Icon */
+        .ets-hamburger {
+            position: absolute;
+            left: 15px;
+            color: white;
+            background-color: transparent;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1001;
+            padding-top: 5%;
+            transition: transform 0.3s ease;
             display: none;
+            border: none;
         }
-        
-        /* Make links more compact on very small screens */
+
+        .ets-hamburger:hover {
+            color: #FFEB3B;
+        }
+
+        /* Navigation Links */
         .ets-nav-link {
-            padding: 10px 12px;
-            font-size: 14px;
+            background-color: transparent;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            /* Prevent items from shrinking */
         }
-        
-        .ets-nav-link i {
-            font-size: 14px;
+
+        /* Active Navigation Link Styling */
+        .ets-nav-link.active {
+            background-color: #4CAF50;
+            color: white !important;
+            border-bottom: 3px solid #FFEB3B;
+            font-weight: bold;
         }
-    }
-</style>
+
+        /* Hover effect for nav links */
+        .ets-nav-link:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #FFEB3B;
+        }
+
+        /* Logout Button Special Styling */
+        .ets-nav-link.ets-logout {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .ets-nav-link.ets-logout:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        /* Role Indicator */
+        .ets-role-indicator {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .ets-nav-container {
+                left: 0;
+                width: 100%;
+                overflow-x: auto;
+                /* Enable horizontal scrolling */
+                -webkit-overflow-scrolling: touch;
+                /* Smooth scrolling on iOS */
+            }
+
+            .main-sidebar.mobile-show~.ets-nav-container {
+                left: 250px;
+                width: calc(100% - 250px);
+            }
+
+            .main-sidebar.collapsed.mobile-show~.ets-nav-container {
+                left: 80px;
+                width: calc(100% - 80px);
+            }
+
+            .ets-hamburger {
+                display: block;
+                position: fixed;
+                /* Keep hamburger fixed during scroll */
+                left: 15px;
+                top: 20px;
+            }
+
+            /* Adjust nav tabs container */
+            .ets-nav-tabs {
+                justify-content: flex-start;
+                /* Align items to start */
+                padding-left: 60px;
+                /* Make space for hamburger */
+                padding-right: 20px;
+                width: max-content;
+                /* Allow container to expand beyond viewport */
+                min-width: 100%;
+                /* Ensure it takes full width */
+            }
+
+            /* Keep both icon and text visible */
+            .ets-nav-link span {
+                display: inline !important;
+                /* Force text to be visible */
+            }
+
+            /* Slightly reduce padding on mobile */
+            .ets-nav-link {
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ets-role-indicator {
+                display: none;
+            }
+
+            /* Make links more compact on very small screens */
+            .ets-nav-link {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .ets-nav-link i {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -216,11 +225,14 @@ $user_role = $_SESSION['user_role'] ?? '';
             </a>
         </div>
 
-        <?php if (isset($user_role) && !empty($user_role)): ?>
+        <?php
+        $current_page = basename($_SERVER['PHP_SELF']);
+        if ($current_page !== 'hrm_assistant.php' && isset($user_role) && !empty($user_role)): ?>
             <div class="ets-role-indicator">
                 Role: <?= strtoupper($user_role) ?>
             </div>
         <?php endif; ?>
+
     </div>
 
     <script>

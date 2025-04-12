@@ -6,7 +6,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
 // Define menu structure with parent-child relationships
 $menu_structure = [
     'Dashboard' => [
-        'pages' => ['index.php', 'index2.php', 'index3.php', 'index4.php', 'hrm_assistant.php'],
+        'pages' => ['index.php', 'index2.php', 'index3.php', 'individual_view.php', 'hrm_assistant.php'],
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [
@@ -476,11 +476,11 @@ foreach ($menu_structure as $parent => $data) {
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="index.php" class="<?= ($current_page == 'index.php') ? 'active-submenu' : '' ?>"><i class="fa fa-chart-line"></i> General Progress</a></li>
-                        <li><a href="index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
-                        <li><a href="index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
-                        <li><a href="index4.php" class="<?= ($current_page == 'index4.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
-                        <li><a href="hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php" class="<?= ($current_page == 'index.php') ? 'active-submenu' : '' ?>"><i class="fa fa-chart-line"></i> General Progress</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view.php" class="<?= ($current_page == 'individual_view.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
                     </ul>
                 </li>
                 <li class="treeview <?= ($active_parent === 'Update') ? 'active' : '' ?>">
@@ -506,7 +506,6 @@ foreach ($menu_structure as $parent => $data) {
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view.php" class="<?= ($current_page == 'individual_view.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Track Staff</a></li>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<? ($current_page == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_page == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_page == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>                        
