@@ -114,7 +114,7 @@ $conn->close();
     <!-- ApexCharts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.css">
 
-    <link rel="stylesheet" href="../components/my_css/index2.css">
+    <link rel="stylesheet" href="styles/index2.css">
     <!-- <link rel="stylesheet" href="bars/nav_sidebar/nav_side_bar.css"> -->
 
 </head>

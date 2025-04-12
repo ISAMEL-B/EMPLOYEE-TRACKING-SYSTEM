@@ -19,6 +19,9 @@ body {
   margin: 0;
   padding: 0;
 }
+.content-wrapper {
+  height: 90%;
+}
 
 .container-fluid {
   margin-left: 230px;
