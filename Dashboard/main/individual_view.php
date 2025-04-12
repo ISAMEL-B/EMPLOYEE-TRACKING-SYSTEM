@@ -150,33 +150,18 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Achievement Explorer - MUST HRM</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+    <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link rel="stylesheet" href="styles/individual_style.css">
-    <style>
-        .performance-badge {
-            font-size: 0.9rem;
-            padding: 0.35rem 0.6rem;
-        }
-        .department-chart-container {
-            position: relative;
-            height: 250px;
-        }
-        .achievement-card {
-            border-radius: 8px;
-            transition: transform 0.2s;
-        }
-        .achievement-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .achievement-icon {
-            font-size: 1.5rem;
-            color: #2e3192;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/individual_style.css">
 </head>
 
 <body>
@@ -505,12 +490,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                             <td><?= htmlspecialchars($staff['department_name']) ?></td>
                                             <td>
                                                 <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-success" 
-                                                         role="progressbar" 
-                                                         style="width: <?= min(100, $staff['performance_score']) ?>%" 
-                                                         aria-valuenow="<?= $staff['performance_score'] ?>" 
-                                                         aria-valuemin="0" 
-                                                         aria-valuemax="100">
+                                                    <div class="progress-bar bg-success"
+                                                        role="progressbar"
+                                                        style="width: <?= min(100, $staff['performance_score']) ?>%"
+                                                        aria-valuenow="<?= $staff['performance_score'] ?>"
+                                                        aria-valuemin="0"
+                                                        aria-valuemax="100">
                                                         <?= round($staff['performance_score'], 1) ?>
                                                     </div>
                                                 </div>
@@ -652,10 +637,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 const departmentChart = new Chart(deptCtx, {
                     type: 'bar',
                     data: {
-                        labels: [<?= implode(',', array_map(function($dept) { return "'" . htmlspecialchars($dept['department_name']) . "'"; }, $department_stats)) ?>],
+                        labels: [<?= implode(',', array_map(function ($dept) {
+                                        return "'" . htmlspecialchars($dept['department_name']) . "'";
+                                    }, $department_stats)) ?>],
                         datasets: [{
                             label: 'Average Performance Score',
-                            data: [<?= implode(',', array_map(function($dept) { return $dept['avg_score']; }, $department_stats)) ?>],
+                            data: [<?= implode(',', array_map(function ($dept) {
+                                        return $dept['avg_score'];
+                                    }, $department_stats)) ?>],
                             backgroundColor: '#2e3192',
                             borderColor: '#1A237E',
                             borderWidth: 1
@@ -691,4 +680,5 @@ $current_page = basename($_SERVER['PHP_SELF']);
         });
     </script>
 </body>
+
 </html>

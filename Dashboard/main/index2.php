@@ -133,7 +133,7 @@ $conn->close();
             <section class="content">
                 <!-- Dashboard Header -->
                 <div class="dashboard-header">
-                    <h3>UNIVERSITY PERFORMANCE DASHBOARD</h3>
+                    <h3>FACAULTY PERFORMANCE DASHBOARD</h3>
                     <p class="mb-0">Comprehensive overview of academic, research, and community engagement metrics</p>
                 </div>
 
@@ -313,8 +313,8 @@ $conn->close();
                             <div class="stat-icon">
                                 <i class="fas fa-money-bill-wave"></i>
                             </div>
-                            <div class="stat-value">$<?= number_format($stats['grants']['total_grants'] ?? 0) ?></div>
-                            <div class="stat-label">Research Grants</div>
+                            <div class="stat-value"><?= number_format($stats['grants']['total_grants'] ?? 0) ?></div>
+                            <div class="stat-label">Research Grants (UGX)</div>
                             <div class="stat-description">
                                 Total funding secured
                             </div>
@@ -442,7 +442,7 @@ $conn->close();
                                 <i class="fas fa-user-graduate"></i>
                             </div>
                             <div class="stat-value"><?= $stats['supervision']['total_supervisions'] ?? 0 ?></div>
-                            <div class="stat-label">Student Supervisions</div>
+                            <div class="stat-label">Help Involvement(s)</div>
                             <div class="stat-description">
                                 PhD and Masters students
                             </div>

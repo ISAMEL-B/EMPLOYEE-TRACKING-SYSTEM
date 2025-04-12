@@ -28,59 +28,6 @@
     <!-- my css -->
     <!-- <link rel="stylesheet" href="bars/nav_sidebar/nav_side_bar.css">
     <link rel="stylesheet" href="bars/main_nav_side_bar.css"> -->
-    <style>
-        /* Main content adjustments */
-        .content-wrapper {
-            margin-top: 15px;
-            /* Small margin for all devices */
-        }
-
-        /* Mobile - full width */
-        @media (max-width: 991.98px) {
-            .content-wrapper {
-                margin-left: 0 !important;
-                margin-top: 12% !important;
-                /* Smaller margin for mobile */
-                padding-top: 0;
-            }
-        }
-
-        /* Remove extra spacing from boxes */
-        .box {
-            margin-bottom: 1rem;
-        }
-
-        .box-header {
-            padding: 0.75rem 1.25rem;
-        }
-
-        /* Info boxes adjustments */
-        .info-box {
-            margin-bottom: 1rem;
-        }
-
-        /* Chart containers */
-        .chart {
-            margin-top: 0.5rem;
-        }
-
-        /* Specific section headers */
-        .box-title {
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
-        }
-
-        /* Smaller font size for section headers on mobile */
-        @media (max-width: 767.98px) {
-            .box-title {
-                font-size: 1.25rem;
-            }
-
-            .box-header h3.box-title {
-                font-size: 1.75rem !important;
-            }
-        }
-    </style>
 
 </head>
 

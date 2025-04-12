@@ -1,3 +1,10 @@
+<?php
+session_start();
+if ($_SESSION['user_role'] !== 'hrm') {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +13,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST HRM - Department Analytics Dashboard</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
+    <script src="../components/Chart.js/dist/Chart.min.js"></script>
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -23,60 +33,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .navbar {
-            background-color: var(--must-green);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            font-size: 1rem;
-            /* Smaller text */
-            padding: 5px 10px;
-            /* Less padding */
-            white-space: nowrap;
-            /* Prevents text wrap */
-        }
-
-        .navbar-brand img {
-            height: 30px;
-            /* Reduce logo height */
-            width: auto;
-            margin-right: 8px;
-            /* Space between image and text */
-        }
-
-
-        .sidebar {
-            background-color: var(--must-light-green);
-            height: 100vh;
-            position: fixed;
-            padding-top: 20px;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .sidebar .nav-link {
-            color: var(--must-blue);
-            font-weight: 500;
-            border-radius: 5px;
-            margin-bottom: 5px;
-            padding: 10px 15px;
-        }
-
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background-color: var(--must-yellow);
-            color: var(--must-blue);
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 10px;
-            color: var(--must-green);
-        }
-
         .main-content {
             margin-left: 250px;
+            margin-top: 5%;
             padding: 20px;
             background-color: #f8f9fa;
             min-height: 100vh;
@@ -93,6 +52,7 @@
             background-color: white;
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             font-weight: 600;
+            font-size: 20px;
             color: var(--must-blue);
             border-radius: 10px 10px 0 0 !important;
         }
@@ -199,94 +159,10 @@
 
 <body>
     <!-- Top Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png" alt="MUST Logo" class="me-2">
-                MUST HRM Analytics Portal
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Reports</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Analytics</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Settings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include 'bars/nav_bar.php'; ?>
 
     <!-- Sidebar -->
-    <div class="sidebar col-md-3 col-lg-2 d-md-block">
-        <div class="position-sticky pt-3">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-people"></i> Employee Directory
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-building"></i> Departments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-graph-up"></i> Performance
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-cash-stack"></i> Payroll
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-calendar-event"></i> Leave Management
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-file-earmark-text"></i> Reports
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-gear"></i> Settings
-                    </a>
-                </li>
-            </ul>
-
-            <div class="mt-4 p-3 highlight-yellow">
-                <h6 class="fw-bold">Quick Actions</h6>
-                <button class="btn btn-sm btn-must w-100 mb-2">Add New Employee</button>
-                <button class="btn btn-sm btn-outline-must w-100 mb-2">Generate Report</button>
-                <button class="btn btn-sm btn-outline-must w-100">Schedule Meeting</button>
-            </div>
-        </div>
-    </div>
-
+    <?php include 'bars/side_bar.php'; ?>
     <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
@@ -300,16 +176,17 @@
                     <div class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="departmentDropdown">
                         <input type="text" class="form-control search-box mb-2" placeholder="Search departments..." id="departmentSearch">
                         <div id="departmentList">
-                            <a class="dropdown-item" href="#" data-dept="it">Information Technology</a>
-                            <a class="dropdown-item" href="#" data-dept="finance">Finance</a>
-                            <a class="dropdown-item" href="#" data-dept="hr">Human Resources</a>
-                            <a class="dropdown-item" href="#" data-dept="academics">Academics</a>
-                            <a class="dropdown-item" href="#" data-dept="research">Research & Development</a>
-                            <a class="dropdown-item" href="#" data-dept="admin">Administration</a>
-                            <a class="dropdown-item" href="#" data-dept="facilities">Facilities Management</a>
-                            <a class="dropdown-item" href="#" data-dept="marketing">Marketing & Communications</a>
-                            <a class="dropdown-item" href="#" data-dept="library">Library Services</a>
-                            <a class="dropdown-item" href="#" data-dept="health">Health Services</a>
+                            <a class="dropdown-item" href="#" data-dept="it">Software Engineering</a>
+                            <a class="dropdown-item" href="#" data-dept="finance">Computer Science</a>
+                            <a class="dropdown-item" href="#" data-dept="hr">Civil Engineering</a>
+                            <a class="dropdown-item" href="#" data-dept="academics">Electrical Engineering</a>
+                            <a class="dropdown-item" href="#" data-dept="research">Accounting & Finance</a>
+                            <a class="dropdown-item" href="#" data-dept="admin">Maths</a>
+                            <a class="dropdown-item" href="#" data-dept="facilities">Phyics</a>
+                            <a class="dropdown-item" href="#" data-dept="marketing">Civil & Building</a>
+                            <a class="dropdown-item" href="#" data-dept="library">Petroleum Engineering</a>
+                            <a class="dropdown-item" href="#" data-dept="health">Information Technology</a>
+                            <a class="dropdown-item" href="#" data-dept="health">Biology</a>
                         </div>
                     </div>
                 </div>
@@ -321,7 +198,7 @@
                     <div class="card department-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span>Department Comparative Overview</span>
-                            <small class="text-muted">Last updated: Today, 10:45 AM</small>
+                            <small class="text-muted">Last updated: Monday, 10:45 AM</small>
                         </div>
                         <div class="card-body">
                             <p class="text-muted mb-4">Select a department from the dropdown above to view detailed analytics. Below is a comparison of all departments across key metrics.</p>
@@ -341,7 +218,7 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><strong>Information Technology</strong></td>
+                                            <td><strong>Software Engineering</strong></td>
                                             <td>42</td>
                                             <td>3.2 years</td>
                                             <td>4.1</td>
@@ -350,7 +227,7 @@
                                             <td>78%</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Finance</strong></td>
+                                            <td><strong>Computer Science</strong></td>
                                             <td>28</td>
                                             <td>5.1 years</td>
                                             <td>4.3</td>
@@ -359,7 +236,7 @@
                                             <td>82%</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Human Resources</strong></td>
+                                            <td><strong>Iformation Technology</strong></td>
                                             <td>18</td>
                                             <td>4.7 years</td>
                                             <td>4.5</td>
@@ -368,7 +245,7 @@
                                             <td>75%</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Academics</strong></td>
+                                            <td><strong>Biology</strong></td>
                                             <td>156</td>
                                             <td>6.3 years</td>
                                             <td>4.2</td>
@@ -377,7 +254,7 @@
                                             <td>88%</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Research & Development</strong></td>
+                                            <td><strong>Chemistry</strong></td>
                                             <td>37</td>
                                             <td>4.2 years</td>
                                             <td>4.4</td>
@@ -510,13 +387,13 @@
                         <div class="card-header">Key Insights</div>
                         <div class="card-body">
                             <div class="alert alert-info">
-                                <strong>IT Department:</strong> High training hours with excellent performance ratings. Consider expanding team to reduce workload.
+                                <strong>Software Engineering Department:</strong> High training hours with excellent performance ratings. Consider expanding team to reduce workload.
                             </div>
                             <div class="alert alert-warning">
-                                <strong>Finance Department:</strong> Lowest vacancy rate indicates good retention. Budget utilization could be improved.
+                                <strong>Computer Science Department:</strong> Lowest vacancy rate indicates good retention. Budget utilization could be improved.
                             </div>
                             <div class="alert alert-success">
-                                <strong>HR Department:</strong> Highest performance ratings. Model department for others.
+                                <strong>Electrical Eng. Department:</strong> Highest performance ratings. Model department for others.
                             </div>
                         </div>
                     </div>
@@ -559,8 +436,8 @@
         // Department data
         const departments = {
             it: {
-                name: "Information Technology",
-                employees: 42,
+                name: "Software Engineering",
+                employees: 60,
                 avgTenure: "3.2 years",
                 avgRating: 4.1,
                 vacancy: "8%",
@@ -582,14 +459,14 @@
                     utilized: 936000
                 },
                 activity: [
-                    "New help desk system implemented (May 2023)",
+                    "New help desk system implemented (April 2025)",
                     "3 new developers hired",
                     "Quarterly security training completed",
                     "Server upgrade scheduled for next month"
                 ]
             },
             finance: {
-                name: "Finance",
+                name: "Computer Science",
                 employees: 28,
                 avgTenure: "5.1 years",
                 avgRating: 4.3,
@@ -619,7 +496,7 @@
                 ]
             },
             hr: {
-                name: "Human Resources",
+                name: "Civil",
                 employees: 18,
                 avgTenure: "4.7 years",
                 avgRating: 4.5,
@@ -649,7 +526,7 @@
                 ]
             },
             academics: {
-                name: "Academics",
+                name: "Electrical",
                 employees: 156,
                 avgTenure: "6.3 years",
                 avgRating: 4.2,
@@ -679,13 +556,13 @@
                 ]
             },
             research: {
-                name: "Research & Development",
+                name: "Accounting & Finance",
                 employees: 37,
                 avgTenure: "4.2 years",
                 avgRating: 4.4,
                 vacancy: "15%",
                 positions: {
-                    labels: ["Scientists", "Engineers", "Technicians", "Managers", "Analysts"],
+                    labels: ["Auditors", "Balancers", "Technicians", "Managers", "Analysts"],
                     data: [15, 10, 8, 2, 2]
                 },
                 training: {
@@ -702,7 +579,7 @@
                     utilized: 2300000
                 },
                 activity: [
-                    "3 new patents filed this quarter",
+                    "3 new Acounting filed this quarter",
                     "Collaboration with industry partners",
                     "New lab equipment installed",
                     "5 research papers published"
@@ -715,10 +592,10 @@
         const deptSizeChart = new Chart(deptSizeCtx, {
             type: 'bar',
             data: {
-                labels: ['IT', 'Finance', 'HR', 'Academics', 'Research'],
+                labels: ['BSE', 'BCS', 'Civil', 'Electrical', 'Accounting & Finance'],
                 datasets: [{
                     label: 'Number of Employees',
-                    data: [42, 28, 18, 156, 37],
+                    data: [60, 28, 18, 156, 37],
                     backgroundColor: [
                         'rgba(0, 102, 51, 0.7)',
                         'rgba(0, 51, 102, 0.7)',

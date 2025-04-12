@@ -1,0 +1,20 @@
+.performance-badge {
+    font-size: 0.9rem;
+    padding: 0.35rem 0.6rem;
+}
+.department-chart-container {
+    position: relative;
+    height: 250px;
+}
+.achievement-card {
+    border-radius: 8px;
+    transition: transform 0.2s;
+}
+.achievement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.achievement-icon {
+    font-size: 1.5rem;
+    color: #2e3192;
+}

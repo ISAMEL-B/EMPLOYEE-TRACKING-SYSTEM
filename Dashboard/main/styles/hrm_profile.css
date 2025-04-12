@@ -1,0 +1,142 @@
+/* Content Wrapper */
+.content-wrapper {
+    margin-left: 250px;
+    padding-top: 70px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background-color: #f8f9fa;
+}
+
+.main-sidebar.collapsed~.content-wrapper {
+    margin-left: 80px;
+}
+
+/* MUST Brand Colors */
+.must-primary {
+    color: #2e3192 !important;
+}
+
+.must-secondary {
+    color: #4CAF50 !important;
+}
+
+.must-bg-primary {
+    background-color: #2e3192 !important;
+}
+
+.must-bg-secondary {
+    background-color: #4CAF50 !important;
+}
+
+/* Profile Page Specific Styles */
+.profile-header {
+    background: linear-gradient(135deg, #2e3192 0%, #4CAF50 100%);
+    color: white;
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+}
+
+.profile-card {
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.profile-img-container {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid white;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    margin: -75px auto 20px;
+    background-color: #f8f9fa;
+}
+
+.profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.stat-card {
+    border-left: 4px solid #4CAF50;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.progress {
+    height: 10px;
+}
+
+.progress-bar {
+    background-color: #4CAF50;
+}
+
+.skill-badge {
+    background-color: #e9f5e9;
+    color: #2e3192;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #4CAF50;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #2e3192;
+    border: 2px solid #4CAF50;
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        margin-left: 0;
+    }
+
+    .profile-header h1 {
+        font-size: 2rem;
+    }
+
+    .profile-img-container {
+        width: 120px;
+        height: 120px;
+        margin-top: -60px;
+    }
+}

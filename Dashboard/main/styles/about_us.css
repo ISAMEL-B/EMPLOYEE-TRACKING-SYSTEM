@@ -1,0 +1,108 @@
+/* Content Wrapper */
+.content-wrapper {
+  margin-left: 250px;
+  padding-top: 70px;
+  min-height: 100vh;
+  transition: all 0.3s;
+  background-color: #f8f9fa;
+}
+
+.main-sidebar.collapsed ~ .content-wrapper {
+  margin-left: 80px;
+}
+
+/* MUST Brand Colors */
+.must-primary {
+  color: #2e3192 !important;
+  /* MUST dark blue */
+}
+
+.must-secondary {
+  color: #4caf50 !important;
+  /* MUST green */
+}
+
+.must-bg-primary {
+  background-color: #2e3192 !important;
+}
+
+.must-bg-secondary {
+  background-color: #4caf50 !important;
+}
+
+/* About Page Specific Styles */
+.about-header {
+  background: linear-gradient(135deg, #2e3192 0%, #4caf50 100%);
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+}
+
+.feature-card {
+  border-left: 4px solid #4caf50;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.team-member-card {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.team-member-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.mission-vision-card {
+  border-radius: 10px;
+  border-top: 5px solid #2e3192;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 50px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #4caf50;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -40px;
+  top: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2e3192;
+  border: 3px solid #4caf50;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    margin-left: 0;
+  }
+
+  .about-header h1 {
+    font-size: 2rem;
+  }
+}

@@ -9,129 +9,25 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - MUST HRM Expert Scorecard System</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        /* Content Wrapper */
-        .content-wrapper {
-            margin-left: 250px;
-            padding-top: 70px;
-            min-height: 100vh;
-            transition: all 0.3s;
-            background-color: #f8f9fa;
-        }
-        
-        .main-sidebar.collapsed ~ .content-wrapper {
-            margin-left: 80px;
-        }
-        
-        /* MUST Brand Colors */
-        .must-primary {
-            color: #2e3192 !important; /* MUST dark blue */
-        }
-        
-        .must-secondary {
-            color: #4CAF50 !important; /* MUST green */
-        }
-        
-        .must-bg-primary {
-            background-color: #2e3192 !important;
-        }
-        
-        .must-bg-secondary {
-            background-color: #4CAF50 !important;
-        }
-        
-        /* About Page Specific Styles */
-        .about-header {
-            background: linear-gradient(135deg, #2e3192 0%, #4CAF50 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-        }
-        
-        .feature-card {
-            border-left: 4px solid #4CAF50;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .team-member-card {
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .team-member-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .mission-vision-card {
-            border-radius: 10px;
-            border-top: 5px solid #2e3192;
-        }
-        
-        .timeline {
-            position: relative;
-            padding-left: 50px;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #4CAF50;
-        }
-        
-        .timeline-item {
-            position: relative;
-            margin-bottom: 30px;
-        }
-        
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -40px;
-            top: 5px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #2e3192;
-            border: 3px solid #4CAF50;
-        }
-        
-        @media (max-width: 768px) {
-            .content-wrapper {
-                margin-left: 0;
-            }
-            
-            .about-header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/about_us.css">
 </head>
+
 <body>
-       
+
     <!-- navigation bar -->
     <?php include 'bars/nav_bar.php'; ?>
-     <!--  sidebar -->
-     <?php include 'bars/side_bar.php'; ?>
-    
+    <!--  sidebar -->
+    <?php include 'bars/side_bar.php'; ?>
+
     <!-- Content Wrapper -->
     <div class="content-wrapper">
         <!-- About Header -->
@@ -150,7 +46,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                 </div>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="container py-5">
             <!-- System Overview -->
@@ -173,12 +69,12 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                     <div class="col-md-6">
                         <div class="ratio ratio-16x9">
-                            <iframe class="rounded shadow" src="https://www.youtube.com/embed/your-video-id" title="System Overview" allowfullscreen></iframe>
+                            <iframe class="rounded shadow" src="https://www.youtube.com/embed/video-id" title="System Overview" allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>
             </section>
-            
+
             <!-- Key Features -->
             <section id="features" class="mb-5">
                 <div class="row mb-4">
@@ -229,7 +125,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                 </div>
             </section>
-            
+
             <!-- Mission & Vision -->
             <section id="mission" class="mb-5">
                 <div class="row mb-4">
@@ -259,7 +155,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                 </div>
             </section>
-            
+
             <!-- Development Team -->
             <section id="team" class="mb-5">
                 <div class="row mb-4">
@@ -271,9 +167,9 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                 <div class="row g-4">
                     <div class="col-md-3">
                         <div class="card team-member-card h-100">
-                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/team/team1.jpg" class="card-img-top" alt="Team Member">
+                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/isamel.png" class="card-img-top" alt="Team Member">
                             <div class="card-body text-center">
-                                <h5 class="card-title must-primary">Dr. John Smith</h5>
+                                <h5 class="card-title must-primary">Byaruhanga Isamel</h5>
                                 <p class="card-text text-muted">Project Lead</p>
                                 <p class="card-text">HRM Specialist with 15 years experience in performance management systems.</p>
                             </div>
@@ -281,9 +177,9 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                     <div class="col-md-3">
                         <div class="card team-member-card h-100">
-                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/team/team2.jpg" class="card-img-top" alt="Team Member">
+                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/praise1.png" class="card-img-top" alt="Team Member">
                             <div class="card-body text-center">
-                                <h5 class="card-title must-primary">Jane Doe</h5>
+                                <h5 class="card-title must-primary">Mugabi Praise</h5>
                                 <p class="card-text text-muted">Lead Developer</p>
                                 <p class="card-text">Full-stack developer specializing in institutional management systems.</p>
                             </div>
@@ -291,9 +187,9 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                     <div class="col-md-3">
                         <div class="card team-member-card h-100">
-                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/team/team3.jpg" class="card-img-top" alt="Team Member">
+                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/felix1.png" class="card-img-top" alt="Team Member">
                             <div class="card-body text-center">
-                                <h5 class="card-title must-primary">Robert Johnson</h5>
+                                <h5 class="card-title must-primary">Mutungi Felix</h5>
                                 <p class="card-text text-muted">Data Analyst</p>
                                 <p class="card-text">Expert in educational metrics and performance visualization.</p>
                             </div>
@@ -301,9 +197,9 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                     <div class="col-md-3">
                         <div class="card team-member-card h-100">
-                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/team/team4.jpg" class="card-img-top" alt="Team Member">
+                            <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/achiever.png" class="card-img-top" alt="Team Member">
                             <div class="card-body text-center">
-                                <h5 class="card-title must-primary">Sarah Williams</h5>
+                                <h5 class="card-title must-primary">Atwiine Achiever</h5>
                                 <p class="card-text text-muted">UI/UX Designer</p>
                                 <p class="card-text">Specializes in creating intuitive interfaces for complex systems.</p>
                             </div>
@@ -311,7 +207,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                 </div>
             </section>
-            
+
             <!-- Contact Section -->
             <section id="contact" class="mb-5">
                 <div class="row mb-4">
@@ -350,8 +246,8 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                                 <div class="mb-4">
                                     <h5 class="must-secondary"><i class="fas fa-map-marker-alt me-2"></i>Address</h5>
                                     <p>Human Resource Department<br>
-                                    Mbarara University of Science and Technology<br>
-                                    P.O. Box 1410, Mbarara, Uganda</p>
+                                        Mbarara University of Science and Technology<br>
+                                        P.O. Box 1410, Mbarara, Uganda</p>
                                 </div>
                                 <div class="mb-4">
                                     <h5 class="must-secondary"><i class="fas fa-phone me-2"></i>Phone</h5>
@@ -364,7 +260,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                                 <div class="mb-4">
                                     <h5 class="must-secondary"><i class="fas fa-clock me-2"></i>Support Hours</h5>
                                     <p>Monday - Friday: 8:00 AM - 5:00 PM<br>
-                                    Saturday: 9:00 AM - 1:00 PM</p>
+                                        Saturday: 9:00 AM - 1:00 PM</p>
                                 </div>
                             </div>
                         </div>
@@ -376,9 +272,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Your existing JavaScript code for sidebar/nav functionality
-        // ... [Your existing JavaScript] ...
-    </script>
+
 </body>
+
 </html>
