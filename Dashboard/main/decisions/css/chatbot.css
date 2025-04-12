@@ -14,7 +14,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
   /* font-size:18px; */
 }
 
@@ -28,14 +28,12 @@ body {
 
 .main-content {
   position: relative;
-  margin-left: 20%;       /* Reserves 20% space on the left for the sidebar */
-  margin-top: 7%;        /* Reserves 10% space at the top for the navbar */
-  width: 80%;             /* 100% - 20% left = 80% remaining for main content */
-  max-width: 100%;        /* Ensures it never overflows the viewport */
+  margin-left: 20%; /* Reserves 20% space on the left for the sidebar */
+  margin-top: 7%; /* Reserves 10% space at the top for the navbar */
+  width: 80%; /* 100% - 20% left = 80% remaining for main content */
+  max-width: 100%; /* Ensures it never overflows the viewport */
   box-sizing: border-box; /* Ensures padding is included in width */
 }
-
-
 
 .header {
   display: flex;
@@ -618,7 +616,7 @@ body {
 /* Responsive */
 @media (max-width: 1200px) {
   .dashboard-container {
-    grid-template-columns: 240px 1fr;
+    /* grid-template-columns: 240px 1fr; */
   }
 
   .sidebar-menu a {
@@ -629,10 +627,11 @@ body {
 @media (max-width: 992px) {
   .dashboard-container {
     grid-template-columns: 1fr;
+    padding:0 !important;
   }
 
   .sidebar {
-    display: none;
+    display: block;
   }
 
   .data-section {
@@ -653,7 +652,8 @@ body {
 
 @media (max-width: 768px) {
   .main-content {
-    padding: 20px 15px;
+    padding: 0;
+    margin-top:18%;
   }
 
   .dashboard-cards {
@@ -662,7 +662,7 @@ body {
 
   .staff-table th,
   .staff-table td {
-    padding: 10px 12px;
+    padding: 0;
   }
 
   .action-btns {
