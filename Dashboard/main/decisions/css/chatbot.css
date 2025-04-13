@@ -15,17 +15,9 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
-  /* font-size:18px; */
 }
 
-/* .dashboard-container {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  min-height: 100vh;
-} */
-
-/* Sidebar */
-
+/* Sidebar and Main Content */
 .main-content {
   position: relative;
   margin-left: 20%; /* Reserves 20% space on the left for the sidebar */
@@ -439,7 +431,6 @@ body {
   justify-content: center;
   margin-right: 15px;
   font-size: 18px;
-  flex-shrink: 0;
 }
 
 .ai-title {
@@ -474,6 +465,7 @@ body {
 .clear-chat-btn i {
   margin-right: 5px;
 }
+
 .ai-conversation {
   height: 350px;
   padding: 20px;
@@ -613,29 +605,20 @@ body {
   color: #4caf50;
 }
 
-/* Responsive */
+/* Responsive Adjustments */
 @media (max-width: 1200px) {
-  .dashboard-container {
-    /* grid-template-columns: 240px 1fr; */
-  }
-
-  .sidebar-menu a {
-    padding: 12px 20px;
+  .main-content {
+    margin-left: 15%; /* Adjust for smaller screens */
+    width: 85%; /* Adjust for smaller screens */
   }
 }
 
 @media (max-width: 992px) {
-  .dashboard-container {
-    grid-template-columns: 1fr;
-    padding:0 !important;
-  }
-
-  .sidebar {
-    display: block;
-  }
-
-  .data-section {
-    grid-template-columns: 1fr;
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    margin-top: 10%; /* Adjust for smaller screens */
+    padding: 0 15px; /* Add padding for smaller screens */
   }
 
   .header {
@@ -648,25 +631,69 @@ body {
     width: 100%;
     justify-content: flex-end;
   }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr; /* Stack cards vertically */
+  }
+
+  .data-section {
+    grid-template-columns: 1fr; /* Stack data sections vertically */
+  }
 }
 
 @media (max-width: 768px) {
   .main-content {
     padding: 0;
-    margin-top:18%;
+    margin-top: 18%;
   }
 
   .dashboard-cards {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack cards vertically */
   }
 
   .staff-table th,
   .staff-table td {
-    padding: 0;
+    padding: 10px; /* Adjust padding for smaller screens */
+    font-size: 12px; /* Smaller font size for better fit */
   }
 
   .action-btns {
     flex-direction: column;
     gap: 5px;
+  }
+
+  .ai-input-container {
+    flex-direction: column; /* Stack input and button */
+  }
+
+  .ai-input {
+    width: 100%; /* Full width for input */
+    margin-bottom: 10px; /* Space between input and button */
+  }
+
+  .ai-send-btn {
+    width: 100%; /* Full width for button */
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 24px; /* Smaller title size */
+  }
+
+  .header-btn {
+    font-size: 12px; /* Smaller button font size */
+  }
+
+  .card-title {
+    font-size: 16px; /* Smaller card title */
+  }
+
+  .card-value {
+    font-size: 28px; /* Smaller card value */
+  }
+
+  .card-description {
+    font-size: 12px; /* Smaller card description */
   }
 }
