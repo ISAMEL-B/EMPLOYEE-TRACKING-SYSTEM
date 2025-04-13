@@ -2,6 +2,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+ini_set('display_errors', 1);
+
 // Include database connection and required classes
 include __DIR__ .'/../config.php'; 
 include __DIR__ .'/../academic_score.php';

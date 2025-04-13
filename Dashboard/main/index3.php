@@ -4,6 +4,20 @@ if ($_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
+
+//get count of employees in a department
+include '../../scoring_calculator/department score/department_employees.php';
+
+//get count of employees in a department
+$department_counts = get_all_department_staff_counts($conn);
+
+//total staff in each department
+$software_engineering = $department_counts['Software Engineering'];
+$computer_science = $department_counts['Computer Science'];
+$information_technology = $department_counts['Information Technology'];
+$biology = $department_counts['Biology'];
+$chemistry = $department_counts['Chemistry'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -217,16 +231,18 @@ if ($_SESSION['user_role'] !== 'hrm') {
                                         </tr>
                                     </thead>
                                     <tbody>
+                                    <?php foreach ($department_counts as $dept => $count): ?>
                                         <tr>
-                                            <td><strong>Software Engineering</strong></td>
-                                            <td>42</td>
+                                            <td><strong><?= $dept ?></strong></td>
+                                            <td><?= $count ?></td>
                                             <td>3.2 years</td>
                                             <td>4.1</td>
                                             <td>35</td>
                                             <td>8%</td>
                                             <td>78%</td>
                                         </tr>
-                                        <tr>
+                                    <?php endforeach; ?>
+                                        <!-- <tr>
                                             <td><strong>Computer Science</strong></td>
                                             <td>28</td>
                                             <td>5.1 years</td>
@@ -234,10 +250,10 @@ if ($_SESSION['user_role'] !== 'hrm') {
                                             <td>28</td>
                                             <td>5%</td>
                                             <td>82%</td>
-                                        </tr>
-                                        <tr>
+                                        </tr> -->
+                                        <!-- <tr>
                                             <td><strong>Iformation Technology</strong></td>
-                                            <td>18</td>
+                                            <td>2</td>
                                             <td>4.7 years</td>
                                             <td>4.5</td>
                                             <td>42</td>
@@ -261,7 +277,7 @@ if ($_SESSION['user_role'] !== 'hrm') {
                                             <td>48</td>
                                             <td>15%</td>
                                             <td>92%</td>
-                                        </tr>
+                                        </tr> -->
                                     </tbody>
                                 </table>
                             </div>
@@ -437,7 +453,7 @@ if ($_SESSION['user_role'] !== 'hrm') {
         const departments = {
             it: {
                 name: "Software Engineering",
-                employees: 60,
+                employees: 4,
                 avgTenure: "3.2 years",
                 avgRating: 4.1,
                 vacancy: "8%",
@@ -595,7 +611,13 @@ if ($_SESSION['user_role'] !== 'hrm') {
                 labels: ['BSE', 'BCS', 'Civil', 'Electrical', 'Accounting & Finance'],
                 datasets: [{
                     label: 'Number of Employees',
-                    data: [60, 28, 18, 156, 37],
+                    data:   [
+                        <?= $department_counts['Software Engineering'] ?>, 
+                        <?= $department_counts['Computer Science'] ?>, 
+                        <?= $department_counts['Civil Engineering'] ?>,
+                        <?= $department_counts['Electrical Engineering'] ?>,
+                        <?= $department_counts['Accounting'] ?>
+                    ],
                     backgroundColor: [
                         'rgba(0, 102, 51, 0.7)',
                         'rgba(0, 51, 102, 0.7)',
