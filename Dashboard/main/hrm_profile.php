@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'approve/config.php'; // Database connection
+require_once 'head/approve/config.php'; // Database connection
 
 // Get current user ID from session
 $user_id = $_SESSION['user_id'] ?? null;

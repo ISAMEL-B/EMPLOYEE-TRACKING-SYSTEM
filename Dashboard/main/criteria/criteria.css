@@ -63,19 +63,6 @@ h2 {
     border: 1px solid #ebccd1;
 }
 
-.role-indicator {
-    position: fixed;
-    top: 70px;
-    right: 20px;
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 4px;
-    font-size: 14px;
-    z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
 /* Category styles */
 .category-section {
     margin-bottom: 30px;
@@ -216,9 +203,16 @@ input[type="number"]:focus {
     .main-content {
         margin-left: 0;
         padding: 20px;
-    }
-
-    .role-indicator {
-        top: 120px;
-    }
+    }.role-indicator {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 }

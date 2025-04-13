@@ -10,11 +10,11 @@ $menu_structure = [
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [
-        'pages' => ['upload_csv.php', 'view_criteria.php', 'modify_db.php'],
+        'pages' => ['upload_csv.php', 'approve.php', 'view_criteria.php', 'modify_db.php'],
         'icon' => 'fa-edit'
     ],
     'Manage' => [
-        'pages' => ['individual_view.php', 'staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php'],
+        'pages' => ['individual_view.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php'],
         'icon' => 'fa-info-circle'
     ],
     'Authentication' => [
@@ -468,36 +468,50 @@ foreach ($menu_structure as $parent => $data) {
         </div>
         <section class="sidebar position-relative">
             <ul class="sidebar-menu" data-widget="tree">
-                <li class="treeview <?= ($active_parent === 'Dashboard') ? 'active' : '' ?>">
-                    <a href="#" class="toggle">
-                        <i class="fa fa-tachometer-alt"></i>
-                        <span style="margin-left: 10px;">Dashboard</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-right pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php" class="<?= ($current_page == 'index.php') ? 'active-submenu' : '' ?>"><i class="fa fa-chart-line"></i> General Progress</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view.php" class="<?= ($current_page == 'individual_view.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
-                    </ul>
-                </li>
-                <li class="treeview <?= ($active_parent === 'Update') ? 'active' : '' ?>">
-                    <a href="#" class="toggle">
-                        <i class="fa fa-edit"></i>
-                        <span style="margin-left: 10px;">Update</span>
-                        <span class="pull-right-container">
-                            <i class="fa fa-angle-right pull-right"></i>
-                        </span>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/upload_csv.php" class="<?= ($current_page == 'upload_csv.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i> CSV Upload</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/view_criteria.php" class="<?= ($current_page == 'view_criteria.php') ? 'active-submenu' : '' ?>"><i class="fa fa-edit"></i> View | Edit Criteria</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/modify_column.php" class="<?= ($current_page == 'modify_db.php') ? 'active-submenu' : '' ?>"><i class="fa fa-database"></i> Modify DB Tables</a></li>
-                    </ul>
-                </li>
+                <!-- Dashboard -->
+                <?php if ($_SESSION['user_role'] === 'hrm'): ?>
+                    <li class="treeview <?= ($active_parent === 'Dashboard') ? 'active' : '' ?>">
+                        <a href="#" class="toggle">
+                            <i class="fa fa-tachometer-alt"></i>
+                            <span style="margin-left: 10px;">Dashboard</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-right pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php" class="<?= ($current_page == 'index.php') ? 'active-submenu' : '' ?>"><i class="fa fa-chart-line"></i> General Progress</a></li>
+                            <?php if ($_SESSION['user_role'] === 'hrm'): ?>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view.php" class="<?= ($current_page == 'individual_view.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Update -->
+                <?php if ($_SESSION['user_role'] !== 'staff'): ?>
+                    <li class="treeview <?= ($active_parent === 'Update') ? 'active' : '' ?>">
+                        <a href="#" class="toggle">
+                            <i class="fa fa-edit"></i>
+                            <span style="margin-left: 10px;">Update</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-right pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php" class="<?= ($current_page == 'upload_csv.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i> CSV Upload</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php" class="<?= ($current_page == 'approve.php') ? 'active-submenu' : '' ?>"><i class="fa fa-check-circle"></i> Approve</a></li>
+                            <?php if ($_SESSION['user_role'] === 'hrm'): ?>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/view_criteria.php" class="<?= ($current_page == 'view_criteria.php') ? 'active-submenu' : '' ?>"><i class="fa fa-edit"></i> View | Edit Criteria</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/modify_column.php" class="<?= ($current_page == 'modify_column.php') ? 'active-submenu' : '' ?>"><i class="fa fa-database"></i> Modify DB Tables</a></li>
+                            <?php endif; ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+
+                <!-- Manage -->
                 <li class="treeview <?= ($active_parent === 'Manage') ? 'active' : '' ?>">
                     <a href="#" class="toggle">
                         <i class="fa fa-info-circle"></i>
@@ -507,12 +521,20 @@ foreach ($menu_structure as $parent => $data) {
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<? ($current_page == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_page == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_page == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>                        
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/about_us.php" class="<?= ($current_page == 'about_us.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>About Us</a></li>
+                        <?php if ($_SESSION['user_role'] !== 'hrm'): ?>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/for_staff_profile.php" class="<?= ($current_page == 'for_staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> My Profile</a></li>
+                        <?php endif; ?>
+
+                        <?php if ($_SESSION['user_role'] === 'hrm'): ?>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<?= ($current_page == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_page == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_page == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/about_us.php" class="<?= ($current_page == 'about_us.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>About Us</a></li>
+                        <?php endif; ?>
                     </ul>
                 </li>
+
+                <!-- Authentication (Always visible) -->
                 <li class="treeview <?= ($active_parent === 'Authentication') ? 'active' : '' ?>">
                     <a href="#" class="toggle">
                         <i class="fa fa-lock"></i>
@@ -522,7 +544,9 @@ foreach ($menu_structure as $parent => $data) {
                         </span>
                     </a>
                     <ul class="treeview-menu">
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/register.php" class="d-light <?= ($current_page == 'register.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user-plus"></i>Register</a></li>
+                        <?php if ($_SESSION['user_role'] === 'hrm'): ?>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/register.php" class="d-light <?= ($current_page == 'register.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user-plus"></i>Register</a></li>
+                        <?php endif; ?>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/logout.php" class="d-light <?= ($current_page == 'logout.php') ? 'active-submenu' : '' ?>"><i class="fas fa-sign-in-alt"></i> Log Out</a></li>
                         <li><a href="auth_lockscreen.html" class="d-light <?= ($current_page == 'auth_lockscreen.html') ? 'active-submenu' : '' ?>"><i class="fas fa-lock"></i> Lockscreen</a></li>
                         <li><a href="auth_user_pass.html" class="d-light <?= ($current_page == 'auth_user_pass.html') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Recover password</a></li>
@@ -531,6 +555,8 @@ foreach ($menu_structure as $parent => $data) {
             </ul>
         </section>
     </aside>
+
+
     <script>
         // DOM Ready Handler
         document.addEventListener('DOMContentLoaded', function() {

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../approve/config.php';
+include '../head/approve/config.php';
 
 // MUST Color Scheme
 define('MUST_YELLOW', '#FFD700');

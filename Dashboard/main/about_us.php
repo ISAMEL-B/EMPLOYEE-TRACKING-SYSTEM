@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Get current page name (handles URLs with parameters)
 $current_uri = $_SERVER['REQUEST_URI'];
 $current_page = basename(parse_url($current_uri, PHP_URL_PATH));

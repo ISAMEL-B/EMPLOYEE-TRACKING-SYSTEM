@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../approve/config.php';
+require_once '../head/approve/config.php';
 
 // Fetch all criteria for decision making
 $criteria_query = $conn->query("SELECT * FROM criteria");

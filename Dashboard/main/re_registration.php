@@ -1,7 +1,11 @@
 <?php
 session_start();
-require_once 'approve/config.php'; // Database connection
+require_once 'head/approve/config.php'; // Database connection
 
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
 // Get current page name (handles URLs with parameters)
 $current_uri = $_SERVER['REQUEST_URI'];
 $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
@@ -80,19 +84,13 @@ $user_role = $_SESSION['user_role'] ?? '';
     <title>Complete Your Profile - MUST HRM</title>
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
-    
+
     <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
 
     <!-- bootstrap js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <?php
-    // filter css for who has logged in since we use different sidebars
-    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] != 'hrm') {
-        echo '<link rel="stylesheet" href="bars/nav_sidebar/nav_side_bar.css">';
-    }
-    ?>
     <link rel="stylesheet" href="styles/re_registration.css">
 </head>
 
@@ -101,13 +99,8 @@ $user_role = $_SESSION['user_role'] ?? '';
     <!-- navigation bar -->
     <?php include 'bars/nav_bar.php';
     // <!-- sidebar -->
-    if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'hrm') {
-        include 'bars/side_bar.php';
-    } else {
-        include 'bars/nav_sidebar/side_bar.php';
-    }
+    include 'bars/side_bar.php';
     ?>
-
 
     <!-- Main Content -->
     <div class="container">

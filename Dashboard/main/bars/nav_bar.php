@@ -30,6 +30,63 @@ $user_role = $_SESSION['user_role'] ?? '';
             width: calc(100% - 80px);
         }
 
+        /* Role Indicator Styling */
+        .role-indicator {
+
+            /* Role Indicator */
+            position: fixed;
+            top: 20px;
+            /* Adjust based on navbar height */
+            left: 270px;
+            /* Sidebar width (280px) + 20px spacing */
+            /* background-color: #4CAF50; */
+            background-color:rgb(68, 40, 250);
+            /* MUST green */
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 3px solid var(--must-yellow);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        /* FontAwesome icon styling */
+        .role-indicator::before {
+            content: "\f007";
+            /* User icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) {
+            .role-indicator {
+                left: 20px;
+                /* When sidebar is collapsed */
+            }
+        }
+
+        @media (max-width: 576px) {
+            .role-indicator {
+                font-size: 11px;
+                padding: 4px 8px;
+                top: 10px;
+            }
+
+            .role-indicator::before {
+                font-size: 10px;
+            }
+        }
+
         /* Navigation Tabs Container */
         .ets-nav-tabs {
             display: flex;
@@ -100,21 +157,6 @@ $user_role = $_SESSION['user_role'] ?? '';
 
         .ets-nav-link.ets-logout:hover {
             background-color: rgba(231, 76, 60, 0.1);
-        }
-
-        /* Role Indicator */
-        .ets-role-indicator {
-            position: absolute;
-            top: 70px;
-            right: 20px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 4px;
-            font-size: 14px;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
         }
 
         /* Responsive Adjustments */
@@ -198,41 +240,42 @@ $user_role = $_SESSION['user_role'] ?? '';
         </button>
 
         <div class="ets-nav-tabs" id="ets-nav-tab" role="tablist">
-            <?php if ($user_role === 'hrm'): ?>
+            <div class="role-indicator">
+                Welcome our <?php echo strtoupper(htmlspecialchars($_SESSION['user_role'] ?? 'guest'));  ?>
+            </div>
+            <?php if ($_SESSION['user_role'] !== 'hrm' && $_SESSION['user_role'] !== 'staff'): ?>
+                <a class="ets-nav-link <?= ($current_page === 'upload_csv.php') ? 'active' : '' ?>"
+                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php">
+                    <i class="fas fa-home"></i> <span>Home</span>
+                </a>
+                <a class="ets-nav-link <?= ($current_page === 'approve.php') ? 'active' : '' ?>"
+                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php">
+                    <i class="fa fa-check-circle"></i> <span>Approve</span>
+                </a>
+            <?php endif; ?>
+            <?php if ($_SESSION['user_role'] === 'hrm'): ?>
                 <a class="ets-nav-link <?= ($current_page === 'index.php') ? 'active' : '' ?>"
                     href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php">
                     <i class="fas fa-chart-pie"></i> <span>ScoreCard</span>
                 </a>
-            <?php else: ?>
-                <a class="ets-nav-link <?= ($current_page === 'upload_csv.php') ? 'active' : '' ?>"
-                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/upload_csv.php">
-                    <i class="fas fa-home"></i> <span>Home</span>
+                <a class="ets-nav-link <?= ($current_page === 'approve.php') ? 'active' : '' ?>"
+                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php">
+                    <i class="fa fa-check-circle"></i> <span>Approve</span>
                 </a>
+
+                <a class="ets-nav-link <?= ($current_page === 'view_criteria.php') ? 'active' : '' ?>"
+                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/view_criteria.php">
+                    <i class="fas fa-tasks"></i> <span>Modify Criteria</span>
+                </a>
+
             <?php endif; ?>
-            <a class="ets-nav-link <?= ($current_page === 'modify_column.php') ? 'active' : '' ?>"
-                href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/modify_column.php">
-                <i class="fas fa-edit"></i> <span>Modify CSV</span>
-            </a>
 
-            <a class="ets-nav-link <?= ($current_page === 'view_criteria.php') ? 'active' : '' ?>"
-                href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/view_criteria.php">
-                <i class="fas fa-tasks"></i> <span>Modify Criteria</span>
-            </a>
-
+            <!-- Logout is visible to everyone -->
             <a class="ets-nav-link ets-logout"
                 href="/EMPLOYEE-TRACKING-SYSTEM/registration/logout.php">
                 <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
             </a>
         </div>
-
-        <?php
-        $current_page = basename($_SERVER['PHP_SELF']);
-        if ($current_page !== 'hrm_assistant.php' && isset($user_role) && !empty($user_role)): ?>
-            <div class="ets-role-indicator">
-                Role: <?= strtoupper($user_role) ?>
-            </div>
-        <?php endif; ?>
-
     </div>
 
     <script>
