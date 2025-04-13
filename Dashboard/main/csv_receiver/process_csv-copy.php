@@ -17,8 +17,7 @@ include 'config.php';
 // Expected column counts for validation
 $expected_columns = [
     'roles' => 2,
-    'faculties' => 2, // New table
-    'departments' => 3, // Now includes faculty_id
+    'departments' => 2,
     'staff' => 8, // Includes scholar_type
     'publications' => 4, // Includes publication_id, staff_id, publication_type, role
     'grants' => 3, // Includes grant_id, staff_id, grant_amount
@@ -29,7 +28,7 @@ $expected_columns = [
     'communityservice' => 3, // Includes community_service_id, staff_id, description
     'professionalbodies' => 3, // Includes professional_body_id, staff_id, body_name
     'degrees' => 4, // Includes degree_id, staff_id, degree_name, degree_classification
-    //'users' => 4 // Includes user_id, employee_id, email, passkey
+    'users' => 4 // Includes user_id, employee_id, email, passkey
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -59,12 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "INSERT INTO roles (role_id, role_name) VALUES (?, ?)",
                     "SELECT * FROM roles WHERE role_id = ?"
                 ],
-                'faculties' => [
-                    "INSERT INTO faculties (faculty_id, faculty_name) VALUES (?, ?)",
-                    "SELECT * FROM faculties WHERE faculty_id = ?"
-                ],
                 'departments' => [
-                    "INSERT INTO departments (department_id, department_name, faculty_id) VALUES (?, ?, ?)",
+                    "INSERT INTO departments (department_id, department_name) VALUES (?, ?)",
                     "SELECT * FROM departments WHERE department_id = ?"
                 ],
                 'staff' => [
@@ -93,8 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "SELECT * FROM academicactivities WHERE activity_id = ?"
                 ],
                 'service' => [
-                    "INSERT INTO service (service_id, staff_id, service_type) VALUES (?, ?, ?)",
-                    "SELECT * FROM service WHERE service_id = ?"
+                    "INSERT INTO service (community_service_id, staff_id, service_type) VALUES (?, ?, ?)",
+                    "SELECT * FROM service WHERE community_service_id = ?"
                 ],
                 'communityservice' => [
                     "INSERT INTO communityservice (community_service_id, staff_id, description) VALUES (?, ?, ?)",
@@ -108,10 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "INSERT INTO degrees (degree_id, staff_id, degree_name, degree_classification) VALUES (?, ?, ?, ?)",
                     "SELECT * FROM degrees WHERE degree_id = ?"
                 ],
-                // 'users' => [
-                //     "INSERT INTO users (user_id, employee_id, email, passkey) VALUES (?, ?, ?, ?)",
-                //     "SELECT * FROM users WHERE user_id = ?"
-                // ]
+                'users' => [
+                    "INSERT INTO users (user_id, employee_id, email, passkey) VALUES (?, ?, ?, ?)",
+                    "SELECT * FROM users WHERE user_id = ?"
+                ]
             ];
 
             if (!isset($query_map[$table])) {
@@ -128,9 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $is_updated = false;
             $roles = [];
             $departments = [];
-            $faculties = [];
 
-            // Fetch foreign keys if necessary
+            // Fetch foreign keys if necessary (roles and departments for 'staff')
             if ($table === 'staff') {
                 $role_result = $conn->query("SELECT role_id, role_name FROM roles");
                 while ($row = $role_result->fetch_assoc()) {
@@ -139,11 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $department_result = $conn->query("SELECT department_id, department_name FROM departments");
                 while ($row = $department_result->fetch_assoc()) {
                     $departments[$row['department_name']] = $row['department_id'];
-                }
-            } elseif ($table === 'departments') {
-                $faculty_result = $conn->query("SELECT faculty_id, faculty_name FROM faculties");
-                while ($row = $faculty_result->fetch_assoc()) {
-                    $faculties[$row['faculty_name']] = $row['faculty_id'];
                 }
             }
 
@@ -156,15 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 switch ($table) {
                     case 'roles':
-                    case 'faculties':
+                    case 'departments':
                         $check_stmt->bind_param("i", $data[0]);
                         $stmt->bind_param("is", $data[0], $data[1]);
-                        break;
-                    case 'departments':
-                        $faculty_id = $faculties[$data[2]] ?? null;
-                        if (!$faculty_id) continue 2; // Skip row if faculty not found
-                        $check_stmt->bind_param("i", $data[0]);
-                        $stmt->bind_param("isi", $data[0], $data[1], $faculty_id);
                         break;
                     case 'staff':
                         $role_id = $roles[$data[4]] ?? null;
@@ -209,10 +192,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $check_stmt->bind_param("i", $data[0]);
                         $stmt->bind_param("iiss", $data[0], $data[1], $data[2], $data[3]);
                         break;
-                    // case 'users':
-                    //     $check_stmt->bind_param("i", $data[0]);
-                    //     $stmt->bind_param("isss", $data[0], $data[1], $data[2], $data[3]);
-                    //     break;
+                    case 'users':
+                        $check_stmt->bind_param("i", $data[0]);
+                        $stmt->bind_param("isss", $data[0], $data[1], $data[2], $data[3]);
+                        break;
                     default:
                         continue 2;
                 }

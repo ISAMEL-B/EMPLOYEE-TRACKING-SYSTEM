@@ -77,13 +77,6 @@ The HR Decision Support Assistant has capabilities beyond the basic queries you 
 - Quick access to top performers
 - Identification of overdue reviews
 
-### 9. **Natural Language Processing**
-
-- Understands variations of questions (e.g., "promotion", "promote", "advancement")
-- Handles staff name queries in different formats
-- Provides contextual follow-up questions
-- Offers related suggestions after each response
-
 ### 10. **User Experience Features**
 
 - Persistent chat history (localStorage + server backup)

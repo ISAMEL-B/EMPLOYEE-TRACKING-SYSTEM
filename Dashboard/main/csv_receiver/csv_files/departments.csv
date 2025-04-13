@@ -1,7 +1,17 @@
-department_id,department_name
-1,Computer Science
-2,Information Technology
-3,Electrical Engineering
-4,Mechanical Engineerings
-5,Civil Engineering
-6,Human Resource Management
+department_id,department_name,faculty_name
+1,Computer Science,faculty of computing and informartics
+2,Information Technology,faculty of computing and informartics
+3,Electrical Engineering,faculty of applied sciences
+4,Mechanical Engineerings,faculty of applied sciences
+5,Civil Engineering,faculty of applied sciences
+6,Human Resource Management,faculty of business
+7,Mathematics,faculty of science
+8,Physics,faculty of science
+9,Human Anatomy,faculty of medicine
+10,Nursing,faculty of medicine
+11,Accounting,faculty of business
+12,Marketing,faculty of business
+13,Food Science,faculty of applied sciences
+14,Agricultural Engineering,faculty of applied sciences
+15,Development Studies,faculty of interdisciplinary studies
+16,Gender and Women Studies,faculty of interdisciplinary studies

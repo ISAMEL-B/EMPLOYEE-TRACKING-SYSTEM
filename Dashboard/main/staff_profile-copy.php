@@ -2,23 +2,36 @@
 session_start();
 require_once 'approve/config.php'; // Database connection
 
-// Get current user ID from session
-$user_id = $_SESSION['user_id'] ?? null;
-
 // Check user authorization
 if ($_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
 
-// Fetch user data from database
+// Initialize variables
+$user_id = null;
 $user_data = [];
 $staff_data = [];
 $performance_data = [];
+$all_staff = [];
 
-if ($user_id) {
+// Fetch all staff for dropdown
+$staff_query = $conn->prepare("SELECT s.staff_id, s.first_name, s.last_name, d.department_name 
+                             FROM staff s
+                             JOIN departments d ON s.department_id = d.department_id
+                             ORDER BY s.first_name, s.last_name");
+$staff_query->execute();
+$staff_result = $staff_query->get_result();
+while ($row = $staff_result->fetch_assoc()) {
+    $all_staff[] = $row;
+}
+
+// Check if a staff member was selected
+if (isset($_POST['selected_staff'])) {
+    $user_id = $_POST['selected_staff'];
+    
     // Get basic user info
-    $user_query = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+    $user_query = $conn->prepare("SELECT * FROM users WHERE staff_id = ?");
     $user_query->bind_param("i", $user_id);
     $user_query->execute();
     $user_result = $user_query->get_result();
@@ -30,7 +43,6 @@ if ($user_id) {
                                      FROM staff s
                                      JOIN departments d ON s.department_id = d.department_id
                                      JOIN roles r ON s.role_id = r.role_id
-                                     JOIN users u ON u.staff_id = s.staff_id
                                      WHERE s.staff_id = ?");
         $staff_query->bind_param("i", $user_id);
         $staff_query->execute();
@@ -42,8 +54,9 @@ if ($user_id) {
                                            (SELECT COUNT(*) FROM publications WHERE staff_id = ?) as publication_count,
                                            (SELECT COUNT(*) FROM degrees WHERE staff_id = ?) as degree_count,
                                            (SELECT COUNT(*) FROM academicactivities WHERE staff_id = ?) as activity_count,
-                                           (SELECT COUNT(*) FROM supervision WHERE staff_id = ?) as supervision_count");
-        $performance_query->bind_param("iiii", $user_id, $user_id, $user_id, $user_id);
+                                           (SELECT COUNT(*) FROM supervision WHERE staff_id = ?) as supervision_count,
+                                           (SELECT COUNT(*) FROM communityservice WHERE staff_id = ?) as community_service_count");
+        $performance_query->bind_param("iiiii", $user_id, $user_id, $user_id, $user_id, $user_id);
         $performance_query->execute();
         $performance_result = $performance_query->get_result();
         $performance_data = $performance_result->fetch_assoc();
@@ -59,15 +72,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - MUST HRM</title>
+    <title>Staff Profile - MUST HRM</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="styles/staff_profile.css">
-
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 38px;
+            padding: 5px;
+            border: 1px solid #ced4da;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px;
+        }
+    </style>
 </head>
 <body>
-         
     <!-- navigation bar -->
     <?php include 'bars/nav_bar.php'; ?>
     <!-- sidebar -->
@@ -78,13 +99,45 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <!-- Profile Header -->
         <div class="profile-header">
             <div class="container text-center">
-                <h1 class="display-4 fw-bold">Selected Staff Profile</h1>
+                <h1 class="display-4 fw-bold">Staff Profile Management</h1>
                 <p class="lead">Mbarara University of Science and Technology</p>
             </div>
         </div>
         
+        <!-- Staff Selection Form -->
+        <div class="container py-3">
+            <div class="card mb-4">
+                <div class="card-header must-bg-primary text-white">
+                    <h5 class="mb-0">Select Staff Member</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <select class="form-select select2" name="selected_staff" required>
+                                    <option value="">-- Select Staff Member --</option>
+                                    <?php foreach ($all_staff as $staff): ?>
+                                        <option value="<?= $staff['staff_id'] ?>" <?= ($user_id == $staff['staff_id']) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']) ?> 
+                                            (<?= htmlspecialchars($staff['department_name']) ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn must-bg-primary text-white w-100">
+                                    <i class="fas fa-search me-1"></i> View Profile
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <?php if (!empty($user_id)): ?>
         <!-- Main Content -->
-        <div class="container py-4">
+        <div class="container py-3">
             <div class="row">
                 <!-- Left Column - Profile Card -->
                 <div class="col-lg-4 mb-4">
@@ -302,9 +355,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <h5 class="mb-0">Skills & Competencies</h5>
                         </div>
                         <div class="card-body">
-                            <?php if (!empty($user_data['employee_id'])): 
+                            <?php if (!empty($user_id)): 
                                 $skills_query = $conn->prepare("SELECT * FROM professionalbodies WHERE staff_id = ?");
-                                $skills_query->bind_param("i", $user_data['employee_id']);
+                                $skills_query->bind_param("i", $user_id);
                                 $skills_query->execute();
                                 $skills_result = $skills_query->get_result();
                                 
@@ -336,23 +389,27 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </div>
             </div>
         </div>
+        <?php endif; ?>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery and Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        // Additional profile page functionality
-        document.addEventListener('DOMContentLoaded', function() {
+        $(document).ready(function() {
+            // Initialize Select2 for staff dropdown
+            $('.select2').select2({
+                placeholder: "Search for staff member...",
+                allowClear: true,
+                width: '100%'
+            });
+            
             // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-            
-            // Handle edit profile button
-            document.querySelector('.btn-edit-profile').addEventListener('click', function() {
-                // Implement your edit profile modal here
-                console.log('Edit profile clicked');
             });
         });
     </script>
