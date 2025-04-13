@@ -3,8 +3,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Include dependencies
-include '../config.php'; 
-include '../department score/department_score.php'; // Ensure this file contains get_department_performance()
+include __DIR__ .'/../config.php'; 
+include __DIR__ .'/../department score/department_score.php'; // Ensure this file contains get_department_performance()
 
 function get_faculty_performance($conn, $faculty_id) {
     // Initialize faculty data structure

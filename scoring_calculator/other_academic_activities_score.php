@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include_once 'config.php'; // Database config
+include_once __DIR__ .'/config.php'; // Database config
 
 class OtherAcademicActivitiesScore {
     private $conn;

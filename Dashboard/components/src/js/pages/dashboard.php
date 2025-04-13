@@ -1,3 +1,19 @@
+<?php
+header("Content-Type: application/javascript");
+
+include __DIR__ .'/../../../../../scoring_calculator/university score/university_score.php';
+
+// Grab data from $university_data array
+$year2025Data = [
+    'year' => '2025',
+    'phd' => $university_data['PhD'],
+    'masters' => $university_data['Masters'],
+    'degree_first' => $university_data['First Class'],
+    'degree_second' => $university_data['Second Upper'],
+    'certifications' => $university_data['Other']
+];
+?>
+
 $(function () {
 
   'use strict';
@@ -92,8 +108,8 @@ $(function () {
 				{ year: '2022', phd: 18, masters: 28, degree_first: 70, degree_second: 95, certifications: 50 },
 				{ year: '2023', phd: 14, masters: 24, degree_first: 65, degree_second: 100, certifications: 45 },
 				{ year: '2024', phd: 20, masters: 30, degree_first: 75, degree_second: 110, certifications: 55 },
-				{ year: '2025', phd: 25, masters: 35, degree_first: 80, degree_second: 120, certifications: 60 }
-			],
+				<?php echo json_encode($year2025Data); ?>
+				],
 			xkey: 'year', // The x-axis key
 			ykeys: ['phd', 'masters', 'degree_first', 'degree_second', 'certifications'], // Keys for bar data
 			labels: ['PhD', 'Masters', 'Degree (First Class)', 'Degree (Second Class)', 'Certifications'], // Labels for the bars
