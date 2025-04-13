@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include 'config.php'; // Database config
+include __DIR__ .'/config.php'; // Database config
 
 class PostgraduateSupervisionScore {
     private $conn;

@@ -1,9 +1,27 @@
 ﻿<?php
+    //report all errors
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+
     session_start();
     if ($_SESSION['user_role'] !== 'hrm') {
         header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
         exit();
     }
+
+    //include backend calculator
+    // include '/EMPLOYEE-TRACKING-SYSTEM/scoring_calculator/university score/university_score.php';
+    include '../../scoring_calculator/university score/university_score.php';
+    
+
+    // echo $university_data['PhD'] . ' space'; 
+    // echo $university_data['First Class']. ' space';
+    // echo $university_data['Masters']. ' space';
+    // echo $university_data['academic_score']. ' space';
+    // echo 'thsi is the world';
+    
+    
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,10 +87,10 @@
                     <!-- actual dynamic data from your database / API -->
                     <?php
 
-                    $phds = 85; // Dynamic value for PhD's
-                    $masters = 600; // Dynamic value for Masters Degrees
-                    $bachelors = 900; // Dynamic value for Bachelor's Honors
-                    $trainings = 1100; // Dynamic value for Professional Trainings
+                    $phds = $university_data['PhD']; // Dynamic value for PhD's
+                    $masters = $university_data['Masters']; // Dynamic value for Masters Degrees
+                    $bachelors_first_class = $university_data['First Class']; // Dynamic value for Bachelor's Honors
+                    $trainings = $university_data['Other']; // Dynamic value for Professional Trainings
                     ?>
 
                     <div class="row">
@@ -103,7 +121,7 @@
                             <div class="info-box">
                                 <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $bachelors; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $bachelors_first_class; ?></b></span>
                                     <span class="info-box-text">Bachelor's Honors</span>
                                 </div>
                             </div>
@@ -136,10 +154,13 @@
                                             <h5><i class="fa fa-circle me-5 text-info"></i>Phd's </h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-secondary"></i>Masters</h5>
+                                            <h5><i class="fa fa-circle me-5 text--bs-indigo"></i>Masters</h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Bachelor's</h5>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First clas</h5>
+                                        </li>
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First clas</h5>
                                         </li>
                                         <li>
                                             <h5><i class="fa fa-circle me-5 text-danger"></i>Certifications</h5>
@@ -448,7 +469,10 @@
     <script src="../components/assets/vendor_components/jquery.peity/jquery.peity.js"></script>
     <script src="../components/src/js/demo.js"></script>
     <script src="../components/src/js/template.js"></script>
-    <script src="../components/src/js/pages/dashboard.js"></script>
+    <!-- <script src="../components/src/js/pages/dashboard.php"></script> -->
+    <?php
+        include '../components/src/js/pages/dashboarddd.php';
+    ?>
 
 
 </body>

@@ -2,7 +2,7 @@
 error_reporting(E_ALL); // Report all PHP errors
 ini_set('display_errors', 1); // Display errors on the page
 
-include 'config.php'; // Include the database configuration file
+include __DIR__ .'/config.php'; // Include the database configuration file
 
 class ResearchGrants {
     private $staff_id;

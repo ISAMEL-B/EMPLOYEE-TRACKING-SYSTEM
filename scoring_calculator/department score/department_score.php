@@ -3,17 +3,17 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Include database connection and required classes
-include '../config.php'; 
-include '../academic_score.php';
-include '../grants_score.php';
-include '../innovation_score.php';
-include '../publication_score.php';
-include '../post_graduate_supervision_score.php';
-include '../membership_to_professional_bodies_score.php';
-include '../community_service_score.php';
-include '../other_academic_activities_score.php';
-include '../teaching_experience_score.php';
-include '../service_to_university_score.php';
+include __DIR__ .'/../config.php'; 
+include __DIR__ .'/../academic_score.php';
+include __DIR__ .'/../grants_score.php';
+include __DIR__ .'/../innovation_score.php';
+include __DIR__ .'/../publication_score.php';
+include __DIR__ .'/../post_graduate_supervision_score.php';
+include __DIR__ .'/../membership_to_professional_bodies_score.php';
+include __DIR__ .'/../community_service_score.php';
+include __DIR__ .'/../other_academic_activities_score.php';
+include __DIR__ .'/../teaching_experience_score.php';
+include __DIR__ .'/../service_to_university_score.php';
 
 function get_department_performance($conn, $department_id) {
     $department_data = [
