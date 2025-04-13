@@ -7,7 +7,7 @@ $username = "root";
 $password = "";
 $dbname = "hrm_db";
 
-$conn = new mysqli ($servername, $username, $password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
@@ -81,12 +81,16 @@ if (isset($_POST['login'])) {
             // Redirect based on role
             if ($_SESSION['user_role'] === 'hrm') {
                 header("Location: ../Dashboard/main/index.php");
-            // } elseif ($_SESSION['user_role'] === 'hod' || $_SESSION['user_role'] === 'ar') {
-            //     // Redirect based on role to upload.php with role as a query parameter
-            //     header("Location: ../Dashboard/main/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
+            } elseif ($_SESSION['user_role'] === 'staff') {
+                // Redirect based on role to upload.php with role as a query parameter
+                header("Location: ../Dashboard/main/staff/for_staff_profile.php");
+
+                // } elseif ($_SESSION['user_role'] === 'hod' || $_SESSION['user_role'] === 'ar') {
+                //     // Redirect based on role to upload.php with role as a query parameter
+                //     header("Location: ../Dashboard/main/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
             } else {
                 // Redirect based on role to upload.php with role as a query parameter
-                header("Location: ../Dashboard/main/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
+                header("Location: ../Dashboard/main/head/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
             }
             exit();
         } else {

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../approve/config.php';
+include '../head/approve/config.php';
 
 // Initialize response variable
 $response = '';

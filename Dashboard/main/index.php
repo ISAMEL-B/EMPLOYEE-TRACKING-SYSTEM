@@ -43,10 +43,6 @@
 
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
 
-    <!-- my css -->
-    <!-- <link rel="stylesheet" href="bars/nav_sidebar/nav_side_bar.css">
-    <link rel="stylesheet" href="bars/main_nav_side_bar.css"> -->
-
 </head>
 
 <body class="hold-transition light-skin sidebar-mini theme-primary fixed sidebar-collapse">
