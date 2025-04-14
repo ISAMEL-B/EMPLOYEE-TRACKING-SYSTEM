@@ -23,10 +23,6 @@ if (!isset($_SESSION['user_id'])) {
   include '../bars/side_bar.php';
   ?>
 
-  <div class="role-indicator">
-    Logged in as: <?php echo strtoupper(htmlspecialchars($_SESSION['user_role'] ?? 'guest')); ?>
-  </div>
-
   <div class="content">
     <form id="uploadForm" action="../csv_receiver/process_csv.php" method="POST" enctype="multipart/form-data">
       <h2>Upload CSV File</h2>
