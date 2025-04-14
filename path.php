@@ -1,3 +1,3 @@
 <?php 
-define('BASE_PATH', dirname(__DIR__)); // If this is in my/name/
+define('BASE_PATH', dirname(__DIR__));
 ?>
