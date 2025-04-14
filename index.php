@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'Dashboard/main/approve/config.php'; // Your database connection file
+include 'Dashboard/main/head/approve/config.php'; // Your database connection file
 ?>
 <!DOCTYPE html>
 <html lang="en">
