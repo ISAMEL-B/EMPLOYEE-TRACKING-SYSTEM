@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'approve/config.php'; // Database connection
+require_once 'head/approve/config.php'; // Database connection
 
 // Fetch all staff for dropdown
 $staff_query = $conn->query("SELECT s.staff_id, s.first_name, s.last_name, d.department_name

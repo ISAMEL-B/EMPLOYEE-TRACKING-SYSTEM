@@ -18,7 +18,7 @@ $menu_structure = [
         'icon' => 'fa-info-circle'
     ],
     'Authentication' => [
-        'pages' => ['register.php', 'logout.php', 'auth_lockscreen.html', 'auth_user_pass.html'],
+        'pages' => ['register.php', 'logout.php', 'lock_screen.php', 'password_recovery.php'],
         'icon' => 'fa-lock'
     ]
 ];
@@ -548,8 +548,8 @@ foreach ($menu_structure as $parent => $data) {
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/register.php" class="d-light <?= ($current_page == 'register.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user-plus"></i>Register</a></li>
                         <?php endif; ?>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/logout.php" class="d-light <?= ($current_page == 'logout.php') ? 'active-submenu' : '' ?>"><i class="fas fa-sign-in-alt"></i> Log Out</a></li>
-                        <li><a href="auth_lockscreen.html" class="d-light <?= ($current_page == 'auth_lockscreen.html') ? 'active-submenu' : '' ?>"><i class="fas fa-lock"></i> Lockscreen</a></li>
-                        <li><a href="auth_user_pass.html" class="d-light <?= ($current_page == 'auth_user_pass.html') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Recover password</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/lock_screen.php" class="d-light <?= ($current_page == 'lock_screen.php') ? 'active-submenu' : '' ?>"><i class="fas fa-lock"></i> Lockscreen</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/password_recovery.php" class="d-light <?= ($current_page == 'password_recovvery.php') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Recover password</a></li>
                     </ul>
                 </li>
             </ul>
