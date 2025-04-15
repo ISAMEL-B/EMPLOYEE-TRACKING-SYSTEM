@@ -171,7 +171,9 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                     <a href="/EMPLOYEE-TRACKING-SYSTEM/registration/register.php" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i> Add Staff
                     </a>
+                    
                 </div>
+                <div style='color:green; font-size: 25px;' class="row pb-0"><p>Current Total Staff Members: <?=$total_staff?></p></div>
             </div>
 
             <div class="card staff-management-card">
@@ -255,6 +257,14 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
             </div>
             <div>
                 <!-- Pagination -->
+                <?php
+                $start_record = ($current_page - 1) * $records_per_page + 1;
+                $end_record = min($start_record + $records_per_page - 1, $total_staff);
+                ?>
+                <p class="text-center mb-3">
+                    Showing <?= $start_record ?>–<?= $end_record ?> of <?= $total_staff ?> staff members
+                </p>
+
                 <nav>
                     <ul class="pagination justify-content-center">
                         <?php if ($current_page > 1): ?>
