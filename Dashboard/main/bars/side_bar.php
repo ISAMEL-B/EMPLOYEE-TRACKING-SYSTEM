@@ -6,7 +6,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
 // Define menu structure with parent-child relationships
 $menu_structure = [
     'Dashboard' => [
-        'pages' => ['index.php', 'index2.php', 'index3.php', 'individual_view.php', 'hrm_assistant.php'],
+        'pages' => ['index.php', 'index2.php', 'index3.php', 'individual_view2.php', 'hrm_assistant.php'],
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [
@@ -14,7 +14,7 @@ $menu_structure = [
         'icon' => 'fa-edit'
     ],
     'Manage' => [
-        'pages' => ['individual_view.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php'],
+        'pages' => ['individual_view2.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php'],
         'icon' => 'fa-info-circle'
     ],
     'Authentication' => [
@@ -483,7 +483,7 @@ foreach ($menu_structure as $parent => $data) {
                             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view.php" class="<?= ($current_page == 'individual_view.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view2.php" class="<?= ($current_page == 'individual_view2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
                             <?php endif; ?>
                         </ul>
