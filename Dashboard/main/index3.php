@@ -223,12 +223,12 @@ $chemistry = $department_counts['Chemistry'];
                                     <thead>
                                         <tr>
                                             <th>Department</th>
-                                            <th>Employees</th>
-                                            <th>Avg. Tenure</th>
-                                            <th>Avg. Rating</th>
-                                            <th>Training Hours</th>
-                                            <th>Vacancy Rate</th>
-                                            <th>Budget Utilization</th>
+                                            <th>Total Employees</th>
+                                            <th>Total Publications</th>
+                                            <th>Total Research Grant amount</th>
+                                            <th>Total innovations</th>
+                                            <th>Average Score</th>
+                                            <!-- <th>Budget Utilization</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -236,11 +236,11 @@ $chemistry = $department_counts['Chemistry'];
                                         <tr>
                                             <td><strong><?= $dept ?></strong></td>
                                             <td><?= $count ?></td>
-                                            <td>3.2 years</td>
-                                            <td>4.1</td>
+                                            <td>100</td>
+                                            <td>700 UGX</td>
                                             <td>35</td>
-                                            <td>8%</td>
-                                            <td>78%</td>
+                                            <td>76</td>
+                                            <!-- <td>78%</td> -->
                                         </tr>
                                     <?php endforeach; ?>
                                         <!-- <tr>
@@ -283,7 +283,7 @@ $chemistry = $department_counts['Chemistry'];
                                 </table>
                             </div>
 
-                            <div class="row mt-4">
+                            <!-- <div class="row mt-4">
                                 <div class="col-md-6">
                                     <div class="chart-container">
                                         <canvas id="deptSizeChart"></canvas>
@@ -294,7 +294,7 @@ $chemistry = $department_counts['Chemistry'];
                                         <canvas id="deptRatingChart"></canvas>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -605,123 +605,123 @@ $chemistry = $department_counts['Chemistry'];
         };
 
         // Initialize comparison charts
-        const deptSizeCtx = document.getElementById('deptSizeChart').getContext('2d');
-        const deptSizeChart = new Chart(deptSizeCtx, {
-            type: 'bar',
-            data: {
-                labels: ['BSE', 'BCS', 'Civil', 'Electrical', 'Accounting & Finance'],
-                datasets: [{
-                    label: 'Number of Employees',
-                    data:   [
-                        <?= $department_counts['Software Engineering'] ?>, 
-                        <?= $department_counts['Computer Science'] ?>, 
-                        <?= $department_counts['Civil Engineering'] ?>,
-                        <?= $department_counts['Electrical Engineering'] ?>,
-                        <?= $department_counts['Accounting'] ?>
-                    ],
-                    backgroundColor: [
-                        'rgba(0, 102, 51, 0.7)',
-                        'rgba(0, 51, 102, 0.7)',
-                        'rgba(255, 204, 0, 0.7)',
-                        'rgba(0, 102, 51, 0.5)',
-                        'rgba(0, 51, 102, 0.5)'
-                    ],
-                    borderColor: [
-                        'rgba(0, 102, 51, 1)',
-                        'rgba(0, 51, 102, 1)',
-                        'rgba(255, 204, 0, 1)',
-                        'rgba(0, 102, 51, 1)',
-                        'rgba(0, 51, 102, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Department Size Comparison',
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        }
-                    },
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Number of Employees'
-                        }
-                    }
-                }
-            }
-        });
+        // const deptSizeCtx = document.getElementById('deptSizeChart').getContext('2d');
+        // const deptSizeChart = new Chart(deptSizeCtx, {
+        //     type: 'bar',
+        //     data: {
+        //         labels: ['BSE', 'BCS', 'Civil', 'Electrical', 'Accounting & Finance'],
+        //         datasets: [{
+        //             label: 'Number of Employees',
+        //             data:   [
+        //                 <?= $department_counts['Software Engineering'] ?>, 
+        //                 <?= $department_counts['Computer Science'] ?>, 
+        //                 <?= $department_counts['Civil Engineering'] ?>,
+        //                 <?= $department_counts['Electrical Engineering'] ?>,
+        //                 <?= $department_counts['Accounting'] ?>
+        //             ],
+        //             backgroundColor: [
+        //                 'rgba(0, 102, 51, 0.7)',
+        //                 'rgba(0, 51, 102, 0.7)',
+        //                 'rgba(255, 204, 0, 0.7)',
+        //                 'rgba(0, 102, 51, 0.5)',
+        //                 'rgba(0, 51, 102, 0.5)'
+        //             ],
+        //             borderColor: [
+        //                 'rgba(0, 102, 51, 1)',
+        //                 'rgba(0, 51, 102, 1)',
+        //                 'rgba(255, 204, 0, 1)',
+        //                 'rgba(0, 102, 51, 1)',
+        //                 'rgba(0, 51, 102, 1)'
+        //             ],
+        //             borderWidth: 1
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         plugins: {
+        //             title: {
+        //                 display: true,
+        //                 text: 'Department Size Comparison',
+        //                 font: {
+        //                     size: 14,
+        //                     weight: 'bold'
+        //                 }
+        //             },
+        //             legend: {
+        //                 display: false
+        //             }
+        //         },
+        //         scales: {
+        //             y: {
+        //                 beginAtZero: true,
+        //                 title: {
+        //                     display: true,
+        //                     text: 'Number of Employees'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
 
-        const deptRatingCtx = document.getElementById('deptRatingChart').getContext('2d');
-        const deptRatingChart = new Chart(deptRatingCtx, {
-            type: 'radar',
-            data: {
-                labels: ['Performance', 'Productivity', 'Collaboration', 'Innovation', 'Satisfaction'],
-                datasets: [{
-                        label: 'IT Department',
-                        data: [4.1, 4.3, 3.9, 4.5, 3.8],
-                        backgroundColor: 'rgba(0, 102, 51, 0.2)',
-                        borderColor: 'rgba(0, 102, 51, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(0, 102, 51, 1)'
-                    },
-                    {
-                        label: 'Finance Department',
-                        data: [4.3, 4.5, 4.2, 3.8, 4.1],
-                        backgroundColor: 'rgba(0, 51, 102, 0.2)',
-                        borderColor: 'rgba(0, 51, 102, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(0, 51, 102, 1)'
-                    },
-                    {
-                        label: 'HR Department',
-                        data: [4.5, 4.4, 4.7, 4.2, 4.6],
-                        backgroundColor: 'rgba(255, 204, 0, 0.2)',
-                        borderColor: 'rgba(255, 204, 0, 1)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'rgba(255, 204, 0, 1)'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Department Performance Metrics',
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        }
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                },
-                scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 0,
-                        suggestedMax: 5
-                    }
-                }
-            }
-        });
+        // const deptRatingCtx = document.getElementById('deptRatingChart').getContext('2d');
+        // const deptRatingChart = new Chart(deptRatingCtx, {
+        //     type: 'radar',
+        //     data: {
+        //         labels: ['Performance', 'Productivity', 'Collaboration', 'Innovation', 'Satisfaction'],
+        //         datasets: [{
+        //                 label: 'IT Department',
+        //                 data: [4.1, 4.3, 3.9, 4.5, 3.8],
+        //                 backgroundColor: 'rgba(0, 102, 51, 0.2)',
+        //                 borderColor: 'rgba(0, 102, 51, 1)',
+        //                 borderWidth: 2,
+        //                 pointBackgroundColor: 'rgba(0, 102, 51, 1)'
+        //             },
+        //             {
+        //                 label: 'Finance Department',
+        //                 data: [4.3, 4.5, 4.2, 3.8, 4.1],
+        //                 backgroundColor: 'rgba(0, 51, 102, 0.2)',
+        //                 borderColor: 'rgba(0, 51, 102, 1)',
+        //                 borderWidth: 2,
+        //                 pointBackgroundColor: 'rgba(0, 51, 102, 1)'
+        //             },
+        //             {
+        //                 label: 'HR Department',
+        //                 data: [4.5, 4.4, 4.7, 4.2, 4.6],
+        //                 backgroundColor: 'rgba(255, 204, 0, 0.2)',
+        //                 borderColor: 'rgba(255, 204, 0, 1)',
+        //                 borderWidth: 2,
+        //                 pointBackgroundColor: 'rgba(255, 204, 0, 1)'
+        //             }
+        //         ]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         plugins: {
+        //             title: {
+        //                 display: true,
+        //                 text: 'Department Performance Metrics',
+        //                 font: {
+        //                     size: 14,
+        //                     weight: 'bold'
+        //                 }
+        //             },
+        //             legend: {
+        //                 position: 'bottom'
+        //             }
+        //         },
+        //         scales: {
+        //             r: {
+        //                 angleLines: {
+        //                     display: true
+        //                 },
+        //                 deptRatingChart               suggestedMin: 0,
+        //                 suggestedMax: 5
+        //             }
+        //         }
+        //     }
+        // });
 
         // Department detail charts (will be initialized when department is selected)
         let deptPositionChart, deptTrainingChart, deptGenderChart, deptBudgetChart;
