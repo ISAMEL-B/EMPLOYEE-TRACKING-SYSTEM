@@ -117,17 +117,6 @@ button:hover {
   color: #3c763d;
 }
 
-.role-indicator {
-  position: absolute;
-  top: 80px;
-  right: 10px;
-  background-color:rgb(76, 206, 78);
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.9em;
-}
-
-
 /* STYLING MAIN CONTENT */
 /* Main Content */
 .main-content {

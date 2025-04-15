@@ -20,236 +20,237 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- Font Awesome -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
-    
+
     <link rel="stylesheet" href="../../../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../../../components/bootstrap/css/bootstrap.min.css">
 
     <link rel="stylesheet" href="../../../components/src/fontawesome/css/all.min.css">
     <!-- Custom CSS -->
-<style>
-    :root {
-    /* MUST Color Scheme */
-    --must-green: #006633;
-    --must-yellow: #FFCC00;
-    --must-blue: #003366;
-    --must-light-green: #e6f2ec;
-    --must-light-yellow: #fff9e6;
-    --must-light-blue: #e6ecf2;
-    --must-red: #cc0000;
-}
+    <style>
+        :root {
+            /* MUST Color Scheme */
+            --must-green: #006633;
+            --must-yellow: #FFCC00;
+            --must-blue: #003366;
+            --must-light-green: #e6f2ec;
+            --must-light-yellow: #fff9e6;
+            --must-light-blue: #e6ecf2;
+            --must-red: #cc0000;
+        }
 
-/* Base Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-}
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
 
-/* Layout Structure */
-.wrapper {
-    margin-left: 280px;
-    padding: 20px 30px;
-    transition: all 0.3s;
-    min-height: calc(100vh - 56px); /* Adjust for navbar height */
-}
+        /* Layout Structure */
+        .wrapper {
+            margin-left: 280px;
+            padding: 20px 30px;
+            transition: all 0.3s;
+            min-height: calc(100vh - 56px);
+            /* Adjust for navbar height */
+        }
 
-#sidebar {
-    width: 280px;
-    transition: all 0.3s;
-    background-color: white;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
+        #sidebar {
+            width: 280px;
+            transition: all 0.3s;
+            background-color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
 
-/* Main Content Container */
-.verification-container {
-    background-color: white;
-    border-top: 4px solid var(--must-green);
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    padding: 25px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+        /* Main Content Container */
+        .verification-container {
+            background-color: white;
+            border-top: 4px solid var(--must-green);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-/* Notification Styles */
-.notification-area {
-    margin: 20px 0;
-}
+        /* Notification Styles */
+        .notification-area {
+            margin: 20px 0;
+        }
 
-.alert-dismissible {
-    padding-right: 4rem;
-    border-left: 4px solid;
-}
+        .alert-dismissible {
+            padding-right: 4rem;
+            border-left: 4px solid;
+        }
 
-.alert-success {
-    border-left-color: var(--must-green);
-}
+        .alert-success {
+            border-left-color: var(--must-green);
+        }
 
-.alert-primary {
-    border-left-color: var(--must-blue);
-}
+        .alert-primary {
+            border-left-color: var(--must-blue);
+        }
 
-.alert-danger {
-    border-left-color: var(--must-red);
-}
+        .alert-danger {
+            border-left-color: var(--must-red);
+        }
 
-/* Filter Controls */
-.filter-controls {
-    background-color: var(--must-light-green);
-    border: 1px solid var(--must-green);
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 25px;
-}
+        /* Filter Controls */
+        .filter-controls {
+            background-color: var(--must-light-green);
+            border: 1px solid var(--must-green);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
 
-.filter-controls .form-select,
-.filter-controls .form-control {
-    border-color: var(--must-blue);
-}
+        .filter-controls .form-select,
+        .filter-controls .form-control {
+            border-color: var(--must-blue);
+        }
 
-.filter-controls .btn-primary {
-    background-color: var(--must-green);
-    border-color: var(--must-green);
-}
+        .filter-controls .btn-primary {
+            background-color: var(--must-green);
+            border-color: var(--must-green);
+        }
 
-/* Approval Items */
-.approval-item {
-    transition: all 0.3s ease;
-    border-left: 4px solid var(--must-blue);
-    border-radius: 6px;
-    margin-bottom: 15px;
-    padding: 15px;
-    background-color: white;
-}
+        /* Approval Items */
+        .approval-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--must-blue);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+        }
 
-.approval-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-left-color: var(--must-green);
-}
+        .approval-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-left-color: var(--must-green);
+        }
 
-.approval-info h5 {
-    color: var(--must-blue);
-    font-weight: 600;
-}
+        .approval-info h5 {
+            color: var(--must-blue);
+            font-weight: 600;
+        }
 
-.approval-info small {
-    color: #6c757d;
-}
+        .approval-info small {
+            color: #6c757d;
+        }
 
-/* Action Buttons */
-.btn-outline-primary {
-    color: var(--must-blue);
-    border-color: var(--must-blue);
-}
+        /* Action Buttons */
+        .btn-outline-primary {
+            color: var(--must-blue);
+            border-color: var(--must-blue);
+        }
 
-.btn-outline-primary:hover {
-    background-color: var(--must-blue);
-    color: white;
-}
+        .btn-outline-primary:hover {
+            background-color: var(--must-blue);
+            color: white;
+        }
 
-.btn-outline-success {
-    color: var(--must-green);
-    border-color: var(--must-green);
-}
+        .btn-outline-success {
+            color: var(--must-green);
+            border-color: var(--must-green);
+        }
 
-.btn-outline-success:hover {
-    background-color: var(--must-green);
-    color: white;
-}
+        .btn-outline-success:hover {
+            background-color: var(--must-green);
+            color: white;
+        }
 
-.btn-outline-danger {
-    color: var(--must-red);
-    border-color: var(--must-red);
-}
+        .btn-outline-danger {
+            color: var(--must-red);
+            border-color: var(--must-red);
+        }
 
-.btn-outline-danger:hover {
-    background-color: var(--must-red);
-    color: white;
-}
+        .btn-outline-danger:hover {
+            background-color: var(--must-red);
+            color: white;
+        }
 
-/* Empty State */
-.empty-state {
-    background-color: var(--must-light-blue);
-    border: 1px dashed var(--must-blue);
-    border-radius: 8px;
-    padding: 40px 20px;
-    text-align: center;
-    opacity: 0.9;
-}
+        /* Empty State */
+        .empty-state {
+            background-color: var(--must-light-blue);
+            border: 1px dashed var(--must-blue);
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            opacity: 0.9;
+        }
 
-.empty-state i {
-    color: var(--must-green);
-    font-size: 3rem;
-    margin-bottom: 15px;
-}
+        .empty-state i {
+            color: var(--must-green);
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
 
-.empty-state h3 {
-    color: var(--must-blue);
-    margin-bottom: 10px;
-}
+        .empty-state h3 {
+            color: var(--must-blue);
+            margin-bottom: 10px;
+        }
 
-.empty-state .badge {
-    background-color: var(--must-blue);
-    padding: 8px 15px;
-    font-weight: 500;
-}
+        .empty-state .badge {
+            background-color: var(--must-blue);
+            padding: 8px 15px;
+            font-weight: 500;
+        }
 
-/* Responsive Adjustments */
-@media (max-width: 991.98px) {
-    #sidebar {
-        transform: translateX(-100%);
-        position: fixed;
-        z-index: 1050;
-        height: 100vh;
-        top: 0;
-        left: 0;
-    }
+        /* Responsive Adjustments */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 1050;
+                height: 100vh;
+                top: 0;
+                left: 0;
+            }
 
-    #sidebar.active {
-        transform: translateX(0);
-    }
+            #sidebar.active {
+                transform: translateX(0);
+            }
 
-    .wrapper {
-        margin-left: 0 !important;
-        padding: 15px !important;
-    }
+            .wrapper {
+                margin-left: 0 !important;
+                padding: 15px !important;
+            }
 
-    .sidebar-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1040;
-        display: none;
-    }
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                display: none;
+            }
 
-    .sidebar-overlay.active {
-        display: block;
-    }
-}
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
 
-@media (max-width: 768px) {
-    .approval-actions {
-        width: 100%;
-        justify-content: center;
-        margin-top: 15px;
-    }
-    
-    .approval-info {
-        text-align: center;
-    }
+        @media (max-width: 768px) {
+            .approval-actions {
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+            }
 
-    .filter-controls .row > div {
-        margin-bottom: 10px;
-    }
+            .approval-info {
+                text-align: center;
+            }
 
-    .filter-controls .row > div:last-child {
-        margin-bottom: 0;
-    }
-}
-</style>
+            .filter-controls .row>div {
+                margin-bottom: 10px;
+            }
+
+            .filter-controls .row>div:last-child {
+                margin-bottom: 0;
+            }
+        }
+    </style>
 </head>
 
 <body class="d-flex">
@@ -264,7 +265,7 @@ body {
     <div class="sidebar-overlay"></div>
 
     <div class="wrapper d-flex flex-column flex-grow-1">
-       
+
         <!-- Main Content -->
         <main class="container-fluid py-4 flex-grow-1">
             <div class="verification-container bg-white rounded-3 shadow-sm p-4">

@@ -1,497 +1,423 @@
 <?php
 session_start();
-include '../criteria/config.php';
+require_once 'approve/config.php';
 
-// Load criteria from database
-$categories = [];
-$criteria_data = [];
-
-$query = "SELECT * FROM criteria";
-$result = $conn->query($query);
-
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $categories[$row['category']][$row['name']] = $row['name'];
-        $criteria_data[$row['name']] = $row['points'];
-    }
-} else {
-    $_SESSION['error_message'] = 'No criteria found in database';
+// Check authentication
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'hrm') {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
 }
 
-$conn->close();
+// Handle form submissions
+$message = '';
+$message_type = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['add_criteria'])) {
+        // Add new criteria
+        $stmt = $conn->prepare("INSERT INTO criteria (category, name, points) VALUES (?, ?, ?)");
+        $stmt->bind_param("ssd", $_POST['category'], $_POST['name'], $_POST['points']);
+
+        if ($stmt->execute()) {
+            $message = "Criteria added successfully!";
+            $message_type = "success";
+        } else {
+            $message = "Error adding criteria: " . $conn->error;
+            $message_type = "danger";
+        }
+    } elseif (isset($_POST['update_criteria'])) {
+        // Update existing criteria
+        $stmt = $conn->prepare("UPDATE criteria SET category = ?, name = ?, points = ? WHERE id = ?");
+        $stmt->bind_param("ssdi", $_POST['category'], $_POST['name'], $_POST['points'], $_POST['id']);
+
+        if ($stmt->execute()) {
+            $message = "Criteria updated successfully!";
+            $message_type = "success";
+        } else {
+            $message = "Error updating criteria: " . $conn->error;
+            $message_type = "danger";
+        }
+    } elseif (isset($_POST['delete_criteria'])) {
+        // Delete criteria
+        $stmt = $conn->prepare("DELETE FROM criteria WHERE id = ?");
+        $stmt->bind_param("i", $_POST['id']);
+
+        if ($stmt->execute()) {
+            $message = "Criteria deleted successfully!";
+            $message_type = "success";
+        } else {
+            $message = "Error deleting criteria: " . $conn->error;
+            $message_type = "danger";
+        }
+    }
+}
+
+// Get all criteria grouped by category
+$criteria = [];
+$result = $conn->query("SELECT * FROM criteria ORDER BY category");
+while ($row = $result->fetch_assoc()) {
+    $criteria[$row['category']][] = $row;
+}
+
+// Get unique categories for dropdown
+$categories = array_keys($criteria);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Competence Scoring System - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../criteria/criteria.css">
+    <title>Performance Criteria Management - MUST HRM</title>
+    <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../../components/bootstrap/css/bootstrap.min.css">
     <style>
-        /* Sidebar and Navigation Styles */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 240px;
-            background-color: #4CAF50;
-            color: white;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-            transform: translateX(0);
+        :root {
+            --must-primary: #2e3192;
+            --must-secondary: #FFC107;
+            --must-accent: #4CAF50;
         }
-        
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 999;
-            display: none;
-        }
-        
-        .hamburger {
-            position: fixed;
-            left: 15px;
-            top: 15px;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 1001;
-        }
-        
-        .nav-container {
-            left: 240px;
-        }
-        
-        .main-content {
-            margin-left: 240px;
-        }
-        
-        /* Responsive styles */
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .nav-container {
-                left: 0;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-        }
-        
-        /* Rest of your existing styles */
-        .debug-info {
-            font-size: 0.9em;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .success-message {
-            background-color: #dff0d8;
-            color: #3c763d;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        
-        .error-message {
-            background-color: #f2dede;
-            color: #a94442;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        
-        .category-section {
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .category-header {
-            background-color:rgb(202, 251, 187);
-            color:rgb(46, 46, 46);
-            padding: 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .category-content {
-            padding: 15px;
-            display: none;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background-color: #f2f2f2;
-        }
-        
-        .editable-criteria {
-            cursor: pointer;
-            padding: 5px;
-            display: inline-block;
-        }
-        
-        .editable-criteria:hover {
-            background-color: #f0f0f0;
-        }
-        
-        .criteria-input {
-            width: 100%;
-            padding: 5px;
-        }
-        
-        .add-criteria-input {
-            width: 100%;
-            padding: 8px;
-        }
-        
-        .add-criteria-btn, .remove-criteria-btn {
-            padding: 6px 12px;
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .remove-criteria-btn {
-            background-color: #d9534f;
-        }
-        
-        .save-button {
-            padding: 10px 20px;
-            background-color: #337ab7;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        
-        /* Mobile-specific styles */
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 10px;
-            }
-            
-            .container {
-                padding: 10px;
-            }
-            
-            table {
-                display: block;
-                overflow-x: auto;
-            }
-            
-            .category-section {
-                margin-bottom: 15px;
-            }
-            
-            .category-header {
-                padding: 10px;
-            }
-            
-            .category-content {
-                padding: 5px;
-            }
-            
-            .add-criteria-row td {
-                padding: 5px;
-            }
-            
-            .save-button {
-                width: 100%;
-                padding: 10px;
-            }
 
-            .action-text {
-                display: none;
+        .push-right-240 {
+            margin-left: 10%;
+        }
+
+        .must-bg-primary {
+            background-color: var(--must-primary) !important;
+        }
+
+        .must-bg-secondary {
+            background-color: var(--must-secondary) !important;
+        }
+
+        .must-text-primary {
+            color: var(--must-primary) !important;
+        }
+
+        .must-text-secondary {
+            color: var(--must-secondary) !important;
+        }
+
+        .criteria-card {
+            border-left: 4px solid var(--must-primary);
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .criteria-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-header {
+            background-color: rgba(46, 49, 146, 0.1);
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .points-badge {
+            background-color: var(--must-accent);
+            color: white;
+            font-weight: bold;
+        }
+
+        .edit-btn {
+            color: var(--must-primary);
+            border-color: var(--must-primary);
+        }
+
+        .edit-btn:hover {
+            background-color: var(--must-primary);
+            color: white;
+        }
+
+        .delete-btn {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .add-criteria-btn {
+            background-color: var(--must-accent);
+            color: white;
+        }
+
+        .add-criteria-btn:hover {
+            background-color: #3e8e41;
+            color: white;
+        }
+
+        .search-box {
+            border: 2px solid var(--must-primary);
+        }
+
+        @media (max-width: 768px) {
+            .criteria-card {
+                margin-bottom: 10px;
             }
         }
     </style>
 </head>
 
 <body>
-    <?php
-    include '../bars/nav_bar.php';
-    include '../bars/side_bar.php';
+    <!-- Navigation Bar -->
+    <?php include '../bars/nav_bar.php'; ?>
+
+    <!-- Sidebar -->
+    <?php include '../bars/side_bar.php';
     ?>
 
-    <div class="main-content">
-        <div class="container">
-            <h2>Competence Scoring System - Edit Criteria</h2>
+    <!-- Main Content -->
+    <div class="content-wrapper w-75 mx-auto">
+        <div class="container-fluid mt-5 py-4 push-right-240">
+            <?php if ($message): ?>
+                <div class="alert alert-<?= $message_type ?> alert-dismissible fade show">
+                    <?= $message ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
 
-            <!-- Debug info -->
-            <div class="debug-info">
-                Database Records: <?php
-                                    include '../criteria/config.php';
-                                    $result = $conn->query("SELECT COUNT(*) AS total FROM criteria");
-                                    $row = $result->fetch_assoc();
-                                    echo htmlspecialchars($row['total']);
-                                    ?><br>
-                Last Updated: <?php
-                                $result = $conn->query("SELECT MAX(updated_at) AS last_updated FROM criteria");
-                                $row = $result->fetch_assoc();
-                                echo $row['last_updated'] ? htmlspecialchars($row['last_updated']) : 'Never';
-                                $conn->close();
-                                ?>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h2 class="must-text-primary">
+                        <i class="fas fa-tasks me-2"></i> Performance Criteria Management
+                    </h2>
+                    <p class="text-muted">Manage scoring criteria for the Employee Tracking System</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn add-criteria-btn" data-bs-toggle="modal" data-bs-target="#addCriteriaModal">
+                        <i class="fas fa-plus me-2"></i> Add New Criteria
+                    </button>
+                </div>
             </div>
 
-            <?php if (isset($_SESSION['success_message'])): ?>
-                <div class="success-message">
-                    <?= htmlspecialchars($_SESSION['success_message']) ?>
-                </div>
-                <?php unset($_SESSION['success_message']); ?>
-            <?php endif; ?>
-
-            <?php if (isset($_SESSION['error_message'])): ?>
-                <div class="error-message">
-                    <?= htmlspecialchars($_SESSION['error_message']) ?>
-                </div>
-                <?php unset($_SESSION['error_message']); ?>
-            <?php endif; ?>
-
-            <form id="criteria-form" action="criteria/criteria_process.php" method="POST">
-                <?php foreach ($categories as $category => $items): ?>
-                    <div class="category-section">
-                        <div class="category-header" onclick="toggleCategory(this)">
-                            <h3><?= htmlspecialchars($category) ?></h3>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-
-                        <div class="category-content">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Criteria</th>
-                                        <th>Points</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($items as $key => $label): ?>
-                                        <tr>
-                                            <td>
-                                                <span class="editable-criteria"
-                                                    onclick="makeEditable(this)"
-                                                    data-original="<?= htmlspecialchars($label) ?>">
-                                                    <?= htmlspecialchars($label) ?>
-                                                </span>
-                                                <input type="hidden" name="criteria_names[<?= htmlspecialchars($key) ?>]"
-                                                    value="<?= htmlspecialchars($label) ?>">
-                                            </td>
-                                            <td>
-                                                <input type="number"
-                                                    name="criteria_values[<?= htmlspecialchars($key) ?>]"
-                                                    value="<?= htmlspecialchars($criteria_data[$key] ?? '0') ?>"
-                                                    required
-                                                    min="0"
-                                                    step="0.1">
-                                            </td>
-                                            <td>
-                                                <button type="button" class="remove-criteria-btn"
-                                                    onclick="removeCriteria(this)">
-                                                    <i class="fas fa-trash"></i> <span class="action-text">Remove</span>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                    <tr class="add-criteria-row">
-                                        <td colspan="2">
-                                            <input type="text" class="add-criteria-input"
-                                                placeholder="New criterion name">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="add-criteria-btn"
-                                                onclick="addCriteria(this, '<?= htmlspecialchars($category) ?>')">
-                                                <i class="fas fa-plus"></i> <span class="action-text">Add</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <span class="input-group-text must-bg-primary text-white">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" class="form-control search-box" placeholder="Search criteria...">
                     </div>
-                <?php endforeach; ?>
+                </div>
+            </div>
 
-                <button type="submit" class="save-button">
-                    <i class="fas fa-save"></i> Save All Changes
-                </button>
-            </form>
+            <div class="row">
+                <div class="col-md-12">
+                    <?php if (empty($criteria)): ?>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No criteria found. Add new criteria to get started.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($criteria as $category => $items): ?>
+                            <div class="category-header">
+                                <h5 class="mb-0 must-text-primary">
+                                    <i class="fas fa-folder-open me-2"></i> <?= htmlspecialchars($category) ?>
+                                </h5>
+                            </div>
+
+                            <div class="row">
+                                <?php foreach ($items as $item): ?>
+                                    <div class="col-md-6 col-lg-4 criteria-item" data-category="<?= htmlspecialchars($category) ?>">
+                                        <div class="card criteria-card">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start">
+
+                                                    <span class="badge points-badge">
+                                                        <?= $item['points'] ?> pts
+                                                    </span>
+                                                </div>
+                                                <p class="card-text text-muted small mb-2">
+                                                    <i class="fas fa-tag me-1"></i> <?= htmlspecialchars($item['name']) ?>
+                                                </p>
+                                                <div class="d-flex justify-content-end">
+                                                    <button class="btn btn-sm edit-btn me-2"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editCriteriaModal"
+                                                        data-id="<?= $item['id'] ?>"
+                                                        data-category="<?= htmlspecialchars($item['category']) ?>"
+                                                        data-name="<?= htmlspecialchars($item['name']) ?>"
+                                                        data-points="<?= $item['points'] ?>">
+                                                        <i class="fas fa-edit me-1"></i> Edit
+                                                    </button>
+
+                                                    <button class="btn btn-sm delete-btn"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteCriteriaModal"
+                                                        data-id="<?= $item['id'] ?>">
+                                                        <i class="fas fa-trash me-1"></i> Delete
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Add Criteria Modal -->
+    <div class="modal fade" id="addCriteriaModal" tabindex="-1" aria-labelledby="addCriteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header must-bg-primary text-white">
+                    <h5 class="modal-title" id="addCriteriaModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i> Add New Criteria
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="addCategory" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="addCategory" name="category" required>
+                            <small class="text-muted">E.g., "Academic Qualifications", "Research Grants"</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addName" class="form-label">System Name</label>
+                            <input type="text" class="form-control" id="addName" name="name" required>
+                            <small class="text-muted">Internal identifier (no spaces, use underscores)</small>
+                        </div>
+                       
+                        <div class="mb-3">
+                            <label for="addPoints" class="form-label">Points</label>
+                            <input type="number" step="0.1" class="form-control" id="addPoints" name="points" required>
+                            <small class="text-muted">Points awarded for this criteria</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="add_criteria" class="btn add-criteria-btn">Add Criteria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Criteria Modal -->
+    <div class="modal fade" id="editCriteriaModal" tabindex="-1" aria-labelledby="editCriteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header must-bg-primary text-white">
+                    <h5 class="modal-title" id="editCriteriaModalLabel">
+                        <i class="fas fa-edit me-2"></i> Edit Criteria
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    <input type="hidden" name="id" id="editId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editCategory" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="editCategory" name="category" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editName" class="form-label">System Name</label>
+                            <input type="text" class="form-control" id="editName" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editPoints" class="form-label">Points</label>
+                            <input type="number" step="0.1" class="form-control" id="editPoints" name="points" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="update_criteria" class="btn add-criteria-btn">Update Criteria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Criteria Modal -->
+    <div class="modal fade" id="deleteCriteriaModal" tabindex="-1" aria-labelledby="deleteCriteriaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteCriteriaModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST">
+                    <input type="hidden" name="id" id="deleteId">
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete the following criteria?</p>
+                        <p class="fw-bold" id="deleteCriteriaName"></p>
+                        <p class="text-danger">This action cannot be undone!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="delete_criteria" class="btn btn-danger">Delete Criteria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../components/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar functionality
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            
-            sidebar.classList.toggle('show');
-            
-            if (sidebar.classList.contains('show')) {
-                if (!overlay) {
-                    const newOverlay = document.createElement('div');
-                    newOverlay.className = 'sidebar-overlay';
-                    newOverlay.onclick = toggleSidebar;
-                    document.body.appendChild(newOverlay);
-                }
-                document.querySelector('.sidebar-overlay').style.display = 'block';
-            } else {
-                if (overlay) overlay.style.display = 'none';
-            }
-        }
-        
-        // Close sidebar when clicking outside on large screens
-        document.addEventListener('click', function(event) {
-            const sidebar = document.querySelector('.sidebar');
-            const hamburger = document.querySelector('.hamburger');
-            const overlay = document.querySelector('.sidebar-overlay');
-            
-            if (window.innerWidth > 992 && sidebar.classList.contains('show')) {
-                const isClickInsideSidebar = sidebar.contains(event.target);
-                const isClickOnHamburger = hamburger && hamburger.contains(event.target);
-                
-                if (!isClickInsideSidebar && !isClickOnHamburger) {
-                    toggleSidebar();
-                }
-            }
+        // Edit modal population
+        document.getElementById('editCriteriaModal').addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const modal = this;
+
+            modal.querySelector('#editId').value = button.getAttribute('data-id');
+            modal.querySelector('#editCategory').value = button.getAttribute('data-category');
+            modal.querySelector('#editName').value = button.getAttribute('data-name');
+            modal.querySelector('#editPoints').value = button.getAttribute('data-points');
         });
-        
-        // Category toggling
-        function toggleCategory(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('i');
-            
-            if (content.style.display === 'block') {
-                content.style.display = 'none';
-                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-            } else {
-                content.style.display = 'block';
-                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-            }
-        }
-        
-        // Editable criteria
-        function makeEditable(element) {
-            const originalValue = element.textContent;
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'criteria-input';
-            input.value = originalValue;
-            
-            function saveEdit() {
-                const newValue = input.value.trim();
-                const span = document.createElement('span');
-                span.className = 'editable-criteria';
-                span.textContent = newValue || originalValue;
-                span.onclick = () => makeEditable(span);
-                span.setAttribute('data-original', originalValue);
-                
-                input.replaceWith(span);
-                
-                // Update hidden input
-                const hiddenInput = input.closest('tr').querySelector('input[type="hidden"]');
-                if (hiddenInput) hiddenInput.value = newValue || originalValue;
-            }
-            
-            input.addEventListener('blur', saveEdit);
-            input.addEventListener('keypress', (e) => e.key === 'Enter' && saveEdit());
-            
-            element.replaceWith(input);
-            input.focus();
-        }
-        
-        // Add new criterion
-        function addCriteria(button, category) {
-            const row = button.closest('tr');
-            const input = row.querySelector('.add-criteria-input');
-            const criteriaName = input.value.trim();
-            
-            if (!criteriaName) return alert('Please enter a criterion name');
-            
-            const newKey = 'new_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-            const newRow = document.createElement('tr');
-            
-            newRow.innerHTML = `
-                <td>
-                    <span class="editable-criteria" onclick="makeEditable(this)" data-original="${criteriaName}">
-                        ${criteriaName}
-                    </span>
-                    <input type="hidden" name="criteria_names[${newKey}]" value="${criteriaName}">
-                </td>
-                <td>
-                    <input type="number" name="criteria_values[${newKey}]" value="0" required min="0" step="0.1">
-                </td>
-                <td>
-                    <button type="button" class="remove-criteria-btn" onclick="removeCriteria(this)">
-                        <i class="fas fa-trash"></i> <span class="action-text">Remove</span>
-                    </button>
-                </td>
-            `;
-            
-            row.parentNode.insertBefore(newRow, row);
-            input.value = '';
-        }
-        
-        // Remove criterion
-        function removeCriteria(button) {
-            if (confirm('Are you sure you want to remove this criterion?')) {
-                button.closest('tr').remove();
-            }
-        }
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show first category by default
-            const firstCategory = document.querySelector('.category-content');
-            if (firstCategory) {
-                firstCategory.style.display = 'block';
-                firstCategory.previousElementSibling.querySelector('i')
-                    .classList.replace('fa-chevron-down', 'fa-chevron-up');
-            }
-            
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                // Hide/show action text based on screen size
-                document.querySelectorAll('.action-text').forEach(text => {
-                    text.style.display = window.innerWidth <= 768 ? 'none' : 'inline';
-                });
-                
-                // Ensure sidebar is visible on large screens
-                if (window.innerWidth > 992) {
-                    document.querySelector('.sidebar').classList.remove('show');
-                    const overlay = document.querySelector('.sidebar-overlay');
-                    if (overlay) overlay.style.display = 'none';
+
+        // Delete modal population
+        document.getElementById('deleteCriteriaModal').addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const modal = this;
+
+            modal.querySelector('#deleteId').value = button.getAttribute('data-id');
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const criteriaItems = document.querySelectorAll('.criteria-item');
+
+            criteriaItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                const category = item.getAttribute('data-category').toLowerCase();
+
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide category headers based on visible items
+            document.querySelectorAll('.category-header').forEach(header => {
+                const category = header.textContent.toLowerCase();
+                const categoryItems = document.querySelectorAll(`.criteria-item[data-category="${header.textContent}"]`);
+                const hasVisibleItems = Array.from(categoryItems).some(item => item.style.display !== 'none');
+
+                if (hasVisibleItems || category.includes(searchTerm)) {
+                    header.style.display = 'block';
+                } else {
+                    header.style.display = 'none';
                 }
             });
         });
     </script>
 </body>
+
 </html>

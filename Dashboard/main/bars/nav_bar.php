@@ -214,7 +214,7 @@ $user_role = $_SESSION['user_role'] ?? '';
         }
 
         @media (max-width: 768px) {
-            .ets-role-indicator {
+            .role-indicator {
                 display: none;
             }
 

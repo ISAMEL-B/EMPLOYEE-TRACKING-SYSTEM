@@ -6,20 +6,32 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
-// Get current page name (handles URLs with parameters)
+
+// Check if user is HRM
+$is_hrm = ($_SESSION['user_role'] === 'hrm');
+
+// Get current page name
 $current_uri = $_SERVER['REQUEST_URI'];
 $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
 
-// Get current user data
-$user_id = $_SESSION['user_id'];
+// Get all employees for HRM dropdown
+$employees = [];
+if ($is_hrm) {
+    $query = $conn->query("SELECT user_id, employee_id, first_name, last_name FROM users ORDER BY first_name");
+    $employees = $query->fetch_all(MYSQLI_ASSOC);
+}
+
+// Get selected user data
+$selected_user_id = $_GET['user_id'] ?? $_SESSION['user_id'];
+$user = null;
 $query = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
-$query->bind_param("i", $user_id);
+$query->bind_param("i", $selected_user_id);
 $query->execute();
 $user = $query->get_result()->fetch_assoc();
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate and sanitize inputs
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'])) {
+    $user_id = $_POST['user_id'];
     $first_name = trim($_POST['first_name']);
     $last_name = trim($_POST['last_name']);
     $phone_number = trim($_POST['phone_number']);
@@ -37,11 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $file_name = 'user_' . $user_id . '_' . time() . '.' . $file_ext;
         $target_file = $upload_dir . $file_name;
 
-        // Validate image file
         $allowed_types = ['jpg', 'jpeg', 'png', 'gif'];
         if (in_array(strtolower($file_ext), $allowed_types)) {
             if (move_uploaded_file($_FILES['photo']['tmp_name'], $target_file)) {
-                // Delete old photo if exists
                 if ($photo_path && file_exists($photo_path)) {
                     unlink($photo_path);
                 }
@@ -61,18 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update->bind_param("sssssi", $first_name, $last_name, $phone_number, $personal_email, $photo_path, $user_id);
 
     if ($update->execute()) {
-        // Success message
         $_SESSION['success'] = "Profile updated successfully!";
-
-        // Refresh user data
-        $query->execute();
-        $user = $query->get_result()->fetch_assoc();
+        header("Location: ?user_id=" . $user_id);
+        exit();
     } else {
         $error = "Error updating profile: " . $conn->error;
     }
 }
-
-$user_role = $_SESSION['user_role'] ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -81,26 +86,18 @@ $user_role = $_SESSION['user_role'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Your Profile - MUST HRM</title>
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
-
+    <title><?= $is_hrm ? 'Employee Profile Management' : 'Complete Your Profile' ?> - MUST HRM</title>
     <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
-
-    <!-- bootstrap js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <link rel="stylesheet" href="styles/re_registration.css">
 </head>
 
 <body>
-
     <!-- navigation bar -->
-    <?php include 'bars/nav_bar.php';
-    // <!-- sidebar -->
-    include 'bars/side_bar.php';
-    ?>
+    <?php include 'bars/nav_bar.php'; ?>
+    <!-- sidebar -->
+    <?php include 'bars/side_bar.php'; ?>
 
     <!-- Main Content -->
     <div class="container">
@@ -119,84 +116,147 @@ $user_role = $_SESSION['user_role'] ?? '';
 
             <!-- Header -->
             <div class="completion-header">
-                <h2>Update Your Profile</h2>
-                <p>Manage your personal information</p>
+                <h2><?= $is_hrm ? 'Employee Profile Management' : 'Update Your Profile' ?></h2>
+                <p><?= $is_hrm ? 'Manage employee profiles' : 'Manage your personal information' ?></p>
             </div>
 
-            <!-- Profile Form -->
-            <form method="POST" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col-md-4 text-center">
-                        <!-- Profile Photo -->
-                        <div class="profile-photo-container">
-                            <?php if (!empty($user['photo_path'])): ?>
-                                <img src="<?= htmlspecialchars($user['photo_path']) ?>" class="profile-photo" id="profilePhotoPreview">
-                            <?php else: ?>
-                                <div class="w-100 h-100 d-flex align-items-center justify-content-center">
-                                    <i class="fas fa-user fa-4x text-muted"></i>
-                                </div>
-                                <img src="" class="profile-photo d-none" id="profilePhotoPreview">
-                            <?php endif; ?>
-                            <div class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <input type="file" id="photoInput" name="photo" accept="image/*" class="d-none" onchange="previewPhoto(event)">
-                        </div>
-                        <small class="text-muted">Upload a clear passport photo</small>
-                    </div>
-
-                    <div class="col-md-8">
-                        <!-- Basic Information -->
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Institutional Email</label>
-                            <input type="email" class="form-control" id="email"
-                                value="<?= htmlspecialchars($user['email']) ?>" readonly>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label required-field">First Name</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name"
-                                    value="<?= htmlspecialchars($user['first_name'] ?? '') ?>" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label required-field">Last Name</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name"
-                                    value="<?= htmlspecialchars($user['last_name'] ?? '') ?>" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="phone_number" class="form-label required-field">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone_number" name="phone_number"
-                                value="<?= htmlspecialchars($user['phone_number'] ?? '') ?>" required>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="personal_email" class="form-label">Personal Email</label>
-                            <input type="email" class="form-control" id="personal_email" name="personal_email"
-                                value="<?= htmlspecialchars($user['personal_email'] ?? '') ?>">
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-must-primary">
-                                <i class="fas fa-save ms-2"></i> Save Changes
-                            </button>
-                        </div>
-                    </div>
+            <?php if ($is_hrm): ?>
+                <!-- Employee Selector Dropdown -->
+                <div class="employee-select-container">
+                    <label for="employeeSelect" class="form-label">Select Employee</label>
+                    <select id="employeeSelect" class="form-select">
+                        <option value=""> Search for an employee </option>
+                        <?php foreach ($employees as $employee): ?>
+                            <option value="<?= $employee['user_id'] ?>" 
+                                >
+                                <span class="employee-id"><?= htmlspecialchars($employee['employee_id']) ?></span>
+                                <?= htmlspecialchars($employee['first_name'] . ' ' . $employee['last_name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
-            </form>
+            <?php endif; ?>
+
+            <?php if (!$user && $is_hrm): ?>
+                <!-- Message when no employee is selected -->
+                <div class="no-selection-message">
+                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                    <h4>No employee selected</h4>
+                    <p class="text-muted">Please select an employee from the dropdown above to view and edit their profile</p>
+                </div>
+            <?php elseif ($user): ?>
+                <!-- Profile Form -->
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
+                    
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <!-- Profile Photo -->
+                            <div class="profile-photo-container">
+                                <?php if (!empty($user['photo_path'])): ?>
+                                    <img src="<?= htmlspecialchars($user['photo_path']) ?>" class="profile-photo" id="profilePhotoPreview">
+                                <?php else: ?>
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                        <i class="fas fa-user fa-4x text-muted"></i>
+                                    </div>
+                                    <img src="" class="profile-photo d-none" id="profilePhotoPreview">
+                                <?php endif; ?>
+                                <div class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                                <input type="file" id="photoInput" name="photo" accept="image/*" class="d-none" onchange="previewPhoto(event)">
+                            </div>
+                            <small class="text-muted">Upload a clear passport photo</small>
+                        </div>
+
+                        <div class="col-md-8">
+                            <!-- Basic Information -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Institutional Email</label>
+                                <input type="email" class="form-control" id="email"
+                                    value="<?= htmlspecialchars($user['email']) ?>" readonly>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="first_name" class="form-label required-field">First Name</label>
+                                    <input type="text" class="form-control" id="first_name" name="first_name"
+                                        value="<?= htmlspecialchars($user['first_name'] ?? '') ?>" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="last_name" class="form-label required-field">Last Name</label>
+                                    <input type="text" class="form-control" id="last_name" name="last_name"
+                                        value="<?= htmlspecialchars($user['last_name'] ?? '') ?>" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phone_number" class="form-label required-field">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder="required format 0701234567" pattern="^07[0-9]{8}$"
+                                    value="<?= htmlspecialchars($user['phone_number'] ?? '') ?>" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="personal_email" class="form-label">Personal Email</label>
+                                <input type="email" class="form-control" id="personal_email" name="personal_email"
+                                    value="<?= htmlspecialchars($user['personal_email'] ?? '') ?>">
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-must-primary">
+                                    <i class="fas fa-save ms-2"></i> Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
 
+    <script src="../components/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        // Toggle sidebar
-        document.getElementById('hamburger').addEventListener('click', function() {
-            const sidebar = document.querySelector('.main-sidebar');
-            sidebar.classList.toggle('collapsed');
+        // Initialize Select2 for employee dropdown
+        $(document).ready(function() {
+            $('#employeeSelect').select2({
+                placeholder: "Search for an employee",
+                allowClear: true,
+                templateResult: formatEmployee,
+                templateSelection: formatEmployeeSelection
+            });
+
+            $('#employeeSelect').on('change', function() {
+                const userId = $(this).val();
+                if (userId) {
+                    window.location.href = '?user_id=' + userId;
+                }
+            });
+
+            function formatEmployee(employee) {
+                if (!employee.id) return employee.text;
+                
+                const $container = $(
+                    '<div><span class="employee-id">' + $(employee.element).find('span').text() + '</span>' + 
+                    employee.text + '</div>'
+                );
+                return $container;
+            }
+
+            function formatEmployeeSelection(employee) {
+                if (!employee.id) return employee.text;
+                
+                const $container = $(
+                    '<div><span class="employee-id">' + $(employee.element).find('span').text() + '</span>' + 
+                    employee.text + '</div>'
+                );
+                return $container;
+            }
         });
 
-        document.getElementById('ets-hamburger').addEventListener('click', function() {
+        // Toggle sidebar
+        document.getElementById('hamburger').addEventListener('click', function() {
             const sidebar = document.querySelector('.main-sidebar');
             sidebar.classList.toggle('collapsed');
         });
@@ -214,8 +274,8 @@ $user_role = $_SESSION['user_role'] ?? '';
         }
 
         // Form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const requiredFields = document.querySelectorAll('[required]');
+        document.querySelector('form')?.addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
             let valid = true;
 
             requiredFields.forEach(field => {
@@ -234,5 +294,4 @@ $user_role = $_SESSION['user_role'] ?? '';
         });
     </script>
 </body>
-
 </html>

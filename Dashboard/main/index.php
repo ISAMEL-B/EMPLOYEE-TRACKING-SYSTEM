@@ -1,27 +1,28 @@
 ﻿<?php
-    //report all errors
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+//report all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 
-    session_start();
-    if ($_SESSION['user_role'] !== 'hrm') {
-        header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-        exit();
-    }
+session_start();
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
 
-    //include backend calculator
-    // include '/EMPLOYEE-TRACKING-SYSTEM/scoring_calculator/university score/university_score.php';
-    include '../../scoring_calculator/university score/university_score.php';
-    
+//include backend calculator
+// include '/EMPLOYEE-TRACKING-SYSTEM/scoring_calculator/university score/university_score.php';
+include '../../scoring_calculator/university score/university_score.php';
 
-    // echo $university_data['PhD'] . ' space'; 
-    // echo $university_data['First Class']. ' space';
-    // echo $university_data['Masters']. ' space';
-    // echo $university_data['academic_score']. ' space';
-    // echo 'thsi is the world';
-    
-    
+
+// echo $university_data['PhD'] . ' space'; 
+// echo $university_data['First Class']. ' space';
+// echo $university_data['Masters']. ' space';
+// echo $university_data['academic_score']. ' space';
+// echo 'thsi is the world';
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -467,7 +468,7 @@
     <script src="../components/src/js/template.js"></script>
     <!-- <script src="../components/src/js/pages/dashboard.php"></script> -->
     <?php
-        include '../components/src/js/pages/dashboarddd.php';
+    include '../components/src/js/pages/dashboarddd.php';
     ?>
 
 

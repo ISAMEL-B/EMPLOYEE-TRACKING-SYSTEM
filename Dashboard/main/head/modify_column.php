@@ -9,22 +9,15 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../modify/style_modify_columns.css">
-    <link rel="stylesheet" href="../bars/nav_sidebar/nav_side_bar.css">
 </head>
 
 <body>
     <?php
     // <!-- Sidebar -->
-    include '../bars/nav_sidebar/side_bar.php';
+    include '../bars/side_bar.php';
     // nav_bar
-    include '../bars/nav_sidebar/nav_bar.php';
+    include '../bars/nav_bar.php';
     ?>
-
-    <!-- Role Indicator -->
-    <div class="role-indicator">
-        Logged in as: <?php echo strtoupper(htmlspecialchars($_SESSION['user_role'] ?? 'guest')); ?>
-    </div>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="container">
