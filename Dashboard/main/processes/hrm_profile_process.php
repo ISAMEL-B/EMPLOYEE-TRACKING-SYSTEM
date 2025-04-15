@@ -15,10 +15,10 @@ header("X-XSS-Protection: 1; mode=block");
 $user_id = $_SESSION['user_id'] ?? null;
 
 // Check user authorization
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
-    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-    exit();
-}
+// if (!isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'hrm') {
+//     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+//     exit();
+// }
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {

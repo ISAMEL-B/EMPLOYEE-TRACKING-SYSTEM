@@ -108,7 +108,7 @@
                     id="confirm-password" />
                 <p class="message" id="error-message">Passwords do not match!</p>
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'hrm'): ?>
-                    <button type="submit" name="signup">Sign Up</button>
+                    <button type="submit" name="signup">Register</button>
                 <?php endif; ?>
             </form>
         </div>
@@ -139,7 +139,7 @@
                     <h1>Hello, MUST Associate!</h1>
                     <p>Enter personal details and start journey with MUST</p>
                     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'hrm'): ?>
-                        <button class="ghost" id="signUp">Sign Up</button>
+                        <button class="ghost" id="signUp">Register</button>
                     <?php endif; ?>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <?php
 // Get current page name (handles URLs with parameters)
-$current_uri = $_SERVER['REQUEST_URI'];
-$current_page = basename(parse_url($current_uri, PHP_URL_PATH));
+$current_ur = 'manage_staff.php';
+$current_pag = 'manage_staff';
 
 // Define menu structure with parent-child relationships
 $menu_structure = [
@@ -14,7 +14,7 @@ $menu_structure = [
         'icon' => 'fa-edit'
     ],
     'Manage' => [
-        'pages' => ['individual_view2.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php'],
+        'pages' => ['manage_staff.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php'],
         'icon' => 'fa-info-circle'
     ],
     'Authentication' => [
@@ -28,7 +28,7 @@ $active_parent = '';
 $is_submenu_active = false;
 
 foreach ($menu_structure as $parent => $data) {
-    if (in_array($current_page, $data['pages'])) {
+    if (in_array($current_pag, $data['pages'])) {
         $active_parent = $parent;
         $is_submenu_active = true;
         break;
@@ -479,12 +479,12 @@ foreach ($menu_structure as $parent => $data) {
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php" class="<?= ($current_page == 'index.php') ? 'active-submenu' : '' ?>"><i class="fa fa-chart-line"></i> General Progress</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php" class="<?= ($current_pag == 'index.php') ? 'active-submenu' : '' ?>"><i class="fa fa-chart-line"></i> General Progress</a></li>
                             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_page == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_page == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view2.php" class="<?= ($current_page == 'individual_view2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_page == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_pag == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_pag == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view2.php" class="<?= ($current_pag == 'individual_view2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_pag == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
                             <?php endif; ?>
                         </ul>
                     </li>
@@ -501,11 +501,11 @@ foreach ($menu_structure as $parent => $data) {
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php" class="<?= ($current_page == 'upload_csv.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i> CSV Upload</a></li>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php" class="<?= ($current_page == 'approve.php') ? 'active-submenu' : '' ?>"><i class="fa fa-check-circle"></i> Approve</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php" class="<?= ($current_pag == 'upload_csv.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i> CSV Upload</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php" class="<?= ($current_pag == 'approve.php') ? 'active-submenu' : '' ?>"><i class="fa fa-check-circle"></i> Approve</a></li>
                             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/view_criteria.php" class="<?= ($current_page == 'view_criteria.php') ? 'active-submenu' : '' ?>"><i class="fa fa-edit"></i> View | Edit Criteria</a></li>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/modify_column.php" class="<?= ($current_page == 'modify_column.php') ? 'active-submenu' : '' ?>"><i class="fa fa-database"></i> Modify DB Tables</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/view_criteria.php" class="<?= ($current_pag == 'view_criteria.php') ? 'active-submenu' : '' ?>"><i class="fa fa-edit"></i> View | Edit Criteria</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/modify_column.php" class="<?= ($current_pag == 'modify_column.php') ? 'active-submenu' : '' ?>"><i class="fa fa-database"></i> Modify DB Tables</a></li>
                             <?php endif; ?>
                         </ul>
                     </li>
@@ -522,14 +522,15 @@ foreach ($menu_structure as $parent => $data) {
                     </a>
                     <ul class="treeview-menu">
                         <?php if ($_SESSION['user_role'] !== 'hrm'): ?>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/for_staff_profile.php" class="<?= ($current_page == 'for_staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> My Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/for_staff_profile.php" class="<?= ($current_pag == 'for_staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> My Profile</a></li>
                         <?php endif; ?>
 
                         <?php if ($_SESSION['user_role'] === 'hrm'): ?>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<?= ($current_page == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_page == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_page == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/about_us.php" class="<?= ($current_page == 'about_us.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>About Us</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/manage_staff.php" class="<?= ($current_pag == 'manage_staff.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Members</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<?= ($current_pag == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_pag == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_pag == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/about_us.php" class="<?= ($current_pag == 'about_us.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>About Us</a></li>
                         <?php endif; ?>
                     </ul>
                 </li>
@@ -545,11 +546,11 @@ foreach ($menu_structure as $parent => $data) {
                     </a>
                     <ul class="treeview-menu">
                         <?php if ($_SESSION['user_role'] === 'hrm'): ?>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/register.php" class="d-light <?= ($current_page == 'register.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user-plus"></i>Register</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/register.php" class="d-light <?= ($current_pag == 'register.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user-plus"></i>Register</a></li>
                         <?php endif; ?>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/logout.php" class="d-light <?= ($current_page == 'logout.php') ? 'active-submenu' : '' ?>"><i class="fas fa-sign-in-alt"></i> Log Out</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/lock_screen.php" class="d-light <?= ($current_page == 'lock_screen.php') ? 'active-submenu' : '' ?>"><i class="fas fa-lock"></i> Lockscreen</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/password_recovery.php" class="d-light <?= ($current_page == 'password_recovvery.php') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Recover password</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/logout.php" class="d-light <?= ($current_pag == 'logout.php') ? 'active-submenu' : '' ?>"><i class="fas fa-sign-in-alt"></i> Log Out</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/lock_screen.php" class="d-light <?= ($current_pag == 'lock_screen.php') ? 'active-submenu' : '' ?>"><i class="fas fa-lock"></i> Lockscreen</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/password_recovery.php" class="d-light <?= ($current_pag == 'password_recovvery.php') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Recover password</a></li>
                     </ul>
                 </li>
             </ul>
@@ -597,7 +598,7 @@ foreach ($menu_structure as $parent => $data) {
 
         // Set active menu items
         function setActiveMenu() {
-            const currentPage = '<?= $current_page ?>';
+            const currentPage = '<?= $current_pag ?>';
             if (currentPage) {
                 const activeLinks = document.querySelectorAll(`a[href*="${currentPage}"]`);
                 activeLinks.forEach(link => {
