@@ -1,7 +1,7 @@
 <?php
 // Get current page name (handles URLs with parameters)
-$current_ur = 'manage_staff.php';
-$current_pag = 'manage_staff';
+// $current_ur = 'manage_staff.php';
+// $current_pag = 'manage_staff';
 
 // Define menu structure with parent-child relationships
 $menu_structure = [
