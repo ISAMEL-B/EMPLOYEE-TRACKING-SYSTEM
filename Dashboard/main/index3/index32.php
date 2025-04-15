@@ -252,10 +252,10 @@
                 <button class="nav-link" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="false">Publications</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" type="button" role="tab" aria-controls="research" aria-selected="false">Research</button>
+                <button class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" type="button" role="tab" aria-controls="research" aria-selected="false">Research & Innovations</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="teaching-tab" data-bs-toggle="tab" data-bs-target="#teaching" type="button" role="tab" aria-controls="teaching" aria-selected="false">Teaching</button>
+                <!-- <button class="nav-link" id="teaching-tab" data-bs-toggle="tab" data-bs-target="#teaching" type="button" role="tab" aria-controls="teaching" aria-selected="false">Teaching</button> -->
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="academicperformance-tab" data-bs-toggle="tab" data-bs-target="#academicperformance" type="button" role="tab" aria-controls="academicperformance" aria-selected="false">Academic Performance</button>
@@ -344,10 +344,12 @@
 
     <!-- Charts -->
     <div class="row">
-        <div class="col-lg-6">
-            <div class="chart-container">
+        <div class="col-lg-6" style="display: flex; flex-direction: column; height: 100%;">
+            <div class="chart-container" style="flex: 1; display: flex; flex-direction: column; height: 100%;">
                 <h3 class="chart-title">Publication Types</h3>
-                <canvas id="publicationTypesChart"></canvas>
+                <div style="flex: 1; min-height: 0; width: 100%;"> <!-- Container for canvas -->
+                    <canvas id="publicationTypesChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
             </div>
         </div>
         <div class="col-lg-6">
@@ -363,16 +365,24 @@
             <!-- Research Tab -->
             <div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab">
                 <div class="row">
-                    <div class="col-lg-6">
-                        <div class="chart-container" style="width: 300px; height: 300px; margin: 0 auto;" >
-                            <h3 class="chart-title">Research Grants</h3>
-                            <canvas id="researchGrantsChart"  ></canvas>
-                        </div>
+                <div class="col-lg-6">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Research Grants</h3>
+                        <canvas id="researchGrantsChart"></canvas>
                     </div>
+                </div>
                     <div class="col-lg-6">
                         <div class="chart-container">
                             <h3 class="chart-title">Supervision Completions</h3>
                             <canvas id="supervisionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="chart-container" height="100px">
+                        <h3 class="chart-title">Innovation Types Distribution</h3>
+                        <div style="height: 300px;"> <!-- Adjust height here (e.g., 250px, 300px) -->
+                            <canvas id="innovationTypesChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -446,7 +456,29 @@
 
         <!-- Community service tab -->
         <div class="tab-pane fade" id="communityservice" role="tabpanel" aria-labelledby="communityservice-tab">
-                <!-- <div class="row">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-value">25</div>
+                        <div class="stat-label">Industrial Placement Supervision</div>
+                    </div>
+                </div>            
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Community Outreach Programs</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-value">34</div>
+                        <div class="stat-label"> Clinical Practices</div>
+                    </div>
+                </div>
+                
+            </div>
+        
+        <!-- <div class="row">
                     <div class="col-lg-6">
                         <div class="chart-container">
                             <h3 class="chart-title">Teaching Experience</h3>
@@ -720,20 +752,21 @@
         const pubTypesChart = new Chart(pubTypesCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Journal Articles', 'Book Chapters', 'Published Books', 'Conference Papers'],
+                labels: ['Journal Articles', 'Book Chapters', 'Books with isbn'],
                 datasets: [{
-                    data: [30, 8, 2, 5],
+                    data: [30, 48, 62],
                     backgroundColor: [
                         '#3498db',
                         '#2ecc71',
                         '#e74c3c',
-                        '#f39c12'
+                        
                     ],
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // Disables aspect ratio enforcement
                 plugins: {
                     legend: {
                         position: 'right',
@@ -747,7 +780,7 @@
         const citationsChart = new Chart(citationsCtx, {
             type: 'bar',
             data: {
-                labels: ['Prof. A', 'Prof. B', 'Dr. C', 'Dr. D', 'Dr. E'],
+                labels: ['2021', '2022', '2023', '2024', '2025'],
                 datasets: [
                     {
                         label: 'Publications',
@@ -775,43 +808,47 @@
             }
         });
 
-        // Research Grants Chart
+        //research grants by amount
         const researchGrantsCtx = document.getElementById('researchGrantsChart').getContext('2d');
         const researchGrantsChart = new Chart(researchGrantsCtx, {
-            type: 'radar',
+            type: 'bar',
             data: {
                 labels: ['Grants >1B', 'Grants 500M-1B', 'Grants 100M-500M', 'Grants <100M', 'Collaborations'],
                 datasets: [
+                    
                     {
-                        label: 'Department Average',
-                        data: [2, 3, 5, 10, 8],
-                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                        borderColor: '#3498db',
-                        pointBackgroundColor: '#3498db',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#3498db'
-                    },
-                    {
-                        label: 'Faculty Average',
+                        label: 'Grant Amount',
                         data: [1, 2, 4, 8, 6],
-                        backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)', // Slightly more opaque for bars
                         borderColor: '#2ecc71',
-                        pointBackgroundColor: '#2ecc71',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#2ecc71'
+                        borderWidth: 1
                     }
                 ]
             },
             options: {
+                indexAxis: 'y', // Makes bars horizontal
                 responsive: true,
                 scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 0
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Grants'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false // Cleaner layout
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top', // Adjust as needed
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
                     }
                 }
             }
@@ -843,6 +880,46 @@
                     }
                 }
             }
+        });
+        // Innovation Types Pie Chart
+        const innovationCtx = document.getElementById('innovationTypesChart').getContext('2d');
+        const innovationChart = new Chart(innovationCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Patent', 'Product', 'Copyright', 'Utility Model', 'Trademark'],
+                datasets: [{
+                    data: [35, 25, 20, 10, 10],
+                    backgroundColor: [
+                        '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    // Configure datalabels
+                    datalabels: {
+                        color: '#fff', // White text for visibility
+                        font: {
+                            weight: 'bold',
+                            size: 14
+                        },
+                        formatter: (value, context) => {
+                            const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${percentage}%`; // Show percentage inside slices
+                            // Or return `${value}`; // To show raw values instead
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // Activate the plugin
         });
 
         // Teaching Experience Chart
