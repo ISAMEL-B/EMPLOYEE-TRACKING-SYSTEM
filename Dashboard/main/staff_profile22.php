@@ -6,7 +6,8 @@ require_once 'approve/config.php'; // Database connection
 $user_id = $_SESSION['user_id'] ?? null;
 
 // Check user authorization
-if ($_SESSION['user_role'] !== 'hrm') {
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }

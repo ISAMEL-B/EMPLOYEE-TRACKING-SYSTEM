@@ -7,6 +7,33 @@
     background-color: #f8f9fa;
 }
 
+/* password verification colors */
+.password-strength {
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.strength-very-weak {
+    color: #ff0000; /* red */
+}
+
+.strength-weak {
+    color: #ff6600; /* orange */
+}
+
+.strength-moderate {
+    color: #ffcc00; /* yellow */
+}
+
+.strength-strong {
+    color: #66cc33; /* light green */
+}
+
+.strength-very-strong {
+    color: #009900; /* green */
+}
+
+
 .main-sidebar.collapsed~.content-wrapper {
     margin-left: 80px;
 }

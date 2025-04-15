@@ -697,6 +697,7 @@ foreach ($menu_structure as $parent => $data) {
         // Make the function available globally
         window.toggleSidebar = toggleSidebar;
     </script>
+    
 </body>
 
 </html>
