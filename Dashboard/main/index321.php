@@ -140,13 +140,17 @@
             background-color: var(--secondary-color);
         }
         
+        .community-service-card {
+            border-left: 4px solid #27ae60;
+        }
         
+        .academic-performance-card {
+            border-left: 4px solid #e67e22;
+        }
     </style>
-    
 </head>
 <body>
     <div class="container-fluid py-4">
-        <!-- Header Section -->
         <div class="dashboard-header">
             <div class="row align-items-center">
                 <div class="col-md-8">
@@ -168,22 +172,35 @@
             </div>
         </div>
         
-        <!-- Quick Stats Section -->
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-value">25</div>
                     <div class="stat-label">Total Staff</div>
+                    <div class="mt-2">
+                        <span class="badge bg-primary me-1">8 Professors</span>
+                        <span class="badge bg-primary me-1">10 Lecturers</span>
+                        <span class="badge bg-primary">7 TAs</span>
+                    </div>
                 </div>
-            </div>            
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">72</div>
+                    <div class="stat-label">Average Score</div>
+                    <div class="progress mt-2">
+                        <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-muted">+5% from last year</small>
+                </div>
+            </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-value">45</div>
                     <div class="stat-label">Total Publications</div>
                     <div class="mt-2">
-                        <span class="badge bg-success me-1">Books with ISBN : 14</span><br>
-                        <span class="badge bg-success">Book chapters : 7</span><br>
-                        <span class="badge bg-success me-1">Journal Articles : 50</span><br>
+                        <span class="badge bg-success me-1">12 First Author</span>
+                        <span class="badge bg-success">8 Corresponding</span>
                     </div>
                 </div>
             </div>
@@ -192,23 +209,16 @@
                     <div class="stat-value">UGX 800M</div>
                     <div class="stat-label">Research Grants</div>
                     <div class="mt-2">
-                        <!-- <span class="badge bg-info me-1">2 Large Grants</span> -->
-                        <!-- <span class="badge bg-info">4 more than 1 Billion</span> -->
+                        <span class="badge bg-info me-1">2 Large Grants</span>
+                        <span class="badge bg-info">4 Medium Grants</span>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value">72</div>
-                    <div class="stat-label">Total innovations</div>
                 </div>
             </div>
         </div>
         
-        <!-- Filter Section -->
         <div class="filter-section mb-4">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="rankFilter" class="form-label">Academic Rank</label>
                     <select id="rankFilter" class="form-select">
                         <option selected>All Ranks</option>
@@ -220,7 +230,7 @@
                         <option>Teaching Assistant</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="categoryFilter" class="form-label">Category</label>
                     <select id="categoryFilter" class="form-select">
                         <option selected>All Categories</option>
@@ -228,7 +238,7 @@
                         <option>Non-Clinical</option>
                     </select>
                 </div>
-                <!-- <div class="col-md-3">
+                <div class="col-md-3">
                     <label for="scoreFilter" class="form-label">Score Range</label>
                     <select id="scoreFilter" class="form-select">
                         <option selected>All Scores</option>
@@ -236,14 +246,13 @@
                         <option>Middle 50%</option>
                         <option>Bottom 25%</option>
                     </select>
-                </div> -->
-                <div class="col-md-4 d-flex align-items-end">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
                     <button class="btn btn-primary w-100">Apply Filters</button>
                 </div>
             </div>
         </div>
         
-        <!-- Main Content Tabs -->
         <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
@@ -258,18 +267,13 @@
                 <button class="nav-link" id="teaching-tab" data-bs-toggle="tab" data-bs-target="#teaching" type="button" role="tab" aria-controls="teaching" aria-selected="false">Teaching</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="academicperformance-tab" data-bs-toggle="tab" data-bs-target="#academicperformance" type="button" role="tab" aria-controls="academicperformance" aria-selected="false">Academic Performance</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="communityservice-tab" data-bs-toggle="tab" data-bs-target="#communityservice" type="button" role="tab" aria-controls="communityservice" aria-selected="false">Community service</button>
+                <button class="nav-link" id="academic-tab" data-bs-toggle="tab" data-bs-target="#academic" type="button" role="tab" aria-controls="academic" aria-selected="false">Academic & Community</button>
             </li>
         </ul>
         
         <div class="tab-content" id="dashboardTabsContent">
-            <!-- Overview Tab -->
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                 <div class="row">
-                    <!-- Performance Distribution -->
                     <div class="col-lg-6">
                         <div class="chart-container">
                             <h3 class="chart-title">Performance Distribution</h3>
@@ -277,7 +281,6 @@
                         </div>
                     </div>
                     
-                    <!-- Trends Over Time -->
                     <div class="col-lg-6">
                         <div class="chart-container">
                             <h3 class="chart-title">Trends Over Time</h3>
@@ -285,7 +288,6 @@
                         </div>
                     </div>
                     
-                    <!-- Publication Impact -->
                     <div class="col-lg-6">
                         <div class="chart-container">
                             <h3 class="chart-title">Publication Impact</h3>
@@ -293,80 +295,38 @@
                         </div>
                     </div>
                     
-                    <!-- Grant Funding -->
                     <div class="col-lg-6">
-                        <div class="chart-container" style="position: relative; width: 700px; height: 380px; ">
+                        <div class="chart-container">
                             <h3 class="chart-title">Grant Funding Distribution</h3>
-                            <canvas id="grantsChart" height="100px" ></canvas>
+                            <canvas id="grantsChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Publications Tab -->
             <div class="tab-pane fade" id="publications" role="tabpanel" aria-labelledby="publications-tab">
-                <!-- Stats Cards -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-white bg-primary shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">First Author Peer reviewed Publications</h5><br>
-                                <p class="card-text" id="firstAuthorCount">20</p>
-                            </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Publication Types</h3>
+                            <canvas id="publicationTypesChart"></canvas>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-success shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">Co-Authored Publications in Peer reviewed Publications</h5>
-                                <p class="card-text" id="coAuthorCount">20</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-warning shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Number of Peer-Reviewed Publications</h5><br>
-                                <p class="card-text" id="peerReviewedCount">20</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-danger shadow">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Number of Citations</h5><br><br>
-                                <p class="card-text" id="totalCitations">20</p>
-                                
-                            </div>
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Citations vs Publications</h3>
+                            <canvas id="citationsChart"></canvas>
                         </div>
                     </div>
                 </div>
-
-    <!-- Charts -->
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <h3 class="chart-title">Publication Types</h3>
-                <canvas id="publicationTypesChart"></canvas>
             </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <h3 class="chart-title">Citations vs Publications</h3>
-                <canvas id="citationsChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
             
-            <!-- Research Tab -->
             <div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab">
                 <div class="row">
                     <div class="col-lg-6">
-                        <div class="chart-container" style="width: 300px; height: 300px; margin: 0 auto;" >
+                        <div class="chart-container">
                             <h3 class="chart-title">Research Grants</h3>
-                            <canvas id="researchGrantsChart"  ></canvas>
+                            <canvas id="researchGrantsChart"></canvas>
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -378,7 +338,6 @@
                 </div>
             </div>
             
-            <!-- Teaching Tab -->
             <div class="tab-pane fade" id="teaching" role="tabpanel" aria-labelledby="teaching-tab">
                 <div class="row">
                     <div class="col-lg-6">
@@ -395,75 +354,36 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Academic Performance tab -->
-        <div class="tab-pane fade" id="academicperformance" role="tabpanel" aria-labelledby="academicperformance-tab">
-        <!-- Quick Stats Section -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value">25</div>
-                    <div class="stat-label">Phd's</div>
-                </div>
-            </div>            
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value">45</div>
-                    <div class="stat-label">Masters</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value">34</div>
-                    <div class="stat-label">First class</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stat-card">
-                    <div class="stat-value">72</div>
-                    <div class="stat-label">Second Class</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- <div class="row">
+            
+            <div class="tab-pane fade" id="academic" role="tabpanel" aria-labelledby="academic-tab">
+                <div class="row">
                     <div class="col-lg-6">
-                        <div class="chart-container">
-                            <h3 class="chart-title">Teaching Experience</h3>
-                            <canvas id="teachingExperienceChart"></canvas>
+                        <div class="chart-container academic-performance-card">
+                            <h3 class="chart-title">Academic Performance Distribution</h3>
+                            <canvas id="academicPerformanceChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container academic-performance-card mt-4">
+                            <h3 class="chart-title">Professional Memberships</h3>
+                            <canvas id="membershipsChart"></canvas>
                         </div>
                     </div>
+                    
                     <div class="col-lg-6">
-                        <div class="chart-container">
-                            <h3 class="chart-title">Thesis Examinations</h3>
-                            <canvas id="examinationsChart"></canvas>
+                        <div class="chart-container community-service-card">
+                            <h3 class="chart-title">Community Service Activities</h3>
+                            <canvas id="communityServiceChart"></canvas>
+                        </div>
+                        
+                        <div class="chart-container community-service-card mt-4">
+                            <h3 class="chart-title">University Service Roles</h3>
+                            <canvas id="universityServiceChart"></canvas>
                         </div>
                     </div>
-                </div> -->
-            </div>
-        </div>
-
-        <!-- Community service tab -->
-        <div class="tab-pane fade" id="communityservice" role="tabpanel" aria-labelledby="communityservice-tab">
-                <!-- <div class="row">
-                    <div class="col-lg-6">
-                        <div class="chart-container">
-                            <h3 class="chart-title">Teaching Experience</h3>
-                            <canvas id="teachingExperienceChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="chart-container">
-                            <h3 class="chart-title">Thesis Examinations</h3>
-                            <canvas id="examinationsChart"></canvas>
-                        </div>
-                    </div>
-                </div> -->
+                </div>
             </div>
         </div>
         
-        <!-- Leaderboard and Comparison Section -->
         <div class="row mt-4">
             <div class="col-lg-8">
                 <div class="leaderboard">
@@ -553,18 +473,18 @@
                 labels: ['Prof. A', 'Prof. B', 'Dr. C', 'Dr. D', 'Dr. E', 'Dr. F', 'Lect. G'],
                 datasets: [
                     {
-                        label: 'years of experience',
+                        label: 'Publications',
                         data: [12, 8, 6, 5, 4, 3, 2],
                         backgroundColor: '#3498db',
                     },
                     {
-                        label: 'publications',
-                        data: [10, 9, 8, 7, 6, 5, 4],
+                        label: 'Grants',
+                        data: [8, 6, 4, 3, 2, 1, 0],
                         backgroundColor: '#2ecc71',
                     },
                     {
-                        label: 'grants won',
-                        data: [8, 6, 4, 3, 2, 1, 0],
+                        label: 'Teaching',
+                        data: [10, 9, 8, 7, 6, 5, 4],
                         backgroundColor: '#e74c3c',
                     }
                 ]
@@ -592,7 +512,7 @@
                 datasets: [
                     {
                         label: 'Publications',
-                        data: [25, 50, 70, 100, 200],
+                        data: [25, 28, 32, 38, 45],
                         borderColor: '#3498db',
                         backgroundColor: 'rgba(52, 152, 219, 0.1)',
                         fill: true,
@@ -607,8 +527,8 @@
                         tension: 0.3
                     },
                     {
-                        label: 'innovations',
-                        data: [62, 80, 100, 190, 250],
+                        label: 'Average Score',
+                        data: [62, 65, 68, 70, 72],
                         borderColor: '#e74c3c',
                         backgroundColor: 'rgba(231, 76, 60, 0.1)',
                         fill: true,
@@ -698,11 +618,9 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Disables aspect ratio enforcement
                 plugins: {
                     legend: {
                         position: 'right',
-                        
                     },
                     tooltip: {
                         callbacks: {
@@ -894,6 +812,67 @@
                         suggestedMin: 0
                     }
                 }
+            }
+        });
+
+        // Academic Performance Chart
+        const academicPerfCtx = document.getElementById('academicPerformanceChart').getContext('2d');
+        new Chart(academicPerfCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Dean/Director', 'Deputy Dean', 'HoD', 'Committee Members'],
+                datasets: [{
+                    label: 'Service Points',
+                    data: [5, 3, 2, 1],
+                    backgroundColor: '#e67e22'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        
+        // Professional Memberships Chart
+        const membershipsCtx = document.getElementById('membershipsChart').getContext('2d');
+        new Chart(membershipsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['1 Membership', '2 Memberships', '3+ Memberships'],
+                datasets: [{
+                    data: [15, 8, 2],
+                    backgroundColor: ['#3498db', '#2ecc71', '#e74c3c']
+                }]
+            }
+        });
+        
+        // Community Service Chart
+        const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
+        new Chart(communityCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Health Camps', 'Education', 'Skill Training', 'Consulting', 'Other'],
+                datasets: [{
+                    data: [12, 8, 5, 3, 2],
+                    backgroundColor: [
+                        '#27ae60', '#2ecc71', '#3498db', '#e74c3c', '#f39c12'
+                    ]
+                }]
+            }
+        });
+        
+        // University Service Chart
+        const universityCtx = document.getElementById('universityServiceChart').getContext('2d');
+        new Chart(universityCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Leadership', 'Committees', 'Examinations', 'Events', 'Mentoring'],
+                datasets: [{
+                    label: 'Service Participation',
+                    data: [8, 12, 15, 10, 7],
+                    backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                    borderColor: '#27ae60'
+                }]
             }
         });
     </script>
