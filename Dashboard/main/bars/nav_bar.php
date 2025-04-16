@@ -1,7 +1,7 @@
 <?php
 // Get current page name
-$current_page = basename($_SERVER['PHP_SELF']);
-$user_role = $_SESSION['user_role'] ?? '';
+    $current_pag = basename($_SERVER['PHP_SELF']);
+    $user_role = $_SESSION['user_role'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,7 +40,7 @@ $user_role = $_SESSION['user_role'] ?? '';
             left: 270px;
             /* Sidebar width (280px) + 20px spacing */
             /* background-color: #4CAF50; */
-            background-color:rgb(68, 40, 250);
+            background-color: rgb(68, 40, 250);
             /* MUST green */
             color: white;
             padding: 6px 12px;
@@ -244,26 +244,26 @@ $user_role = $_SESSION['user_role'] ?? '';
                 Welcome our <?php echo strtoupper(htmlspecialchars($_SESSION['user_role'] ?? 'guest'));  ?>
             </div>
             <?php if ($_SESSION['user_role'] !== 'hrm' && $_SESSION['user_role'] !== 'staff'): ?>
-                <a class="ets-nav-link <?= ($current_page === 'upload_csv.php') ? 'active' : '' ?>"
+                <a class="ets-nav-link <?= ($current_pag === 'upload_csv.php') ? 'active' : '' ?>"
                     href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php">
                     <i class="fas fa-home"></i> <span>Home</span>
                 </a>
-                <a class="ets-nav-link <?= ($current_page === 'approve.php') ? 'active' : '' ?>"
+                <a class="ets-nav-link <?= ($current_pag === 'approve.php') ? 'active' : '' ?>"
                     href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php">
                     <i class="fa fa-check-circle"></i> <span>Approve</span>
                 </a>
             <?php endif; ?>
             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
-                <a class="ets-nav-link <?= ($current_page === 'index.php') ? 'active' : '' ?>"
+                <a class="ets-nav-link <?= ($current_pag === 'index.php') ? 'active' : '' ?>"
                     href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index.php">
                     <i class="fas fa-chart-pie"></i> <span>ScoreCard</span>
                 </a>
-                <a class="ets-nav-link <?= ($current_page === 'approve.php') ? 'active' : '' ?>"
+                <a class="ets-nav-link <?= ($current_pag === 'approve.php') ? 'active' : '' ?>"
                     href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php">
                     <i class="fa fa-check-circle"></i> <span>Approve</span>
                 </a>
 
-                <a class="ets-nav-link <?= ($current_page === 'view_criteria.php') ? 'active' : '' ?>"
+                <a class="ets-nav-link <?= ($current_pag === 'view_criteria.php') ? 'active' : '' ?>"
                     href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/view_criteria.php">
                     <i class="fas fa-tasks"></i> <span>Modify Criteria</span>
                 </a>
@@ -293,7 +293,7 @@ $user_role = $_SESSION['user_role'] ?? '';
 
         // Set active navigation link
         function setActiveNavLink() {
-            const currentPage = '<?= $current_page ?>';
+            const currentPage = '<?= $current_pag ?>';
             if (currentPage) {
                 document.querySelectorAll('.ets-nav-link').forEach(link => {
                     if (link.getAttribute('href').includes(currentPage)) {

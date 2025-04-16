@@ -76,66 +76,69 @@ $achievements = [
     'services' => []
 ];
 
-// Handle staff selection/search
+// Handle staff selection from either POST or GET (URL parameter)
+$staff_id = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['staff_id'])) {
-    $staff_id = $_POST['staff_id'];
+    $staff_id = (int)$_POST['staff_id'];
+} elseif (isset($_GET['staff_id'])) {
+    $staff_id = (int)$_GET['staff_id'];
+}
 
-    if ($staff_id) {
-        // Get staff details
-        $stmt = $conn->prepare("SELECT s.*, d.department_name, r.role_name, u.photo_path 
-                              FROM staff s
-                              JOIN departments d ON s.department_id = d.department_id
-                              JOIN roles r ON s.role_id = r.role_id
-                              LEFT JOIN users u ON s.staff_id = u.staff_id
-                              WHERE s.staff_id = ?");
-        $stmt->bind_param("i", $staff_id);
-        $stmt->execute();
-        $staff_details = $stmt->get_result()->fetch_assoc();
+if ($staff_id) {
+    // Get staff details
+    $stmt = $conn->prepare("SELECT s.*, d.department_name, r.role_name, u.photo_path 
+                          FROM staff s
+                          JOIN departments d ON s.department_id = d.department_id
+                          JOIN roles r ON s.role_id = r.role_id
+                          LEFT JOIN users u ON s.staff_id = u.staff_id
+                          WHERE s.staff_id = ?");
+    $stmt->bind_param("i", $staff_id);
+    $stmt->execute();
+    $staff_details = $stmt->get_result()->fetch_assoc();
 
-        // Get all achievements
-        if ($staff_details) {
-            // Publications
-            $pub_query = $conn->prepare("SELECT * FROM publications WHERE staff_id = ?");
-            $pub_query->bind_param("i", $staff_id);
-            $pub_query->execute();
-            $achievements['publications'] = $pub_query->get_result()->fetch_all(MYSQLI_ASSOC);
+    // Get all achievements
+    if ($staff_details) {
+        // Publications
+        $pub_query = $conn->prepare("SELECT * FROM publications WHERE staff_id = ?");
+        $pub_query->bind_param("i", $staff_id);
+        $pub_query->execute();
+        $achievements['publications'] = $pub_query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-            // Degrees
-            $deg_query = $conn->prepare("SELECT * FROM degrees WHERE staff_id = ?");
-            $deg_query->bind_param("i", $staff_id);
-            $deg_query->execute();
-            $achievements['degrees'] = $deg_query->get_result()->fetch_all(MYSQLI_ASSOC);
+        // Degrees
+        $deg_query = $conn->prepare("SELECT * FROM degrees WHERE staff_id = ?");
+        $deg_query->bind_param("i", $staff_id);
+        $deg_query->execute();
+        $achievements['degrees'] = $deg_query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-            // Grants
-            $grant_query = $conn->prepare("SELECT * FROM grants WHERE staff_id = ?");
-            $grant_query->bind_param("i", $staff_id);
-            $grant_query->execute();
-            $achievements['grants'] = $grant_query->get_result()->fetch_all(MYSQLI_ASSOC);
+        // Grants
+        $grant_query = $conn->prepare("SELECT * FROM grants WHERE staff_id = ?");
+        $grant_query->bind_param("i", $staff_id);
+        $grant_query->execute();
+        $achievements['grants'] = $grant_query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-            // Supervisions
-            $sup_query = $conn->prepare("SELECT * FROM supervision WHERE staff_id = ?");
-            $sup_query->bind_param("i", $staff_id);
-            $sup_query->execute();
-            $achievements['supervisions'] = $sup_query->get_result()->fetch_all(MYSQLI_ASSOC);
+        // Supervisions
+        $sup_query = $conn->prepare("SELECT * FROM supervision WHERE staff_id = ?");
+        $sup_query->bind_param("i", $staff_id);
+        $sup_query->execute();
+        $achievements['supervisions'] = $sup_query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-            // Innovations
-            $inn_query = $conn->prepare("SELECT * FROM innovations WHERE staff_id = ?");
-            $inn_query->bind_param("i", $staff_id);
-            $inn_query->execute();
-            $achievements['innovations'] = $inn_query->get_result()->fetch_all(MYSQLI_ASSOC);
+        // Innovations
+        $inn_query = $conn->prepare("SELECT * FROM innovations WHERE staff_id = ?");
+        $inn_query->bind_param("i", $staff_id);
+        $inn_query->execute();
+        $achievements['innovations'] = $inn_query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-            // Academic Activities
-            $act_query = $conn->prepare("SELECT * FROM academicactivities WHERE staff_id = ?");
-            $act_query->bind_param("i", $staff_id);
-            $act_query->execute();
-            $achievements['activities'] = $act_query->get_result()->fetch_all(MYSQLI_ASSOC);
+        // Academic Activities
+        $act_query = $conn->prepare("SELECT * FROM academicactivities WHERE staff_id = ?");
+        $act_query->bind_param("i", $staff_id);
+        $act_query->execute();
+        $achievements['activities'] = $act_query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-            // Services
-            $serv_query = $conn->prepare("SELECT * FROM service WHERE staff_id = ?");
-            $serv_query->bind_param("i", $staff_id);
-            $serv_query->execute();
-            $achievements['services'] = $serv_query->get_result()->fetch_all(MYSQLI_ASSOC);
-        }
+        // Services
+        $serv_query = $conn->prepare("SELECT * FROM service WHERE staff_id = ?");
+        $serv_query->bind_param("i", $staff_id);
+        $serv_query->execute();
+        $achievements['services'] = $serv_query->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 }
 
@@ -155,8 +158,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* New styles for the profile header */
-        .profile-header {
+         /* New styles for the profile header */
+         .profile-header {
             display: flex;
             align-items: center;
             background-color: white;
@@ -306,7 +309,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
         }
     </style>
     <link rel="stylesheet" href="styles/individual_style.css">
-    <link rel="stylesheet" href="styles/individual_style.css">
 </head>
 
 <body>
@@ -364,7 +366,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php if ($staff_details): ?>
             <!-- Results Section for Selected Staff -->
             <div class="container">
-                <!-- New Profile Header -->
+                <!-- Profile Header -->
                 <div class="profile-header">
                     <?php if (!empty($staff_details['photo_path'])): ?>
                         <img src="<?= htmlspecialchars($staff_details['photo_path']) ?>" alt="Profile Picture" class="profile-pic">
@@ -420,33 +422,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </div>
                 </div>
 
-                <!-- Detailed Achievements (Rest of the original content remains exactly the same) -->
+                <!-- Detailed Achievements -->
                 <div class="row">
-                    <!-- Publications -->
-                    <!-- <div class="col-md-6 mb-4">
-                        <div class="card h-100">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Publications</h5>
-                                <span class="badge badge-must"><?= count($achievements['publications']) ?></span>
-                            </div>
-                            <div class="card-body">
-                                <?php if (!empty($achievements['publications'])): ?>
-                                    <div class="timeline">
-                                        <?php foreach ($achievements['publications'] as $pub): ?>
-                                            <div class="timeline-item mb-3">
-                                                <h6 class="mb-1"><?= htmlspecialchars($pub['publication_type']) ?></h6>
-                                                <p class="text-muted small mb-1">Role: <?= htmlspecialchars($pub['role']) ?></p>
-                                            </div>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php else: ?>
-                                    <p class="text-muted">No publications recorded</p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div> -->
-
-                    <div class="row">
                     <!-- Publications -->
                     <div class="col-md-6 mb-4">
                         <div class="card h-100">
@@ -698,12 +675,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                             <td><?= $staff['publication_count'] ?? 0 ?></td>
                                             <td><?= $staff['grant_count'] ?? 0 ?></td>
                                             <td>
-                                                <form method="POST" class="d-inline">
-                                                    <input type="hidden" name="staff_id" value="<?= $staff['staff_id'] ?>">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                                        View Details
-                                                    </button>
-                                                </form>
+                                                <a href="?staff_id=<?= $staff['staff_id'] ?>" class="btn btn-sm btn-outline-primary">
+                                                    View Details
+                                                </a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -714,7 +688,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </div>
 
                 <!-- Department-wise Performance -->
-                
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Department Performance Comparison</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 400px;">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         <?php endif; ?>
     </div>
@@ -731,6 +714,11 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 placeholder: "Search for staff member",
                 allowClear: true
             });
+
+            // If a staff is selected via URL, ensure Select2 shows the correct value
+            <?php if (isset($staff_id) && $staff_id): ?>
+                $('.select2').val(<?= $staff_id ?>).trigger('change');
+            <?php endif; ?>
 
             <?php if ($staff_details): ?>
                 // Initialize Publications vs Citations Chart

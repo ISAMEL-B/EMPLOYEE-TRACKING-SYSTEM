@@ -558,13 +558,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <body>
     <!-- navigation bar -->
-    <?php //include '../bars/nav_bar.php'; ?>
+    <?php include '../bars/nav_bar.php'; ?>
 
     <!-- sidebar -->
-    <?php //include '../bars/side_bar.php'; ?>
+    <?php include '../bars/side_bar.php'; ?>
 
     <!-- Content Wrapper -->
-    <div class="content-wrapper">
+    <div class="content-wrapper mt-5" style="width: 80%; margin-left: 20%;">
         <div class="container py-4">
             <div class="row">
                 <div class="col-md-8">
