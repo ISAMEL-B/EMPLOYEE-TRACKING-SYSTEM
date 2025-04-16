@@ -479,7 +479,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4">
+                <!-- <div class="col-lg-4">
                     <div class="compare-card chart-container">
                         <h3 class="chart-title">Department Comparison</h3>
                         <div class="mb-3">
@@ -518,8 +518,8 @@
                                 <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div> 
+                </div> -->
             </div>
         </div>
     </div>
