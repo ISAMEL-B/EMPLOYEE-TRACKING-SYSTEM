@@ -97,7 +97,7 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr;
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -107,12 +107,13 @@
             border-radius: var(--border-radius);
             padding: 20px;
             box-shadow: var(--box-shadow);
-            height: 400px;
+            height: auto;
+            margin-bottom: 20px;
         }
 
         .chart-container {
             position: relative;
-            height: 350px;
+            height: 400px;
             width: 100%;
         }
 
@@ -242,13 +243,51 @@
             text-align: center;
         }
 
+        /* Improved Stat Cards */
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-top: 4px solid var(--primary-color);
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--dark-color);
+            margin: 10px 0 5px;
+        }
+
+        .stat-card .subtext {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Color variations for stat cards */
+        .summary-cards .stat-card:nth-child(1) {
+            border-top-color: #3498db;
+        }
+        .summary-cards .stat-card:nth-child(2) {
+            border-top-color: #2ecc71;
+        }
+        .summary-cards .stat-card:nth-child(3) {
+            border-top-color: #e74c3c;
+        }
+        .summary-cards .stat-card:nth-child(4) {
+            border-top-color: #f39c12;
+        }
+
         @media (max-width: 1200px) {
             .summary-cards {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .main-content {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -328,20 +367,37 @@
         <!-- Academic Performance Tab Content -->
         <div class="tab-content" id="academic">
             <div class="main-content">
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Qualifications Distribution</h2>
+                <!-- Top Row: 4 Stat Cards -->
+                <div class="summary-cards">
+                    <div class="card stat-card">
+                        <h3>PhD Holders</h3>
+                        <div class="value">25</div>
+                        <div class="subtext">32% of faculty</div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="qualificationsChart"></canvas>
+                    <div class="card stat-card">
+                        <h3>Masters</h3>
+                        <div class="value">45</div>
+                        <div class="subtext">58% of faculty</div>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>First Class</h3>
+                        <div class="value">34</div>
+                        <div class="subtext">44% of faculty</div>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>Second Class</h3>
+                        <div class="value">72</div>
+                        <div class="subtext">93% of faculty</div>
                     </div>
                 </div>
+
+                <!-- Single Chart Card for Departmental Qualifications -->
                 <div class="large-card">
                     <div class="section-title">
-                        <h2>Teaching Experience</h2>
+                        <h2>Qualifications by Department</h2>
                     </div>
                     <div class="chart-container">
-                        <canvas id="teachingExpChart"></canvas>
+                        <canvas id="qualificationsByDeptChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -422,11 +478,10 @@
                 <thead>
                     <tr>
                         <th>Department</th>
-                        <th>Avg. Score</th>
+                        <th>Total Score</th>
                         <th>Publications</th>
                         <th>Grants (UGX)</th>
                         <th>Innovations</th>
-                        
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -437,7 +492,6 @@
                         <td>12.4</td>
                         <td>1.8B</td>
                         <td>24</td>
-                        
                         <td><a href="#" class="view-details">View Details</a></td>
                     </tr>
                     <tr>
@@ -560,7 +614,6 @@
                 },
                 options: {
                     responsive: true,
-                    // maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'top'
@@ -595,45 +648,69 @@
                 }
             });
 
-
-            // Qualifications Chart
-            const qualificationsCtx = document.getElementById('qualificationsChart').getContext('2d');
-            new Chart(qualificationsCtx, {
-                type: 'pie',
+            // Qualifications by Department Chart
+            const qualDeptCtx = document.getElementById('qualificationsByDeptChart').getContext('2d');
+            new Chart(qualDeptCtx, {
+                type: 'bar',
                 data: {
-                    labels: ['PhD', 'Masters', 'Bachelor', 'Other'],
-                    datasets: [{
-                        data: [45, 35, 15, 5],
-                        backgroundColor: [
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(155, 89, 182, 0.7)',
-                            'rgba(241, 196, 15, 0.7)'
-                        ]
-                    }]
-                }
-            });
-
-            // Teaching Experience Chart
-            const teachingExpCtx = document.getElementById('teachingExpChart').getContext('2d');
-            new Chart(teachingExpCtx, {
-                type: 'line',
-                data: {
-                    labels: ['0-5 yrs', '6-10 yrs', '11-15 yrs', '16-20 yrs', '20+ yrs'],
-                    datasets: [{
-                        label: 'Number of Staff',
-                        data: [25, 40, 35, 20, 15],
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }]
+                    labels: ['Medicine', 'Surgery', 'Pediatrics', 'Pathology', 'Public Health'],
+                    datasets: [
+                        {
+                            label: 'PhD',
+                            data: [15, 12, 8, 5, 10],
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Masters',
+                            data: [25, 18, 15, 12, 20],
+                            backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'First Class',
+                            data: [18, 15, 12, 8, 10],
+                            backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Second Class',
+                            data: [30, 25, 20, 15, 25],
+                            backgroundColor: 'rgba(241, 196, 15, 0.8)',
+                            borderColor: 'rgba(241, 196, 15, 1)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
+                        x: {
+                            stacked: false,
+                            grid: {
+                                display: false
+                            }
+                        },
                         y: {
-                            beginAtZero: true
+                            stacked: false,
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Staff'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
                         }
                     }
                 }
