@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Qualification Visualizations</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
+        .sankey-container {
+            width: 100%;
+            height: 300px;
+        }
+        .description {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center; margin-bottom: 30px;">Academic Staff Qualification Visualizations</h1>
+    
+    <div class="dashboard">
+        <!-- 1. Pyramid Chart -->
+        <div class="chart-container">
+            <div class="chart-title">1. Qualification Pyramid</div>
+            <canvas id="pyramidChart"></canvas>
+            <div class="description">Shows hierarchical distribution of academic qualifications</div>
+        </div>
+        
+        <!-- 2. Radial Map -->
+        <div class="chart-container">
+            <div class="chart-title">2. Radial Qualification Map</div>
+            <canvas id="radialChart"></canvas>
+            <div class="description">Displays qualification levels as concentric circles</div>
+        </div>
+        
+        <!-- 3. Tiered Performance Matrix -->
+        <div class="chart-container">
+            <div class="chart-title">3. Tiered Performance Matrix</div>
+            <canvas id="matrixChart"></canvas>
+            <div class="description">Combines qualification with years of service</div>
+        </div>
+        
+        <!-- 4. Sankey Diagram -->
+        <div class="chart-container">
+            <div class="chart-title">4. Career Progression Sankey</div>
+            <div id="sankeyDiagram" class="sankey-container"></div>
+            <div class="description">Tracks qualification to current position flow</div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - same for all visualizations
+        const staffData = {
+            qualifications: {
+                phd: 15,
+                masters: 22,
+                firstClass: 18,
+                secondClass: 10
+            },
+            positions: {
+                professor: 8,
+                associateProfessor: 12,
+                seniorLecturer: 15,
+                lecturer: 20,
+                assistant: 10
+            },
+            progression: [
+                { from: "PhD", to: "Professor", value: 6 },
+                { from: "PhD", to: "Associate Professor", value: 5 },
+                { from: "PhD", to: "Senior Lecturer", value: 4 },
+                { from: "Master's", to: "Associate Professor", value: 7 },
+                { from: "Master's", to: "Senior Lecturer", value: 10 },
+                { from: "Master's", to: "Lecturer", value: 5 },
+                { from: "First Class", to: "Senior Lecturer", value: 1 },
+                { from: "First Class", to: "Lecturer", value: 12 },
+                { from: "First Class", to: "Assistant", value: 5 },
+                { from: "Second Class", to: "Lecturer", value: 3 },
+                { from: "Second Class", to: "Assistant", value: 5 }
+            ]
+        };
+
+        // 1. Pyramid Chart
+        const pyramidCtx = document.getElementById('pyramidChart').getContext('2d');
+        new Chart(pyramidCtx, {
+            type: 'bar',
+            data: {
+                labels: ['PhD', 'Master\'s', 'First Class', 'Second Class'],
+                datasets: [{
+                    data: [
+                        staffData.qualifications.phd,
+                        staffData.qualifications.masters,
+                        staffData.qualifications.firstClass,
+                        staffData.qualifications.secondClass
+                    ],
+                    backgroundColor: [
+                        '#3498db', '#2ecc71', '#f1c40f', '#e74c3c'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: { stacked: true, beginAtZero: true },
+                    y: { stacked: true }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `${ctx.raw} staff members` } }
+                }
+            }
+        });
+
+        // 2. Radial Map
+        const radialCtx = document.getElementById('radialChart').getContext('2d');
+        new Chart(radialCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['PhD', 'Master\'s', 'First Class', 'Second Class'],
+                datasets: [{
+                    data: [
+                        staffData.qualifications.phd,
+                        staffData.qualifications.masters,
+                        staffData.qualifications.firstClass,
+                        staffData.qualifications.secondClass
+                    ],
+                    backgroundColor: [
+                        'rgba(52, 152, 219, 0.7)',
+                        'rgba(46, 204, 113, 0.7)',
+                        'rgba(241, 196, 15, 0.7)',
+                        'rgba(231, 76, 60, 0.7)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { r: { beginAtZero: true } },
+                plugins: {
+                    legend: { position: 'right' },
+                    tooltip: { callbacks: { label: ctx => `${ctx.raw} staff (${ctx.label})` } }
+                }
+            }
+        });
+
+        // 3. Tiered Performance Matrix
+        const matrixCtx = document.getElementById('matrixChart').getContext('2d');
+        new Chart(matrixCtx, {
+            type: 'bubble',
+            data: {
+                datasets: [
+                    {
+                        label: 'PhD',
+                        data: [{x: 8, y: 4, r: 15}],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)'
+                    },
+                    {
+                        label: 'Master\'s',
+                        data: [{x: 5, y: 3, r: 22}],
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)'
+                    },
+                    {
+                        label: 'First Class',
+                        data: [{x: 3, y: 2, r: 18}],
+                        backgroundColor: 'rgba(241, 196, 15, 0.7)'
+                    },
+                    {
+                        label: 'Second Class',
+                        data: [{x: 2, y: 1, r: 10}],
+                        backgroundColor: 'rgba(231, 76, 60, 0.7)'
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Average Years in Position' },
+                        min: 0, max: 10
+                    },
+                    y: {
+                        title: { display: true, text: 'Academic Level' },
+                        min: 0, max: 5
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const label = ctx.dataset.label || '';
+                                return `${label}: ${ctx.raw.r} staff members`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 4. Sankey Diagram
+        const sankeyData = {
+            nodes: [
+                { name: "PhD" },
+                { name: "Master's" },
+                { name: "First Class" },
+                { name: "Second Class" },
+                { name: "Professor" },
+                { name: "Associate Professor" },
+                { name: "Senior Lecturer" },
+                { name: "Lecturer" },
+                { name: "Assistant" }
+            ],
+            links: staffData.progression.map(item => ({
+                source: item.from,
+                target: item.to,
+                value: item.value
+            }))
+        };
+
+        const width = 600;
+        const height = 300;
+        const color = d3.scaleOrdinal(d3.schemeTableau10);
+
+        const svg = d3.select("#sankeyDiagram")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        const sankey = d3.sankey()
+            .nodeWidth(15)
+            .nodePadding(10)
+            .size([width, height]);
+
+        const { nodes, links } = sankey({
+            nodes: sankeyData.nodes.map(d => Object.assign({}, d)),
+            links: sankeyData.links.map(d => Object.assign({}, d))
+        });
+
+        svg.append("g")
+            .selectAll("rect")
+            .data(nodes)
+            .join("rect")
+            .attr("x", d => d.x0)
+            .attr("y", d => d.y0)
+            .attr("height", d => d.y1 - d.y0)
+            .attr("width", d => d.x1 - d.x0)
+            .attr("fill", d => color(d.name.replace(/ .*/, "")));
+
+        svg.append("g")
+            .selectAll("text")
+            .data(nodes)
+            .join("text")
+            .attr("x", d => d.x0 < width / 2 ? d.x1 + 6 : d.x0 - 6)
+            .attr("y", d => (d.y1 + d.y0) / 2)
+            .attr("dy", "0.35em")
+            .attr("text-anchor", d => d.x0 < width / 2 ? "start" : "end")
+            .text(d => d.name)
+            .style("font-size", "10px");
+
+        svg.append("g")
+            .attr("fill", "none")
+            .selectAll("g")
+            .data(links)
+            .join("path")
+            .attr("d", d3.sankeyLinkHorizontal())
+            .attr("stroke", d => color(d.source.name.replace(/ .*/, "")))
+            .attr("stroke-width", d => Math.max(1, d.width));
+    </script>
+</body>
+</html>

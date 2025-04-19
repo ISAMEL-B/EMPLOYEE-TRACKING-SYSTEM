@@ -151,17 +151,51 @@
         .tab-pane {
             min-height: 500px;
         }
+
+        /* Chart.js performance chart styles */
+        .rank-filter-container {
+            margin-bottom: 15px;
+        }
+
+        .rank-filter-container select {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: white;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+
+        /* Prevent infinite resizing by setting height properly */
+        .chart-wrapper {
+            position: relative;
+            height: 400px; /* fixed height for Chart.js to prevent infinite growth */
+            width: 100%;
+        }
+
+        #performanceChart {
+            height: 100% !important;
+            width: 100% !important;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
     </style>
 
-    <link rel="stylesheet" href="styles/individual_style.css">
-    <link rel="stylesheet" href="styles/individual_style.css">
+    <!-- <link rel="stylesheet" href="styles/individual_style.css">
+    <link rel="stylesheet" href="styles/individual_style.css"> -->
 </head>
 <body>
     <!-- navigation bar -->
-    <?php include 'bars/nav_bar.php'; ?>
+    <?php //include 'bars/nav_bar.php'; ?>
 
     <!-- sidebar -->
-    <?php include 'bars/side_bar.php'; ?>
+    <?php //include 'bars/side_bar.php'; ?>
     
     <div class="content-wrapper">
         <div class="container-fluid py-4">
@@ -220,7 +254,7 @@
             
             <div class="filter-section mb-4">
                 <div class="row">
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <label for="rankFilter" class="form-label">Academic Rank</label>
                         <select id="rankFilter" class="form-select">
                             <option selected>All Ranks</option>
@@ -231,7 +265,7 @@
                             <option>Assistant Lecturer</option>
                             <option>Teaching Assistant</option>
                         </select>
-                    </div>
+                    </div> -->
                     <div class="col-md-4">
                         <label for="categoryFilter" class="form-label">Category</label>
                         <select id="categoryFilter" class="form-select">
@@ -269,9 +303,23 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="chart-container">
-                                <h3 class="chart-title">Performance Distribution</h3>
+                                <div class="chart-title">Performance by Academic Rank</div>            
+                                <div class="rank-filter-container">
+                                    <label for="rankFilter">Select Academic Rank:</label>
+                                    <select id="rankFilter">
+                                        <option value="professor" selected>Professor</option>
+                                        <option value="associate">Associate Professor</option>
+                                        <option value="senior">Senior Lecturer</option>
+                                        <option value="lecturer">Lecturer</option>
+                                        <option value="assistant">Assistant Lecturer</option>
+                                        <option value="teaching">Teaching Assistant</option>
+                                    </select>
+                                </div>
                                 <div class="chart-wrapper">
                                     <canvas id="performanceChart"></canvas>
+                                </div>
+                                <div id="noDataMessage" class="no-data-message" style="display: none;">
+                                    No staff members found for this rank
                                 </div>
                             </div>
                         </div>
@@ -527,42 +575,102 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
-        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-        const performanceChart = new Chart(performanceCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Prof. A', 'Prof. B', 'Dr. C', 'Dr. D', 'Dr. E', 'Dr. F', 'Lect. G'],
-                datasets: [
-                    {
-                        label: 'years of experience',
-                        data: [12, 8, 6, 5, 4, 3, 2],
-                        backgroundColor: '#3498db',
+         // Academic staff data
+        const academicStaff = [
+            { name: 'Prof. A', rank: 'professor', experience: 12, publications: 10, grants: 8 },
+            { name: 'Prof. B', rank: 'professor', experience: 8, publications: 9, grants: 6 },
+            { name: 'Dr. C', rank: 'associate', experience: 6, publications: 8, grants: 4 },
+            { name: 'Dr. C', rank: 'associate', experience: 6, publications: 8, grants: 4 },
+            { name: 'Dr. D', rank: 'senior', experience: 5, publications: 7, grants: 3 },
+            { name: 'Dr. E', rank: 'lecturer', experience: 4, publications: 6, grants: 2 },
+            { name: 'Dr. F', rank: 'assistant', experience: 3, publications: 5, grants: 1 },
+            { name: 'Lect. G', rank: 'teaching', experience: 2, publications: 4, grants: 0 }
+        ];
+
+        // Filter staff by rank
+        function filterDataByRank(rank) {
+            return academicStaff.filter(staff => staff.rank === rank);
+        }
+
+        // Chart setup
+        const chartCanvas = document.getElementById('performanceChart');
+        const noDataMessage = document.getElementById('noDataMessage');
+        let performanceChart;
+
+        function initializeChart(data) {
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            if (data.length === 0) {
+                chartCanvas.style.display = 'none';
+                noDataMessage.style.display = 'block';
+                return;
+            }
+
+            chartCanvas.style.display = 'block';
+            noDataMessage.style.display = 'none';
+
+            const ctx = chartCanvas.getContext('2d');
+            performanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(staff => staff.name),
+                    datasets: [
+                        {
+                            label: 'Years of Experience',
+                            data: data.map(staff => staff.experience),
+                            backgroundColor: '#3498db',
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Publications',
+                            data: data.map(staff => staff.publications),
+                            backgroundColor: '#2ecc71',
+                            barPercentage: 0.6
+                        },
+                        {
+                            label: 'Grants Won',
+                            data: data.map(staff => staff.grants),
+                            backgroundColor: '#e74c3c',
+                            barPercentage: 0.6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
                     },
-                    {
-                        label: 'publications',
-                        data: [10, 9, 8, 7, 6, 5, 4],
-                        backgroundColor: '#2ecc71',
-                    },
-                    {
-                        label: 'grants won',
-                        data: [8, 6, 4, 3, 2, 1, 0],
-                        backgroundColor: '#e74c3c',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        stacked: false,
-                    },
-                    y: {
-                        stacked: false,
-                        beginAtZero: true
+                    scales: {
+                        x: {
+                            stacked: false,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f5f5f5'
+                            }
+                        }
                     }
                 }
-            }
+            });
+        }
+
+        // Initial chart load
+        initializeChart(filterDataByRank('professor'));
+
+        // Update chart on rank selection
+        document.getElementById('rankFilter').addEventListener('change', function () {
+            const selectedRank = this.value;
+            const filteredData = filterDataByRank(selectedRank);
+            initializeChart(filteredData);
         });
 
         const trendsCtx = document.getElementById('trendsChart').getContext('2d');
@@ -758,11 +866,11 @@
         const researchGrantsChart = new Chart(researchGrantsCtx, {
             type: 'bar',
             data: {
-                labels: ['Grants >1B', 'Grants 500M-1B', 'Grants 100M-500M', 'Grants <100M', 'Collaborations'],
+                labels: ['Grants >1B', 'Grants 500M-1B', 'Grants 100M-500M', 'Grants <100M'],
                 datasets: [
                     {
                         label: 'Grant Amount',
-                        data: [1, 2, 4, 8, 6],
+                        data: [1, 2, 4, 8],
                         backgroundColor: 'rgba(46, 204, 113, 0.7)',
                         borderColor: '#2ecc71',
                         borderWidth: 1
