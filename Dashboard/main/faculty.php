@@ -344,21 +344,22 @@
         <div class="tab-content active" id="overview">
             <div class="main-content">
                 <div class="large-card">
-                    <div class="section-title">
-                        <h2>Faculty Overview</h2>
-                    </div>
-                    <div class="chart-container">
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Faculty Overview</h2>
+                        </div>
+                        <div class="chart-container">
                         <canvas id="facultyOverviewChart"></canvas>
                     </div>
+                    </div>
+                    
                 </div>
                 <div class="large-card">
                     <div class="section-title">
                         <h2>Key Metrics Summary</h2>
                     </div>
-                    <div class="chart-container">
-                        <div style="width: 100%; max-width: 700px; overflow-x: auto;">
-                            <canvas id="keyMetricsChart" width="1000" height="400"></canvas>
-                        </div>
+                    <div class="chart-container" style="height: 400px; width: 100%;">
+                        <canvas id="keyMetricsChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -406,6 +407,25 @@
         <!-- Publications Tab Content -->
         <div class="tab-content" id="publications">
             <div class="main-content">
+            <!-- status cards -->
+            <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <div class="card stat-card" style="width: 300px;">
+                    <h3>Total peer reviewed publications</h3>
+                    <div class="value">34</div>
+                    
+                </div>
+                <div class="card stat-card" style="width: 300px;">
+                    <h3>Total number of citations</h3>
+                    <div class="value">72</div>
+                    
+                </div>
+                <div class="card stat-card" style="width: 300px;">
+                    <h3>Total peer reviewed publications uploaded to must repository</h3>
+                    <div class="value">72</div>
+                    
+                </div>
+
+            </div>
                 <div class="large-card">
                     <div class="section-title">
                         <h2>Publications vs Citations</h2>
@@ -422,6 +442,7 @@
                         <canvas id="publicationTypesChart"></canvas>
                     </div>
                 </div>
+                
             </div>
         </div>
 
@@ -450,22 +471,33 @@
         <!-- Community Service Tab Content -->
         <div class="tab-content" id="community">
             <div class="main-content">
+                <!-- status cards -->
+                <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <div class="card stat-card" style="width: 300px;">
+                        <h3>Total student supervised for community placements</h3>
+                        <div class="value">34</div>
+                        
+                    </div>
+                    <div class="card stat-card" style="width: 300px;">
+                        <h3>other community outreaches</h3>
+                        <div class="value">72</div>
+                        
+                    </div>
+                    <div class="card stat-card" style="width: 300px;">
+                        <h3> total number of beneficiaries</h3>
+                        <div class="value">72</div>
+                        
+                    </div>
+                </div>
                 <div class="large-card">
                     <div class="section-title">
-                        <h2>Community Engagement</h2>
+                        <h2>Community Engagement by department</h2>
                     </div>
                     <div class="chart-container">
                         <canvas id="communityEngagementChart"></canvas>
                     </div>
                 </div>
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>University Service</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="universityServiceChart"></canvas>
-                    </div>
-                </div>
+                
             </div>
         </div>
 
@@ -578,45 +610,49 @@
             new Chart(keyMetricsCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Publications', 'Grants', 'Postgraduate Supervisions', 'Innovations'],
+                    labels: ['Medicine', 'Engineering', 'Science', 'Arts', 'Business', 'Law'], // Departments on x-axis
                     datasets: [
                         {
-                            label: 'Medicine',
-                            data: [9.2, 8.8, 8.5, 7.2],
-                            backgroundColor: 'rgba(52, 152, 219, 0.7)'
+                            label: 'Publications',
+                            data: [9.2, 8.1, 7.5, 6.8, 7.2, 6.5], // Scores for each department
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1
                         },
                         {
-                            label: 'Engineering',
-                            data: [8.1, 9.2, 7.8, 8.5],
-                            backgroundColor: 'rgba(46, 204, 113, 0.7)'
+                            label: 'Grants',
+                            data: [8.8, 9.2, 7.8, 6.2, 8.1, 5.8],
+                            backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
                         },
                         {
-                            label: 'Science',
-                            data: [7.5, 7.8, 8.2, 6.9],
-                            backgroundColor: 'rgba(155, 89, 182, 0.7)'
+                            label: 'Postgraduate Supervisions',
+                            data: [8.5, 7.8, 8.2, 7.5, 6.9, 7.1],
+                            backgroundColor: 'rgba(155, 89, 182, 0.8)',
+                            borderColor: 'rgba(155, 89, 182, 1)',
+                            borderWidth: 1
                         },
                         {
-                            label: 'Arts',
-                            data: [6.8, 6.2, 7.5, 5.8],
-                            backgroundColor: 'rgba(241, 196, 15, 0.7)'
-                        },
-                        {
-                            label: 'Business',
-                            data: [7.2, 8.1, 6.9, 7.5],
-                            backgroundColor: 'rgba(231, 76, 60, 0.7)'
-                        },
-                        {
-                            label: 'Law',
-                            data: [6.5, 5.8, 7.1, 6.2],
-                            backgroundColor: 'rgba(26, 188, 156, 0.7)'
+                            label: 'Innovations',
+                            data: [7.2, 8.5, 6.9, 5.8, 7.5, 6.2],
+                            backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                            borderColor: 'rgba(255, 193, 7, 1)',
+                            borderWidth: 1
                         }
                     ]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'top'
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20,
+                                font: { size: 12 }
+                            }
                         },
                         tooltip: {
                             callbacks: {
@@ -624,27 +660,37 @@
                                     return context.dataset.label + ': ' + context.raw.toFixed(1);
                                 }
                             }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Department Performance by Metric',
+                            font: { size: 16, weight: 'bold' },
+                            padding: { bottom: 20 }
                         }
                     },
                     scales: {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Competencies'
-                            }
+                                text: 'Department',
+                                font: { weight: 'bold', size: 14 }
+                            },
+                            grid: { display: false }
                         },
                         y: {
                             beginAtZero: true,
                             suggestedMax: 10,
-                            ticks: {
-                                stepSize: 2
-                            },
+                            ticks: { stepSize: 2 },
                             title: {
                                 display: true,
-                                text: 'Scores'
-                            }
+                                text: 'Average Score',
+                                font: { weight: 'bold', size: 14 }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         }
-                    }
+                    },
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.9
                 }
             });
 
@@ -719,57 +765,108 @@
             // Publications vs Citations Chart
             const pubCiteCtx = document.getElementById('pubCitationChart').getContext('2d');
             new Chart(pubCiteCtx, {
-                type: 'scatter',
+                type: 'bar',
                 data: {
+                    labels: ['Medicine', 'Surgery', 'Public Health', 'mental health'],
                     datasets: [
                         {
-                            label: 'Medicine',
-                            data: [
-                                {x: 12, y: 45},
-                                {x: 8, y: 30},
-                                {x: 15, y: 60},
-                                {x: 6, y: 18},
-                                {x: 10, y: 35}
-                            ],
-                            backgroundColor: 'rgba(52, 152, 219, 0.7)'
+                            label: 'Publications',
+                            data: [12, 10, 6, 10], // Average publications per department
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.6
                         },
                         {
-                            label: 'Surgery',
-                            data: [
-                                {x: 10, y: 32},
-                                {x: 7, y: 25},
-                                {x: 9, y: 28},
-                                {x: 5, y: 15},
-                                {x: 8, y: 22}
-                            ],
-                            backgroundColor: 'rgba(46, 204, 113, 0.7)'
-                        },
-                        {
-                            label: 'Public Health',
-                            data: [
-                                {x: 6, y: 12},
-                                {x: 4, y: 8},
-                                {x: 5, y: 10},
-                                {x: 3, y: 5},
-                                {x: 7, y: 15}
-                            ],
-                            backgroundColor: 'rgba(231, 76, 60, 0.7)'
+                            label: 'Citations',
+                            data: [45, 32, 12, 34], // Average citations per department
+                            backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                            borderColor: 'rgba(231, 76, 60, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.6
                         }
                     ]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         x: {
+                            grid: {
+                                display: false
+                            },
                             title: {
                                 display: true,
-                                text: 'Publications'
+                                text: 'Department',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                }
                             }
                         },
                         y: {
+                            beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Citations'
+                                text: 'Count',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
                             }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                usePointStyle: true,
+                                boxWidth: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Publications and Citations by Department',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            padding: 12,
+                            cornerRadius: 4,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 10
                         }
                     }
                 }
@@ -780,18 +877,94 @@
             new Chart(pubTypesCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Journal Articles', 'Book Chapters', 'Books'],
-                    datasets: [{
-                        label: 'Publication Types',
-                        data: [305, 63, 19],
-                        backgroundColor: [
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(155, 89, 182, 0.7)'
-                        ]
-                    }]
+                    labels: ['medicine', 'pharmarcy', 'pharmacology', 'medical lab science'],
+                    datasets: [
+                        {
+                            label: 'Journal articles',
+                            data: [120, 25, 8, 30], // Sample data for Medicine department
+                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                            borderColor: 'rgba(52, 152, 219, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Book chapters',
+                            data: [100, 20, 5, 43], // Sample data for Surgery department
+                            backgroundColor: 'rgba(46, 204, 113, 0.8)',
+                            borderColor: 'rgba(46, 204, 113, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Books',
+                            data: [85, 18, 6, 49], // Sample data for Public Health department
+                            backgroundColor: 'rgba(155, 89, 182, 0.8)',
+                            borderColor: 'rgba(155, 89, 182, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Department',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Publications',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                usePointStyle: true
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Publication Types by Department',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 4
+                        }
+                    },
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.8
                 }
             });
+
+            
 
             // Grant Trend Chart
             const grantCtx = document.getElementById('grantTrendChart').getContext('2d');
@@ -841,19 +1014,94 @@
             // Innovations Chart
             const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
             new Chart(innovationsCtx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: ['Patents', 'Utility Models', 'Copyrights', 'Products', 'Trademarks'],
-                    datasets: [{
-                        data: [8, 12, 15, 5, 3],
-                        backgroundColor: [
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(155, 89, 182, 0.7)',
-                            'rgba(241, 196, 15, 0.7)',
-                            'rgba(231, 76, 60, 0.7)'
-                        ]
-                    }]
+                    labels: ['Medicine', 'Surgery', 'Public Health'], // Departments on x-axis
+                    datasets: [
+                        {
+                            label: 'Patents',
+                            data: [3, 2, 3], // Medicine, Surgery, Public Health
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',  // Teal
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Utility Models',
+                            data: [5, 3, 4],
+                            backgroundColor: 'rgba(255, 159, 64, 0.8)',   // Orange
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Copyrights',
+                            data: [6, 4, 5],
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',  // Blue
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Products',
+                            data: [2, 1, 2],
+                            backgroundColor: 'rgba(153, 102, 255, 0.8)',  // Purple
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Trademarks',
+                            data: [1, 1, 1],
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',  // Pink
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Department',
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count',
+                                font: { weight: 'bold' }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Innovations by Department and Type',
+                            font: { size: 16, weight: 'bold' },
+                            padding: { bottom: 20 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 4,
+                            bodyFont: { size: 12 },
+                            titleFont: { size: 14 }
+                        }
+                    },
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.9
                 }
             });
 
@@ -862,40 +1110,86 @@
             new Chart(communityCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Surgery', 'Pediatrics', 'Pathology', 'Public Health'],
-                    datasets: [{
-                        label: 'Community Service Score',
-                        data: [4.2, 3.8, 4.5, 3.2, 4.8],
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)'
-                    }]
+                    labels: ['Medicine', 'Pharmacy', 'Pharmacology', 'Medical Lab Science'],
+                    datasets: [
+                        {
+                            label: 'Students Supervised',
+                            data: [120, 25, 8, 30],
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',  // Vibrant Pink
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Community Outreaches',
+                            data: [100, 20, 5, 43],
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',  // Bright Blue
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Total Beneficiaries',
+                            data: [85, 18, 6, 49],
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',  // Refreshing Teal
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
+                        x: {
+                            grid: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Department',
+                                font: { weight: 'bold', size: 14 }
+                            }
+                        },
                         y: {
                             beginAtZero: true,
-                            max: 5
+                            title: {
+                                display: true,
+                                text: 'Number of Participants',
+                                font: { weight: 'bold', size: 14 }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         }
-                    }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { size: 12 },
+                                usePointStyle: true,
+                                padding: 20,
+                                boxWidth: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Community Engagement by Department',
+                            font: { size: 18, weight: 'bold' },
+                            padding: { bottom: 25 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                            padding: 12,
+                            cornerRadius: 6,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            footerFont: { size: 10 }
+                        }
+                    },
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
                 }
             });
+            
 
             // University Service Chart
-            const universityCtx = document.getElementById('universityServiceChart').getContext('2d');
-            new Chart(universityCtx, {
-                type: 'polarArea',
-                data: {
-                    labels: ['Committee Members', 'HODs', 'Deputy Deans', 'Deans'],
-                    datasets: [{
-                        data: [45, 12, 8, 5],
-                        backgroundColor: [
-                            'rgba(52, 152, 219, 0.7)',
-                            'rgba(46, 204, 113, 0.7)',
-                            'rgba(155, 89, 182, 0.7)',
-                            'rgba(241, 196, 15, 0.7)'
-                        ]
-                    }]
-                }
-            });
+            
         });
     </script>
 </body>

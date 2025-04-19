@@ -688,7 +688,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 </div>
 
                 <!-- Department-wise Performance -->
-                <div class="card mb-4">
+                <!-- <div class="card mb-4">
                     <div class="card-header bg-white">
                         <h4 class="mb-0">Department Performance Comparison</h4>
                     </div>
@@ -697,7 +697,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <canvas id="departmentChart"></canvas>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         <?php endif; ?>
     </div>
