@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once 'config.php';
-
+$current_pag = basename($_SERVER['PHP_SELF']);
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
@@ -27,7 +27,7 @@ if (!$approval) {
 
 // Fetch submitter details
 $submitter = [];
-$stmt = $conn->prepare("SELECT employee_id, email, role FROM users WHERE user_id = ?");
+$stmt = $conn->prepare("SELECT employee_id, email, system_role FROM staff WHERE staff_id = ?");
 $stmt->bind_param("i", $approval['submitted_by']);
 $stmt->execute();
 $result = $stmt->get_result();

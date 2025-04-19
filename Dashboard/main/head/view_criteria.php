@@ -3,10 +3,10 @@ session_start();
 require_once 'approve/config.php';
 
 // Check authentication
-if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'hrm') {
-    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-    exit();
-}
+// if (!isset($_SESSION['staff_id']) || $_SESSION['user_role'] !== 'hrm') {
+//     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+//     exit();
+// }
 
 // Handle form submissions
 $message = '';

@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['profile_picture'])) {
         if ($uploadOk == 1) {
             if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) {
                 // Update database with new photo path
-                $update_query = $conn->prepare("UPDATE users SET photo_path = ? WHERE user_id = ?");
+                $update_query = $conn->prepare("UPDATE staff SET photo_path = ? WHERE staff_id = ?");
                 $update_query->bind_param("si", $target_file, $user_id);
                 $update_query->execute();
 
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_password'])) {
 
     // Password Verification
     $password = $_POST['verify_password'];
-    $verify_query = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
+    $verify_query = $conn->prepare("SELECT password FROM staff WHERE staff_id = ?");
     $verify_query->bind_param("i", $user_id);
     $verify_query->execute();
     $user = $verify_query->get_result()->fetch_assoc();
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_password'])) {
     // Database Update with Transaction
     $conn->begin_transaction();
     try {
-        $update_query = $conn->prepare("UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, personal_email = ? WHERE user_id = ?");
+        $update_query = $conn->prepare("UPDATE staff SET first_name = ?, last_name = ?, email = ?, phone_number = ?, personal_email = ? WHERE staff_id = ?");
         $update_query->bind_param("sssssi", $first_name, $last_name, $email, $phone_number, $personal_email, $user_id);
         $update_query->execute();
         
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['current_password'])) {
         $confirm_password = $_POST['confirm_password'];
 
         // Verify current password
-        $verify_query = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
+        $verify_query = $conn->prepare("SELECT password FROM staff WHERE staff_id = ?");
         $verify_query->bind_param("i", $user_id);
         $verify_query->execute();
         $verify_result = $verify_query->get_result();
@@ -202,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['current_password'])) {
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
             
             // Update password
-            $update_query = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+            $update_query = $conn->prepare("UPDATE staff SET password = ? WHERE staff_id = ?");
             $update_query->bind_param("si", $hashed_password, $user_id);
             
             if ($update_query->execute()) {
@@ -229,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['current_password'])) {
 // Fetch user data from database
 $user_data = [];
 if ($user_id) {
-    $user_query = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
+    $user_query = $conn->prepare("SELECT * FROM staff WHERE staff_id = ?");
     $user_query->bind_param("i", $user_id);
     $user_query->execute();
     $user_result = $user_query->get_result();

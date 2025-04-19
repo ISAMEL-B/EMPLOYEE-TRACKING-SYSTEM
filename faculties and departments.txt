@@ -1,0 +1,50 @@
+1. Faculty of Computing and Informatics
+- Department of Software Engineering
+- Department of Computer Science
+- Department of Information Tecnology
+- Department of Computing Services
+- Software Incubation and Innovations
+2. Faculty of Science
+- Department of Chemistry
+- Department of Biology
+- Department of Mathematics
+- Department of Physics
+- Department of Education Foundations and Psychology
+- Diploma in Science Laboratory Technology
+- Higher Education Access Certificate - HEAC
+3. Faculty of Applied Sciences and Technology
+- Department of Biomedical Sciences and Engineering
+- Electrical and Electronics Engineering
+- Department of Mechanical and Industrial Engineering
+- Department of Civil And Building Engineering
+4. Faculty of Business and Management Sciences
+- Department of Accounting and Finance
+- Department of Economics and Entrepreneurship
+- Department of Human Resource Management
+- Department of Procurement and Marketing
+5. Faculty of Interdisciplinary Studies
+- Planning and Governance
+- Human Development and relational Sciences
+- Environment and livelihood support system
+- Community Engagement and service learning
+6. Faculty Of Medicine
+- Anesthesia
+- Biochemistry
+- Community Health
+- Dental Surgery
+- Dermatology
+- Ears, Nose and Throat (ENT)
+- Emergency Medicine
+- Family Medicine
+- Internal Medicine
+- Medical Laboratory Science
+- Microbiology and Parasitology
+- Nursing
+- Obstetrics and Gynecology
+- Ophthalmology
+- Pathology
+- Pediatrics and Child Health
+- Pharmaceutical Sciences
+- Pharmacology
+- Pharmacy
+- Physiology

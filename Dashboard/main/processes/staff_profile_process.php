@@ -46,11 +46,11 @@ if (isset($_POST['selected_staff'])) {
         $staff_data = $staff_result->fetch_assoc();
         
         // Get user data
-        $user_query = $conn->prepare("SELECT * FROM users WHERE staff_id = ?");
-        $user_query->bind_param("i", $user_id);
-        $user_query->execute();
-        $user_result = $user_query->get_result();
-        $user_data = $user_result->fetch_assoc();
+        // $user_query = $conn->prepare("SELECT * FROM users WHERE staff_id = ?");
+        // $user_query->bind_param("i", $user_id);
+        // $user_query->execute();
+        // $user_result = $user_query->get_result();
+        // $user_data = $user_result->fetch_assoc();
         
         // Get performance data
         $performance_query = $conn->prepare("SELECT 

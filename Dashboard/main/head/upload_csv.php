@@ -1,6 +1,6 @@
 ﻿<?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['staff_id'])) {
   header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
   exit();
 }

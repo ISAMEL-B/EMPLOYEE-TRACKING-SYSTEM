@@ -88,12 +88,12 @@ include "processes/staff_profile_process.php";
                             <hr>
                             
                             <div class="d-flex justify-content-center">
-                                <a href="#" class="btn btn-must me-2">
-                                    <i class="fas fa-edit me-1"></i> Edit Profile
+                                <a href="none_user_update.php?staff_id=<?= $staff['staff_id'] ?>" class="btn btn-must me-2">
+                                    <i class="fas fa-edit me-1"></i> Manage Profile
                                 </a>
-                                <a href="#" class="btn btn-outline-secondary">
+                                <!-- <a href="#" class="btn btn-outline-secondary">
                                     <i class="fas fa-lock me-1"></i> Change Password
-                                </a>
+                                </a> -->
                             </div>
                         </div>
                     </div>
