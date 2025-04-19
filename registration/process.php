@@ -18,12 +18,12 @@ if ($conn->connect_error) {
 if (isset($_POST['signup'])) {
     $employee_id = $_POST['employee_id'];
     $email = $_POST['email'];
-    $role = $_POST['role'];
+    $system_role = $_POST['role'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
     // Check if email or employee_id already exists
-    $check_sql = "SELECT * FROM users WHERE email='$email' OR employee_id='$employee_id'";
+    $check_sql = "SELECT * FROM staff WHERE email='$email' OR employee_id='$employee_id'";
     $check_result = $conn->query($check_sql);
 
     if ($check_result->num_rows > 0) {
@@ -36,7 +36,7 @@ if (isset($_POST['signup'])) {
             if ($row['employee_id'] === $employee_id) {
                 $errors[] = "Employee ID is already taken!   ";
             }
-            if ($row['role'] === $role) {
+            if ($row['system_role'] === $system_role) {
                 $errors[] = "Role is already taken!";
             }
         }
@@ -47,7 +47,7 @@ if (isset($_POST['signup'])) {
 
     if ($password === $confirm_password) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $sql = "INSERT INTO users (employee_id, email, password, role) VALUES ('$employee_id', '$email', '$hashed_password', '$role')";
+        $sql = "INSERT INTO staff (employee_id, email, password, system_role) VALUES ('$employee_id', '$email', '$hashed_password', '$system_role')";
 
         if ($conn->query($sql) === TRUE) {
             $_SESSION['signup_message'] = "Account created successfully!";
@@ -66,17 +66,17 @@ if (isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM users WHERE email='$email'";
+    $sql = "SELECT * FROM staff WHERE email='$email'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
             // Set session variables
-            $_SESSION['user_id'] = $row['user_id'];
+            $_SESSION['staff_id'] = $row['staff_id'];
             $_SESSION['employee_id'] = $row['employee_id'];
             $_SESSION['email'] = $row['email'];
-            $_SESSION['user_role'] = $row['role'];
+            $_SESSION['user_role'] = $row['system_role'];
 
             // Redirect based on role
             if ($_SESSION['user_role'] === 'hrm') {
@@ -85,9 +85,6 @@ if (isset($_POST['login'])) {
                 // Redirect based on role to upload.php with role as a query parameter
                 header("Location: ../Dashboard/main/staff/for_staff_profile.php");
 
-                // } elseif ($_SESSION['user_role'] === 'hod' || $_SESSION['user_role'] === 'ar') {
-                //     // Redirect based on role to upload.php with role as a query parameter
-                //     header("Location: ../Dashboard/main/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
             } else {
                 // Redirect based on role to upload.php with role as a query parameter
                 header("Location: ../Dashboard/main/head/upload_csv.php?role=" . urlencode($_SESSION['user_role']));

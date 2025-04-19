@@ -6,7 +6,7 @@
 // Define menu structure with parent-child relationships
 $menu_structure = [
     'Dashboard' => [
-        'pages' => ['index.php', 'index2.php', 'index3.php', 'individual_view2.php', 'hrm_assistant.php'],
+        'pages' => ['index.php', 'index2.php', 'index3.php', 'individual_view.php', 'hrm_assistant.php'],
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [
@@ -483,7 +483,7 @@ foreach ($menu_structure as $parent => $data) {
                             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index2.php" class="<?= ($current_pag == 'index2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-university"></i> Faculty Progress</a></li>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/index3.php" class="<?= ($current_pag == 'index3.php') ? 'active-submenu' : '' ?>"><i class="fa fa-building"></i> Department Progress</a></li>
-                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view2.php" class="<?= ($current_pag == 'individual_view2.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
+                                <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/individual_view.php" class="<?= ($current_pag == 'individual_view.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user"></i> Individual Progress</a></li>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/hrm_assistant.php" class="<?= ($current_pag == 'hrm_assistant.php') ? 'active-submenu' : '' ?>"><i class="fa fa-user-cog"></i> HRM Assistant </a></li>
                             <?php endif; ?>
                         </ul>
@@ -530,7 +530,7 @@ foreach ($menu_structure as $parent => $data) {
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<?= ($current_pag == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_pag == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_pag == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decissions/visual_assistant.php" class="<?= ($current_pag == 'visual_assistant.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Visual Assistant</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/visual_assistant.php" class="<?= ($current_pag == 'visual_assistant.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Visual Assistant</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/about_us.php" class="<?= ($current_pag == 'about_us.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>About Us</a></li>
                         <?php endif; ?>
                     </ul>
@@ -699,7 +699,7 @@ foreach ($menu_structure as $parent => $data) {
         // Make the function available globally
         window.toggleSidebar = toggleSidebar;
     </script>
-    
+
 </body>
 
 </html>

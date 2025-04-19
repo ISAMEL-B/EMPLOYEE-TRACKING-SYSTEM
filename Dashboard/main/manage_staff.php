@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
     try {
         // Verify password first
-        $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
+        $stmt = $conn->prepare("SELECT password FROM staff WHERE staff_id = ?");
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $conn->error);
         }
@@ -108,15 +108,15 @@ if ($current_page > $total_pages && $total_pages > 0) {
 // Get staff data with pagination
 $staff_query = $conn->query("
     SELECT s.staff_id, s.first_name, s.last_name, s.performance_score, s.years_of_experience,
-           d.department_name, r.role_name, u.photo_path
+           d.department_name, r.role_name
     FROM staff s
     JOIN departments d ON s.department_id = d.department_id
     JOIN roles r ON s.role_id = r.role_id
-    LEFT JOIN users u ON s.staff_id = u.staff_id
     $search_condition
     ORDER BY s.last_name, s.first_name
     LIMIT $offset, $records_per_page
 ");
+
 $staff_list = $staff_query ? $staff_query->fetch_all(MYSQLI_ASSOC) : [];
 
 // Get current page for active menu highlighting
@@ -216,6 +216,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                                                     <?php endif; ?>
                                                     <div>
                                                         <h6 class="mb-0"><?= htmlspecialchars($staff['first_name']) ?> <?= htmlspecialchars($staff['last_name']) ?></h6>
+                                                        <!-- <p class="mb-0"><?= htmlspecialchars($staff['staff_id']) ?></p> -->
                                                     </div>
                                                 </div>
                                             </td>
@@ -228,10 +229,10 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                                             </td>
                                             <td><?= $staff['years_of_experience'] ?> years</td>
                                             <td>
-                                                <a href="individual_view2.php?staff_id=<?= $staff['staff_id'] ?>" class="action-btn view-btn" title="View">
+                                                <a href="individual_view.php?staff_id=<?= $staff['staff_id'] ?>" class="action-btn view-btn" title="View">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="re_registration.php?user_id=<?= $staff['staff_id'] ?>" class="action-btn edit-btn" title="Edit">
+                                                <a href="re_registration.php?staff_id=<?= $staff['staff_id'] ?>" class="action-btn edit-btn" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="#" class="action-btn delete-btn" title="Delete"

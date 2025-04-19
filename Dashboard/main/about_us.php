@@ -70,7 +70,7 @@ $current_page = basename(parse_url($current_uri, PHP_URL_PATH));
                     </div>
                     <div class="col-md-6">
                         <div class="ratio ratio-16x9">
-                            <iframe class="rounded shadow" src="https://youtu.be/CARfBfJpUsU?si=WSAHQ3baqh-KUW09" title="System Overview" allowfullscreen></iframe>
+                            <iframe class="rounded shadow" src="https://www.youtube.com/embed/CARfBfJpUsU" title="System Overview" allowfullscreen></iframe>
                         </div>
                     </div>
                 </div>

@@ -102,7 +102,7 @@
                 <!-- <span>or use your email for registration</span> -->
                 <input type="text" name="employee_id" id="employee_id" placeholder="Employee ID" required />
                 <input type="email" name="email" id="email" placeholder="Email" required />
-                <input type="role" name="role" id="role" placeholder="role" required />
+                <input type="text" name="role" id="role" placeholder="role" required />
                 <input type="password" name="password" placeholder="Password" required id="password" />
                 <input type="password" name="confirm_password" placeholder="Confirm Password" required
                     id="confirm-password" />

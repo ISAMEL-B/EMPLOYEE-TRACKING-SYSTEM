@@ -1,0 +1,109 @@
+staff_id,first_name,last_name,role_id,department_id,years_of_experience,total_score
+00,Kabonesa,Anderson,Professor,Department of Software Engineering,40,64.81
+01,Ainomugisha,Johnson,Professor,Department of Software Engineering,8,72.16
+02,Abwooli,Garcia,Associate Professor,Department of Software Engineering,17,87.55
+03,Akanyoreka,Garcia,Associate Professor,Department of Software Engineering,9,91.33
+04,Tumwijuke,Smith,Senior Lecturer,Department of Software Engineering,31,91.06
+05,Busingye,Williams,Senior Lecturer,Department of Software Engineering,24,88.18
+06,Busingye,Wilson,Lecturer,Department of Software Engineering,39,85.23
+07,Tibendekezo,Williams,Lecturer,Department of Software Engineering,9,97.89
+08,Kugonza,Anderson,Assistant Lecturer,Department of Software Engineering,7,86.29
+09,Ainomugisha,Williams,Assistant Lecturer,Department of Software Engineering,21,85.61
+10,Akanyoreka,Martinez,Teaching Assistant,Department of Software Engineering,37,63.02
+11,Tumwijuke,Miller,Teaching Assistant,Department of Software Engineering,24,47.67
+12,Mutanoga,Rodriguez,Professor,Department of Computer Science,31,54.48
+13,Tumwijuke,Williams,Professor,Department of Computer Science,4,73.14
+14,Kugonza,Jones,Associate Professor,Department of Computer Science,3,45.5
+15,Kabonesa,Davis,Associate Professor,Department of Computer Science,25,43.96
+16,Tumwijuke,Rodriguez,Senior Lecturer,Department of Computer Science,17,62.96
+17,Ainomugisha,Anderson,Senior Lecturer,Department of Computer Science,6,76.74
+18,Tumwijuke,Miller,Lecturer,Department of Computer Science,20,63.95
+19,Kabonesa,Martinez,Lecturer,Department of Computer Science,10,95.21
+20,Tumwijuke,Rodriguez,Assistant Lecturer,Department of Computer Science,6,60.41
+21,Ainomugisha,Davis,Assistant Lecturer,Department of Computer Science,30,51.72
+22,Busingye,Rodriguez,Teaching Assistant,Department of Computer Science,16,54.2
+23,Kamaani,Brown,Teaching Assistant,Department of Computer Science,14,48.47
+24,Tibendekezo,Jones,Professor,Department of Information Technology,13,83.82
+25,Abwooli,Brown,Professor,Department of Information Technology,28,80.96
+26,Kugonza,Martinez,Associate Professor,Department of Information Technology,1,80.47
+27,Tumwijuke,Martinez,Associate Professor,Department of Information Technology,4,41.99
+28,Ainomugisha,Smith,Senior Lecturer,Department of Information Technology,29,41.25
+29,Tumwijuke,Johnson,Senior Lecturer,Department of Information Technology,15,91.66
+30,Abwooli,Jones,Lecturer,Department of Information Technology,11,82.44
+31,Akanyoreka,Smith,Lecturer,Department of Information Technology,39,79.37
+32,Ainomugisha,Jones,Assistant Lecturer,Department of Information Technology,26,79.07
+33,Mutanoga,Miller,Assistant Lecturer,Department of Information Technology,17,83.26
+34,Abwooli,Williams,Teaching Assistant,Department of Information Technology,9,60.13
+35,Ategyeka,Wilson,Teaching Assistant,Department of Information Technology,10,97.34
+36,Ategyeka,Smith,Professor,Department of Pharmarcy,23,58.74
+37,Kugonza,Jones,Professor,Department of Pharmarcy,29,80.5
+38,Kamaani,Miller,Associate Professor,Department of Pharmarcy,7,41.64
+39,Tibendekezo,Rodriguez,Associate Professor,Department of Pharmarcy,40,51.4
+40,Ategyeka,Garcia,Senior Lecturer,Department of Pharmarcy,16,43.24
+41,Kugonza,Martinez,Senior Lecturer,Department of Pharmarcy,4,65.31
+42,Ninsiima,Brown,Lecturer,Department of Pharmarcy,16,54.77
+43,Akanyoreka,Anderson,Lecturer,Department of Pharmarcy,15,48.08
+44,Kugonza,Anderson,Assistant Lecturer,Department of Pharmarcy,1,79.84
+45,Ategyeka,Johnson,Assistant Lecturer,Department of Pharmarcy,19,61.85
+46,Kabonesa,Williams,Teaching Assistant,Department of Pharmarcy,28,42.89
+47,Kugonza,Davis,Teaching Assistant,Department of Pharmarcy,26,47.89
+48,Ainomugisha,Smith,Professor,Department of Nursing,24,98.86
+49,Mutanoga,Anderson,Professor,Department of Nursing,36,73.79
+50,Ainomugisha,Davis,Associate Professor,Department of Nursing,37,53.35
+51,Abwooli,Williams,Associate Professor,Department of Nursing,17,41.58
+52,Ategyeka,Wilson,Senior Lecturer,Department of Nursing,13,79.95
+53,Ategyeka,Wilson,Senior Lecturer,Department of Nursing,8,54.12
+54,Ninsiima,Martinez,Lecturer,Department of Nursing,31,70.78
+55,Kamaani,Anderson,Lecturer,Department of Nursing,16,88.77
+56,Ategyeka,Williams,Assistant Lecturer,Department of Nursing,18,66.72
+57,Abwooli,Jones,Assistant Lecturer,Department of Nursing,16,74.8
+58,Busingye,Rodriguez,Teaching Assistant,Department of Nursing,11,57.74
+59,Akanyoreka,Brown,Teaching Assistant,Department of Nursing,6,41.87
+60,Tumwijuke,Jones,Professor,Department of Microbiology,16,73.94
+61,Busingye,Rodriguez,Professor,Department of Microbiology,19,59.13
+62,Abwooli,Brown,Associate Professor,Department of Microbiology,18,67.39
+63,Tibendekezo,Williams,Associate Professor,Department of Microbiology,37,92.71
+64,Kamaani,Wilson,Senior Lecturer,Department of Microbiology,39,77.93
+65,Busingye,Smith,Senior Lecturer,Department of Microbiology,4,41.18
+66,Ategyeka,Davis,Lecturer,Department of Microbiology,4,70.02
+67,Akanyoreka,Smith,Lecturer,Department of Microbiology,8,64.42
+68,Abwooli,Williams,Assistant Lecturer,Department of Microbiology,33,42.5
+69,Tumwijuke,Miller,Assistant Lecturer,Department of Microbiology,14,96.79
+70,Kugonza,Rodriguez,Teaching Assistant,Department of Microbiology,9,73.13
+71,Tumwijuke,Martinez,Teaching Assistant,Department of Microbiology,16,97.73
+72,Ninsiima,Davis,Professor,Department of Accounting and Finance,9,98.87
+73,Ategyeka,Martinez,Professor,Department of Accounting and Finance,4,53.86
+74,Ategyeka,Anderson,Associate Professor,Department of Accounting and Finance,8,95.8
+75,Mutanoga,Wilson,Associate Professor,Department of Accounting and Finance,3,67.59
+76,Ninsiima,Rodriguez,Senior Lecturer,Department of Accounting and Finance,37,85.98
+77,Busingye,Davis,Senior Lecturer,Department of Accounting and Finance,30,76.14
+78,Mutanoga,Jones,Lecturer,Department of Accounting and Finance,8,51.0
+79,Akanyoreka,Miller,Lecturer,Department of Accounting and Finance,39,50.64
+80,Busingye,Brown,Assistant Lecturer,Department of Accounting and Finance,25,55.31
+81,Ategyeka,Garcia,Assistant Lecturer,Department of Accounting and Finance,35,58.01
+82,Tibendekezo,Wilson,Teaching Assistant,Department of Accounting and Finance,26,96.5
+83,Abwooli,Martinez,Teaching Assistant,Department of Accounting and Finance,40,44.47
+84,Akanyoreka,Jones,Professor,Department of Economics and Entreprenuership,39,91.2
+85,Busingye,Johnson,Professor,Department of Economics and Entreprenuership,33,49.23
+86,Tumwijuke,Martinez,Associate Professor,Department of Economics and Entreprenuership,23,71.74
+87,Ninsiima,Jones,Associate Professor,Department of Economics and Entreprenuership,15,84.0
+88,Mutanoga,Johnson,Senior Lecturer,Department of Economics and Entreprenuership,20,72.87
+89,Akanyoreka,Anderson,Senior Lecturer,Department of Economics and Entreprenuership,9,40.75
+90,Kugonza,Rodriguez,Lecturer,Department of Economics and Entreprenuership,39,91.77
+91,Busingye,Garcia,Lecturer,Department of Economics and Entreprenuership,13,65.09
+92,Busingye,Miller,Assistant Lecturer,Department of Economics and Entreprenuership,33,96.85
+93,Busingye,Brown,Assistant Lecturer,Department of Economics and Entreprenuership,31,82.25
+94,Kugonza,Smith,Teaching Assistant,Department of Economics and Entreprenuership,18,99.64
+95,Mutanoga,Anderson,Teaching Assistant,Department of Economics and Entreprenuership,16,44.75
+96,Kugonza,Wilson,Professor,Department of Human Resource Management,24,73.42
+97,Abwooli,Davis,Professor,Department of Human Resource Management,23,41.61
+98,Abwooli,Brown,Associate Professor,Department of Human Resource Management,36,44.94
+99,Kugonza,Martinez,Associate Professor,Department of Human Resource Management,20,62.65
+100,Ategyeka,Jones,Senior Lecturer,Department of Human Resource Management,17,84.13
+101,Tumwijuke,Miller,Senior Lecturer,Department of Human Resource Management,22,94.85
+102,Mutanoga,Johnson,Lecturer,Department of Human Resource Management,7,62.55
+103,Akanyoreka,Anderson,Lecturer,Department of Human Resource Management,29,85.92
+104,Tumwijuke,Johnson,Assistant Lecturer,Department of Human Resource Management,35,40.46
+105,Tumwijuke,Miller,Assistant Lecturer,Department of Human Resource Management,10,97.49
+106,Akanyoreka,Smith,Teaching Assistant,Department of Human Resource Management,17,87.42
+107,Mutanoga,Brown,Teaching Assistant,Department of Human Resource Management,30,91.67

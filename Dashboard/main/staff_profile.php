@@ -61,7 +61,7 @@ include "processes/staff_profile_process.php";
                                     </div>
                                 <?php endif; ?>
                             </div>
-                            <h3 class="mt-3 mb-1"><?= htmlspecialchars($staff_data['first_name'] . ' ' . $staff_data['last_name']) ?></h3>
+                            <h3 class="mt-3 mb-1"><?= htmlspecialchars ($staff_data['first_name'] . ' ' . $staff_data['last_name']) ?></h3>
                             <h5 class="text-muted mb-3"><?= htmlspecialchars($staff_data['role_name']) ?></h5>
                             
                             <div class="d-flex justify-content-center mb-3">
@@ -78,9 +78,9 @@ include "processes/staff_profile_process.php";
                             <hr>
                             
                             <div class="text-start">
-                                <p><i class="fas fa-envelope me-2 text-muted"></i> <?= htmlspecialchars($user_data['email'] ?? 'N/A') ?></p>
-                                <p><i class="fas fa-id-card me-2 text-muted"></i> <?= htmlspecialchars($user_data['employee_id'] ?? 'N/A') ?></p>
-                                <p><i class="fas fa-phone me-2 text-muted"></i> <?= htmlspecialchars($user_data['phone_number'] ?? 'N/A') ?></p>
+                                <p><i class="fas fa-envelope me-2 text-muted"></i> <?= htmlspecialchars($staff_data['email'] ?? 'N/A') ?></p>
+                                <p><i class="fas fa-id-card me-2 text-muted"></i> <?= htmlspecialchars($staff_data['employee_id'] ?? 'N/A') ?></p>
+                                <p><i class="fas fa-phone me-2 text-muted"></i> <?= htmlspecialchars($staff_data['phone_number'] ?? 'N/A') ?></p>
                                 <p><i class="fas fa-user-tie me-2 text-muted"></i> <?= htmlspecialchars($staff_data['scholar_type']) ?> Scholar</p>
                                 <p><i class="fas fa-briefcase me-2 text-muted"></i> <?= htmlspecialchars($staff_data['years_of_experience']) ?> years experience</p>
                             </div>
@@ -88,12 +88,12 @@ include "processes/staff_profile_process.php";
                             <hr>
                             
                             <div class="d-flex justify-content-center">
-                                <a href="#" class="btn btn-must me-2">
-                                    <i class="fas fa-edit me-1"></i> Edit Profile
+                                <a href="re_registration.php?staff_id=<?= $staff_data['staff_id'] ?>" class="btn btn-must me-2">
+                                    <i class="fas fa-edit me-1"></i> Manage Profile
                                 </a>
-                                <a href="#" class="btn btn-outline-secondary">
+                                <!-- <a href="#" class="btn btn-outline-secondary">
                                     <i class="fas fa-lock me-1"></i> Change Password
-                                </a>
+                                </a> -->
                             </div>
                         </div>
                     </div>
