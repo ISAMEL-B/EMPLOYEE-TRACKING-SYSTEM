@@ -12,7 +12,7 @@ header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
 
 // Get current user ID from session
-$user_id = $_SESSION['user_id'] ?? null;
+$user_id = $_SESSION['staff_id'] ?? null;
 
 // Check user authorization
 // if (!isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'hrm') {

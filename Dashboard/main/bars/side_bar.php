@@ -14,7 +14,7 @@ $menu_structure = [
         'icon' => 'fa-edit'
     ],
     'Manage' => [
-        'pages' => ['manage_staff.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'none_user_update.php', 'hrm_profile.php', 'about_us.php', 'visual_assistant.php'],
+        'pages' => ['manage_staff.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php', 'visual_assistant.php'],
         'icon' => 'fa-info-circle'
     ],
     'Authentication' => [
@@ -529,7 +529,6 @@ foreach ($menu_structure as $parent => $data) {
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/manage_staff.php" class="<?= ($current_pag == 'manage_staff.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Members</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff_profile.php" class="<?= ($current_pag == 'staff_profile.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Staff Profile</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/re_registration.php" class="<?= ($current_pag == 're_registration.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Update Profile</a></li>
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/none_user_update.php" class="<?= ($current_pag == 'none_user_update.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>Staff Non-Users</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/hrm_profile.php" class="<?= ($current_pag == 'hrm_profile.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>My Profile</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/decisions/visual_assistant.php" class="<?= ($current_pag == 'visual_assistant.php') ? 'active-submenu' : '' ?>"><i class="fas fa-user"></i> Visual Assistant</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/about_us.php" class="<?= ($current_pag == 'about_us.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i>About Us</a></li>
@@ -700,7 +699,7 @@ foreach ($menu_structure as $parent => $data) {
         // Make the function available globally
         window.toggleSidebar = toggleSidebar;
     </script>
-    
+
 </body>
 
 </html>

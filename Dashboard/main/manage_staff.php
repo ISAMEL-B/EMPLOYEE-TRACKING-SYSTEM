@@ -232,7 +232,7 @@ $current_page_name = basename($_SERVER['PHP_SELF']);
                                                 <a href="individual_view.php?staff_id=<?= $staff['staff_id'] ?>" class="action-btn view-btn" title="View">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="re_registration.php?user_id=<?= $staff['staff_id'] ?>" class="action-btn edit-btn" title="Edit">
+                                                <a href="re_registration.php?staff_id=<?= $staff['staff_id'] ?>" class="action-btn edit-btn" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="#" class="action-btn delete-btn" title="Delete"
