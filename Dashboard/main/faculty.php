@@ -297,273 +297,282 @@
             }
         }
     </style>
+    
+    <link rel="stylesheet" href="styles/individual_style.css">
+
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">
-            <h1>Faculty Performance Dashboard</h1>
-            <select class="faculty-selector">
-                <option>Faculty of Medicine</option>
-                <option>Faculty of Engineering</option>
-                <option>Faculty of Science</option>
-                <option>Faculty of Arts</option>
-            </select>
-        </div>
+    
+    <div class="content-wrapper">
+        <div class="dashboard">
+            <div class="explorer-header">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="display-5 fw-bold">Faculty of computing and informartics</h1>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <i class="fas fa-trophy fa-4x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <div class="summary-cards">
-            <div class="card">
-                <h3>Total Staff</h3>
-                <div class="value">142</div>
-                <div class="subtext">32 Professors, 65 Lecturers</div>
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Total Staff</h3>
+                    <div class="value">142</div>
+                    <div class="subtext">32 Professors, 65 Lecturers</div>
+                </div>
+                <div class="card trend-up">
+                    <h3>Total publications</h3>
+                    <div class="value">34</div>
+                </div>
+                <div class="card trend-up">
+                    <h3>Research Grants</h3>
+                    <div class="value">UGX 3.2B</div>
+                </div>
+                <div class="card trend-down">
+                    <h3>Total Innovations</h3>
+                    <div class="value">43</div>
+                </div>
             </div>
-            <div class="card trend-up">
-                <h3>Total publications</h3>
-                <div class="value">34</div>
-            </div>
-            <div class="card trend-up">
-                <h3>Research Grants</h3>
-                <div class="value">UGX 3.2B</div>
-            </div>
-            <div class="card trend-down">
-                <h3>Total Innovations</h3>
-                <div class="value">43</div>
-            </div>
-        </div>
 
-        <div class="tab-container">
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('overview')">Overview</div>
-                <div class="tab" onclick="switchTab('academic')">Academic Performance</div>
-                <div class="tab" onclick="switchTab('publications')">Publications</div>
-                <div class="tab" onclick="switchTab('research')">Research & Innovations</div>
-                <div class="tab" onclick="switchTab('community')">Community Service</div>
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('overview')">Overview</div>
+                    <div class="tab" onclick="switchTab('academic')">Academic Performance</div>
+                    <div class="tab" onclick="switchTab('publications')">Publications</div>
+                    <div class="tab" onclick="switchTab('research')">Research & Innovations</div>
+                    <div class="tab" onclick="switchTab('community')">Community Service</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Overview Tab Content -->
-        <div class="tab-content active" id="overview">
-            <div class="main-content">
-                <div class="large-card">
+            <!-- Overview Tab Content -->
+            <div class="tab-content active" id="overview">
+                <div class="main-content">
+                    <div class="large-card">
+                        <div class="large-card">
+                            <div class="section-title">
+                                <h2>Faculty Overview</h2>
+                            </div>
+                            <div class="chart-container">
+                            <canvas id="facultyOverviewChart"></canvas>
+                        </div>
+                        </div>
+                        
+                    </div>
                     <div class="large-card">
                         <div class="section-title">
-                            <h2>Faculty Overview</h2>
+                            <h2>Key Metrics Summary</h2>
+                        </div>
+                        <div class="chart-container" style="height: 400px; width: 100%;">
+                            <canvas id="keyMetricsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Performance Tab Content -->
+            <div class="tab-content" id="academic">
+                <div class="main-content">
+                    <!-- Top Row: 4 Stat Cards -->
+                    <div class="summary-cards">
+                        <div class="card stat-card">
+                            <h3>PhD Holders</h3>
+                            <div class="value">25</div>
+                            <div class="subtext">32% of faculty</div>
+                        </div>
+                        <div class="card stat-card">
+                            <h3>Masters</h3>
+                            <div class="value">45</div>
+                            <div class="subtext">58% of faculty</div>
+                        </div>
+                        <div class="card stat-card">
+                            <h3>First Class</h3>
+                            <div class="value">34</div>
+                            <div class="subtext">44% of faculty</div>
+                        </div>
+                        <div class="card stat-card">
+                            <h3>Second Class</h3>
+                            <div class="value">72</div>
+                            <div class="subtext">93% of faculty</div>
+                        </div>
+                    </div>
+
+                    <!-- Single Chart Card for Departmental Qualifications -->
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Qualifications by Department</h2>
                         </div>
                         <div class="chart-container">
-                        <canvas id="facultyOverviewChart"></canvas>
-                    </div>
-                    </div>
-                    
-                </div>
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Key Metrics Summary</h2>
-                    </div>
-                    <div class="chart-container" style="height: 400px; width: 100%;">
-                        <canvas id="keyMetricsChart"></canvas>
+                            <canvas id="qualificationsByDeptChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Academic Performance Tab Content -->
-        <div class="tab-content" id="academic">
-            <div class="main-content">
-                <!-- Top Row: 4 Stat Cards -->
-                <div class="summary-cards">
-                    <div class="card stat-card">
-                        <h3>PhD Holders</h3>
-                        <div class="value">25</div>
-                        <div class="subtext">32% of faculty</div>
-                    </div>
-                    <div class="card stat-card">
-                        <h3>Masters</h3>
-                        <div class="value">45</div>
-                        <div class="subtext">58% of faculty</div>
-                    </div>
-                    <div class="card stat-card">
-                        <h3>First Class</h3>
-                        <div class="value">34</div>
-                        <div class="subtext">44% of faculty</div>
-                    </div>
-                    <div class="card stat-card">
-                        <h3>Second Class</h3>
-                        <div class="value">72</div>
-                        <div class="subtext">93% of faculty</div>
-                    </div>
-                </div>
-
-                <!-- Single Chart Card for Departmental Qualifications -->
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Qualifications by Department</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="qualificationsByDeptChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Publications Tab Content -->
-        <div class="tab-content" id="publications">
-            <div class="main-content">
-            <!-- status cards -->
-            <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                <div class="card stat-card" style="width: 300px;">
-                    <h3>Total peer reviewed publications</h3>
-                    <div class="value">34</div>
-                    
-                </div>
-                <div class="card stat-card" style="width: 300px;">
-                    <h3>Total number of citations</h3>
-                    <div class="value">72</div>
-                    
-                </div>
-                <div class="card stat-card" style="width: 300px;">
-                    <h3>Total peer reviewed publications uploaded to must repository</h3>
-                    <div class="value">72</div>
-                    
-                </div>
-
-            </div>
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Publications vs Citations</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="pubCitationChart"></canvas>
-                    </div>
-                </div>
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Publication Types</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="publicationTypesChart"></canvas>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- Research & Innovations Tab Content -->
-        <div class="tab-content" id="research">
-            <div class="main-content">
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Research Grants</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="grantTrendChart"></canvas>
-                    </div>
-                </div>
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Innovations</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="innovationsChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Community Service Tab Content -->
-        <div class="tab-content" id="community">
-            <div class="main-content">
+            <!-- Publications Tab Content -->
+            <div class="tab-content" id="publications">
+                <div class="main-content">
                 <!-- status cards -->
                 <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                     <div class="card stat-card" style="width: 300px;">
-                        <h3>Total student supervised for community placements</h3>
+                        <h3>Total peer reviewed publications</h3>
                         <div class="value">34</div>
                         
                     </div>
                     <div class="card stat-card" style="width: 300px;">
-                        <h3>other community outreaches</h3>
+                        <h3>Total number of citations</h3>
                         <div class="value">72</div>
                         
                     </div>
                     <div class="card stat-card" style="width: 300px;">
-                        <h3> total number of beneficiaries</h3>
+                        <h3>Total peer reviewed publications uploaded to must repository</h3>
                         <div class="value">72</div>
                         
                     </div>
-                </div>
-                <div class="large-card">
-                    <div class="section-title">
-                        <h2>Community Engagement by department</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="communityEngagementChart"></canvas>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
 
-        <!-- Department Comparison Section (Visible on all tabs) -->
-        <div class="department-comparison">
-            <div class="section-title">
-                <h2>Department Metrics</h2>
+                </div>
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Publications vs Citations</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="pubCitationChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Publication Types</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="publicationTypesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                </div>
             </div>
-            <table class="department-table">
-                <thead>
-                    <tr>
-                        <th>Department</th>
-                        <th>Total Score</th>
-                        <th>Publications</th>
-                        <th>Grants (UGX)</th>
-                        <th>Innovations</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Medicine</td>
-                        <td>8.2</td>
-                        <td>12.4</td>
-                        <td>1.8B</td>
-                        <td>24</td>
-                        <td><a href="#" class="view-details">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>Surgery</td>
-                        <td>7.9</td>
-                        <td>10.1</td>
-                        <td>1.2B</td>
-                        <td>18</td>
-                        <td><a href="#" class="view-details">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>Pediatrics</td>
-                        <td>7.5</td>
-                        <td>8.7</td>
-                        <td>800M</td>
-                        <td>15</td>
-                        <td><a href="#" class="view-details">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>Pathology</td>
-                        <td>6.8</td>
-                        <td>7.2</td>
-                        <td>500M</td>
-                        <td>10</td>
-                        <td><a href="#" class="view-details">View Details</a></td>
-                    </tr>
-                    <tr>
-                        <td>Public Health</td>
-                        <td>6.2</td>
-                        <td>5.8</td>
-                        <td>300M</td>
-                        <td>8</td>
-                        <td><a href="#" class="view-details">View Details</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
-        <div class="footer-notes">
-            Data updated: June 2023 | Next review: December 2023
+            <!-- Research & Innovations Tab Content -->
+            <div class="tab-content" id="research">
+                <div class="main-content">
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Research Grants</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="grantTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Innovations</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="innovationsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Service Tab Content -->
+            <div class="tab-content" id="community">
+                <div class="main-content">
+                    <!-- status cards -->
+                    <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                        <div class="card stat-card" style="width: 300px;">
+                            <h3>Total student supervised for community placements</h3>
+                            <div class="value">34</div>
+                            
+                        </div>
+                        <div class="card stat-card" style="width: 300px;">
+                            <h3>other community outreaches</h3>
+                            <div class="value">72</div>
+                            
+                        </div>
+                        <div class="card stat-card" style="width: 300px;">
+                            <h3> total number of beneficiaries</h3>
+                            <div class="value">72</div>
+                            
+                        </div>
+                    </div>
+                    <div class="large-card">
+                        <div class="section-title">
+                            <h2>Community Engagement by department</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="communityEngagementChart"></canvas>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Department Comparison Section (Visible on all tabs) -->
+            <div class="department-comparison">
+                <div class="section-title">
+                    <h2>Department Metrics</h2>
+                </div>
+                <table class="department-table">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Total Score</th>
+                            <th>Publications</th>
+                            <th>Grants (UGX)</th>
+                            <th>Innovations</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Medicine</td>
+                            <td>8.2</td>
+                            <td>12.4</td>
+                            <td>1.8B</td>
+                            <td>24</td>
+                            <td><a href="#" class="view-details">View Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>Surgery</td>
+                            <td>7.9</td>
+                            <td>10.1</td>
+                            <td>1.2B</td>
+                            <td>18</td>
+                            <td><a href="#" class="view-details">View Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>Pediatrics</td>
+                            <td>7.5</td>
+                            <td>8.7</td>
+                            <td>800M</td>
+                            <td>15</td>
+                            <td><a href="#" class="view-details">View Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>Pathology</td>
+                            <td>6.8</td>
+                            <td>7.2</td>
+                            <td>500M</td>
+                            <td>10</td>
+                            <td><a href="#" class="view-details">View Details</a></td>
+                        </tr>
+                        <tr>
+                            <td>Public Health</td>
+                            <td>6.2</td>
+                            <td>5.8</td>
+                            <td>300M</td>
+                            <td>8</td>
+                            <td><a href="#" class="view-details">View Details</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer-notes">
+                Data updated: June 2023 | Next review: December 2023
+            </div>
         </div>
     </div>
 

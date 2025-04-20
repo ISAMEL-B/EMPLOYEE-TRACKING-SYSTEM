@@ -1,5 +1,5 @@
 <?php
-header("Content-Type: application/javascript");
+// header("Content-Type: application/javascript");
 
 include __DIR__ .'/../../../../../scoring_calculator/university score/university_score.php';
 

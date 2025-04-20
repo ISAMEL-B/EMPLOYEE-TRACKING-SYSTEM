@@ -7,188 +7,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: var(--primary-color);
-        }
-        
-        .dashboard-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease;
-            height: 100%;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-card .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        
-        .stat-card .stat-label {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-        
-        .chart-container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            height: 100%;
-        }
-        
-        .chart-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        
-        .leaderboard {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .leaderboard-item:last-child {
-            border-bottom: none;
-        }
-        
-        .leaderboard-rank {
-            font-weight: bold;
-            color: var(--secondary-color);
-            width: 30px;
-        }
-        
-        .leaderboard-name {
-            flex-grow: 1;
-        }
-        
-        .leaderboard-score {
-            font-weight: bold;
-        }
-        
-        .badge-custom {
-            background-color: var(--secondary-color);
-        }
-        
-        .filter-section {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .tab-content {
-            padding: 20px 0;
-        }
-        
-        .nav-tabs .nav-link.active {
-            font-weight: bold;
-            color: var(--secondary-color);
-            border-bottom: 2px solid var(--secondary-color);
-        }
-        
-        .compare-card {
-            border-left: 4px solid var(--secondary-color);
-        }
-        
-        .progress {
-            height: 10px;
-            margin-bottom: 5px;
-        }
-        
-        .progress-bar {
-            background-color: var(--secondary-color);
-        }
-        
-        .chart-wrapper {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-        
-        .tab-pane {
-            min-height: 500px;
-        }
+    <style>    </style>
+<link rel="stylesheet" href="styles/department_styles.css">
+<link rel="stylesheet" href="styles/individual_style.css">
 
-        /* Chart.js performance chart styles */
-        .rank-filter-container {
-            margin-bottom: 15px;
-        }
-
-        .rank-filter-container select {
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            background-color: white;
-            font-size: 14px;
-            color: var(--primary-color);
-        }
-
-        /* Prevent infinite resizing by setting height properly */
-        .chart-wrapper {
-            position: relative;
-            height: 400px; /* fixed height for Chart.js to prevent infinite growth */
-            width: 100%;
-        }
-
-        #performanceChart {
-            height: 100% !important;
-            width: 100% !important;
-        }
-
-        .no-data-message {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-            font-style: italic;
-        }
-
-    </style>
-
-    <!-- <link rel="stylesheet" href="styles/individual_style.css">
-    <link rel="stylesheet" href="styles/individual_style.css"> -->
+<!-- <link rel="stylesheet" href="styles/individual_style.css">
+<link rel="stylesheet" href="styles/individual_style.css"> -->
 </head>
 <body>
     <!-- navigation bar -->
@@ -197,111 +21,78 @@
     <!-- sidebar -->
     <?php //include 'bars/side_bar.php'; ?>
     
-    <div class="content-wrapper">
-        <div class="container-fluid py-4">
-            <div class="dashboard-header">
+<div class="content-wrapper">
+    <div class="container-fluid py-4">
+        <div class="explorer-header">
+            <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h1><i class="fas fa-university me-2"></i> Department of Computer Science</h1>
-                        <p class="mb-0">Employee Performance Dashboard</p>
+                        <h1 class="display-5 fw-bold">Department of Computer Science</h1>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="dropdown">
-                            <button class="btn btn-light dropdown-toggle" type="button" id="timePeriodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Academic Year 2023-2024
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="timePeriodDropdown">
-                                <li><a class="dropdown-item" href="#">2023-2024</a></li>
-                                <li><a class="dropdown-item" href="#">2022-2023</a></li>
-                                <li><a class="dropdown-item" href="#">2021-2022</a></li>
-                            </ul>
-                        </div>
+                    <div class="col-md-4 text-md-end">
+                        <i class="fas fa-trophy fa-4x opacity-75"></i>
                     </div>
                 </div>
             </div>
-            
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-value">25</div>
-                        <div class="stat-label">Total Staff</div>
-                    </div>
-                </div>            
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-value">45</div>
-                        <div class="stat-label">Total Publications</div>
-                        <div class="mt-2">
-                            <span class="badge bg-success me-1">Books with ISBN : 14</span>
-                            <span class="badge bg-success">Book chapters : 7</span>
-                            <span class="badge bg-success me-1">Journal Articles : 50</span>
-                        </div>
-                    </div>
+        </div>
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">25</div>
+                    <div class="stat-label" style="font-size: 20px; font-weight: bold;">Total Staff</div>
                 </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-value">UGX 800M</div>
-                        <div class="stat-label">Research Grants</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-card">
-                        <div class="stat-value">72</div>
-                        <div class="stat-label">Total innovations</div>
+            </div>            
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">45</div>
+                    <div class="stat-label" style="font-size: 20px; font-weight: bold;">Total Publications</div>
+                    <div class="mt-2">
+                        <span class="badge bg-success me-1">Books with ISBN : 14</span>
+                        <span class="badge bg-success">Book chapters : 7</span>
+                        <span class="badge bg-success me-1">Journal Articles : 50</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="filter-section mb-4">
-                <div class="row">
-                    <!-- <div class="col-md-4">
-                        <label for="rankFilter" class="form-label">Academic Rank</label>
-                        <select id="rankFilter" class="form-select">
-                            <option selected>All Ranks</option>
-                            <option>Professor</option>
-                            <option>Associate Professor</option>
-                            <option>Senior Lecturer</option>
-                            <option>Lecturer</option>
-                            <option>Assistant Lecturer</option>
-                            <option>Teaching Assistant</option>
-                        </select>
-                    </div> -->
-                    <div class="col-md-4">
-                        <label for="categoryFilter" class="form-label">Category</label>
-                        <select id="categoryFilter" class="form-select">
-                            <option selected>All Categories</option>
-                            <option>Clinical</option>
-                            <option>Non-Clinical</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button class="btn btn-primary w-100">Apply Filters</button>
-                    </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">UGX 800M</div>
+                    <div class="stat-label" style="font-size: 20px; font-weight: bold;">Research Grants</div>
                 </div>
             </div>
-            
-            <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="false">Publications</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" type="button" role="tab" aria-controls="research" aria-selected="false">Research & Innovations</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="academicperformance-tab" data-bs-toggle="tab" data-bs-target="#academicperformance" type="button" role="tab" aria-controls="academicperformance" aria-selected="false">Academic Performance</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="communityservice-tab" data-bs-toggle="tab" data-bs-target="#communityservice" type="button" role="tab" aria-controls="communityservice" aria-selected="false">Community service</button>
-                </li>
-            </ul>
-            
-            <div class="tab-content" id="dashboardTabsContent">
-                <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-                    <div class="row">
-                        <div class="col-lg-6">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value">72</div>
+                    <div class="stat-label" style="font-size: 20px; font-weight: bold;">Total innovations</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="publications-tab" data-bs-toggle="tab" data-bs-target="#publications" type="button" role="tab" aria-controls="publications" aria-selected="false">Publications</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" type="button" role="tab" aria-controls="research" aria-selected="false">Research & Innovations</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="academicperformance-tab" data-bs-toggle="tab" data-bs-target="#academicperformance" type="button" role="tab" aria-controls="academicperformance" aria-selected="false">Academic Performance</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="communityservice-tab" data-bs-toggle="tab" data-bs-target="#communityservice" type="button" role="tab" aria-controls="communityservice" aria-selected="false">Community service</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="dashboardTabsContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <!-- Performance by Academic Rank (Full width) -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="large-card">
                             <div class="chart-container">
                                 <div class="chart-title">Performance by Academic Rank</div>            
                                 <div class="rank-filter-container">
@@ -323,254 +114,475 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Trends Over Time</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="trendsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Publication Impact</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="publicationImpactChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Grant Funding Distribution</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="grantsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 
-                <div class="tab-pane fade" id="publications" role="tabpanel" aria-labelledby="publications-tab">
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="card text-white bg-primary shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title">First Author Peer reviewed Publications</h5>
-                                    <p class="card-text" id="firstAuthorCount">20</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-white bg-success shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title">Co-Authored Publications in Peer reviewed Publications</h5>
-                                    <p class="card-text" id="coAuthorCount">20</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-white bg-warning shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Number of Peer-Reviewed Publications</h5>
-                                    <p class="card-text" id="peerReviewedCount">20</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="card text-white bg-danger shadow">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Number of Citations</h5>
-                                    <p class="card-text" id="totalCitations">20</p>
-                                </div>
+                <!-- Other charts in original two-column layout -->
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Trends Over Time</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="trendsChart"></canvas>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Publication Types</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="publicationTypesChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Citations vs Publications</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="citationsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Research Grants</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="researchGrantsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Supervision Completions</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="supervisionChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="chart-container">
-                                <h3 class="chart-title">Innovation Types Distribution</h3>
-                                <div class="chart-wrapper">
-                                    <canvas id="innovationTypesChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-pane fade" id="academicperformance" role="tabpanel" aria-labelledby="academicperformance-tab">
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">25</div>
-                                <div class="stat-label">Phd's</div>
-                            </div>
-                        </div>            
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">45</div>
-                                <div class="stat-label">Masters</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">34</div>
-                                <div class="stat-label">First class</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-card">
-                                <div class="stat-value">72</div>
-                                <div class="stat-label">Second Class</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="communityservice" role="tabpanel" aria-labelledby="communityservice-tab">
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="stat-card">
-                                <div class="stat-value">25</div>
-                                <div class="stat-label">Industrial Placement Supervision</div>
-                            </div>
-                        </div>            
-                        <div class="col-md-4">
-                            <div class="stat-card">
-                                <div class="stat-value">45</div>
-                                <div class="stat-label">Community Outreach Programs</div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="stat-card">
-                                <div class="stat-value">34</div>
-                                <div class="stat-label">Clinical Practices</div>
+                    
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Grant Funding Distribution</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="grantsChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="row mt-4">
-                <div class="col-lg-8">
-                    <div class="leaderboard">
-                        <h3 class="chart-title">Top Performers</h3>
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank">1</div>
-                            <div class="leaderboard-name">Dr. Jane Smith</div>
-                            <div class="leaderboard-score">92 pts</div>
+            <div class="tab-pane fade" id="publications" role="tabpanel" aria-labelledby="publications-tab">
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">72</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">First Author Peer reviewed Publications</div>
                         </div>
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank">2</div>
-                            <div class="leaderboard-name">Prof. John Doe</div>
-                            <div class="leaderboard-score">88 pts</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">72</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Co-Authored Publications in Peer reviewed Publications</div>
                         </div>
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank">3</div>
-                            <div class="leaderboard-name">Dr. Alice Johnson</div>
-                            <div class="leaderboard-score">85 pts</div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">72</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Peer-Reviewed Publications</div>
                         </div>
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank">4</div>
-                            <div class="leaderboard-name">Dr. Robert Brown</div>
-                            <div class="leaderboard-score">80 pts</div>
-                        </div>
-                        <div class="leaderboard-item">
-                            <div class="leaderboard-rank">5</div>
-                            <div class="leaderboard-name">Dr. Emily Wilson</div>
-                            <div class="leaderboard-score">78 pts</div>
-                        </div>
-                        <div class="text-end mt-2">
-                            <a href="#" class="text-primary">View Full Ranking →</a>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">72</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Citations</div>
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col-lg-4">
-                    <div class="compare-card chart-container">
-                        <h3 class="chart-title">Department Comparison</h3>
-                        <div class="mb-3">
-                            <label class="form-label">Compare with:</label>
-                            <select class="form-select">
-                                <option>Faculty Average</option>
-                                <option>University Average</option>
-                                <option>Department of Mathematics</option>
-                                <option>Department of Engineering</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Publications</span>
-                                <span>45 vs 38</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
+
+                <div class="row">                    
+                    <div class="col-lg-8">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Citations vs Publications</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="citationsChart"></canvas>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Research Grants</span>
-                                <span>UGX 800M vs UGX 650M</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Teaching Score</span>
-                                <span>7.2 vs 6.8</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Publication Types</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="publicationTypesChart"></canvas>
                             </div>
                         </div>
-                    </div> 
-                </div> -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="research" role="tabpanel" aria-labelledby="research-tab">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Research Grants</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="researchGrantsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Supervision Completions</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="supervisionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Innovation Types Distribution</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="innovationTypesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="academicperformance" role="tabpanel" aria-labelledby="academicperformance-tab">
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">25</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Phd's</div>
+                        </div>
+                    </div>            
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">45</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Masters</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">34</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">First class</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-value">72</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Second Class</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Staff Academic Qualifications Section -->
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Professors -->
+                        <div class="rank-section">
+                            <div class="rank-header">
+                                <span>Professors</span>
+                                <span class="rank-count">8 staff</span>
+                            </div>
+                            <table class="qualifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Qualifications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="staff-name">Prof. John Smith</td>
+                                        <td>
+                                            <span class="qualification-badge phd counted" data-count="2">PhD</span>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Prof. Alice Johnson</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Prof. Robert Brown</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Prof. Emily Wilson</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge second-class">Second Class</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="more-link">View all 8 professors →</a>
+                        </div>
+                        
+                        <!-- Associate Professors -->
+                        <div class="rank-section">
+                            <div class="rank-header">
+                                <span>Associate Professors</span>
+                                <span class="rank-count">5 staff</span>
+                            </div>
+                            <table class="qualifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Qualifications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="staff-name">Assoc. Prof. David Lee</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Assoc. Prof. Sarah Miller</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge masters">Masters</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Assoc. Prof. James Taylor</td>
+                                        <td>
+                                            <span class="qualification-badge phd counted" data-count="3">PhD</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="more-link">View all 5 associate professors →</a>
+                        </div>
+                        
+                        <!-- Senior Lecturers -->
+                        <div class="rank-section">
+                            <div class="rank-header">
+                                <span>Senior Lecturers</span>
+                                <span class="rank-count">10 staff</span>
+                            </div>
+                            <table class="qualifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Qualifications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="staff-name">Dr. Michael Clark</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Dr. Patricia Adams</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Dr. Richard Evans</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                            <span class="qualification-badge second-class">Second Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Dr. Lisa Wong</td>
+                                        <td>
+                                            <span class="qualification-badge first-class counted" data-count="3">First Class</span>
+                                            <span class="qualification-badge second-class">Second Class</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="more-link">View all 10 senior lecturers →</a>
+                        </div>
+                        
+                        <!-- Lecturers -->
+                        <div class="rank-section">
+                            <div class="rank-header">
+                                <span>Lecturers</span>
+                                <span class="rank-count">12 staff</span>
+                            </div>
+                            <table class="qualifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Qualifications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="staff-name">Dr. Kevin White</td>
+                                        <td>
+                                            <span class="qualification-badge phd">PhD</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Dr. Lisa Green</td>
+                                        <td>
+                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Mr. Daniel King</td>
+                                        <td>
+                                            <span class="qualification-badge masters">Masters</span>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Ms. Rachel Young</td>
+                                        <td>
+                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                                            <span class="qualification-badge second-class">Second Class</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="more-link">View all 12 lecturers →</a>
+                        </div>
+                        
+                        <!-- Assistant Lecturers -->
+                        <div class="rank-section">
+                            <div class="rank-header">
+                                <span>Assistant Lecturers</span>
+                                <span class="rank-count">5 staff</span>
+                            </div>
+                            <table class="qualifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Qualifications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="staff-name">Ms. Angela Scott</td>
+                                        <td>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Mr. Brian Hill</td>
+                                        <td>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                            <span class="qualification-badge second-class">Second Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Ms. Rachel Young</td>
+                                        <td>
+                                            <span class="qualification-badge masters">Masters</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="more-link">View all 5 assistant lecturers →</a>
+                        </div>
+                        
+                        <!-- Teaching Assistants -->
+                        <div class="rank-section">
+                            <div class="rank-header">
+                                <span>Teaching Assistants</span>
+                                <span class="rank-count">8 staff</span>
+                            </div>
+                            <table class="qualifications-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff Member</th>
+                                        <th>Qualifications</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="staff-name">Mr. Jason Wright</td>
+                                        <td>
+                                            <span class="qualification-badge first-class">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Ms. Olivia Carter</td>
+                                        <td>
+                                            <span class="qualification-badge masters">Masters</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Mr. Ethan Walker</td>
+                                        <td>
+                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="staff-name">Ms. Sophia Chen</td>
+                                        <td>
+                                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="more-link">View all 8 teaching assistants →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- community service -->
+            <div class="tab-pane fade" id="communityservice" role="tabpanel" aria-labelledby="communityservice-tab">
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-value">25</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Industrial Placement Supervision</div>
+                        </div>
+                    </div>            
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-value">45</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Community Outreach Programs</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-value">34</div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total number of beneficiaries</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-8">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Community Service Distribution</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="communityServiceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-lg-8">
+                <div class="leaderboard">
+                    <h3 class="chart-title">Top Performers</h3>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">1</div>
+                        <div class="leaderboard-name">Dr. Jane Smith</div>
+                        <div class="leaderboard-score">92 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">2</div>
+                        <div class="leaderboard-name">Prof. John Doe</div>
+                        <div class="leaderboard-score">88 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">3</div>
+                        <div class="leaderboard-name">Dr. Alice Johnson</div>
+                        <div class="leaderboard-score">85 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">4</div>
+                        <div class="leaderboard-name">Dr. Robert Brown</div>
+                        <div class="leaderboard-score">80 pts</div>
+                    </div>
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank">5</div>
+                        <div class="leaderboard-name">Dr. Emily Wilson</div>
+                        <div class="leaderboard-score">78 pts</div>
+                    </div>
+                    <div class="text-end mt-2">
+                        <a href="#" class="text-primary">View Full Ranking →</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
@@ -716,58 +728,7 @@
             }
         });
 
-        const impactCtx = document.getElementById('publicationImpactChart').getContext('2d');
-        const impactChart = new Chart(impactCtx, {
-            type: 'scatter',
-            data: {
-                datasets: [
-                    {
-                        label: 'Faculty Members',
-                        data: [
-                            {x: 12, y: 120},
-                            {x: 8, y: 85},
-                            {x: 6, y: 45},
-                            {x: 5, y: 30},
-                            {x: 4, y: 25},
-                            {x: 3, y: 15},
-                            {x: 2, y: 8}
-                        ],
-                        backgroundColor: '#3498db',
-                        pointRadius: 8,
-                        pointHoverRadius: 10
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Number of Publications'
-                        },
-                        beginAtZero: true
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Total Citations'
-                        },
-                        beginAtZero: true
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Publications: ${context.parsed.x}, Citations: ${context.parsed.y}`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        
 
         const grantsCtx = document.getElementById('grantsChart').getContext('2d');
         const grantsChart = new Chart(grantsCtx, {
@@ -972,6 +933,55 @@
             },
             plugins: [ChartDataLabels]
         });
+
+        
+        const ctx = document.getElementById('communityServiceChart').getContext('2d');        
+        const communityServiceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Industrial Placements', 'Outreach Programs', 'Beneficiaries'],
+                datasets: [{
+                    label: 'Community Service Metrics',
+                    data: [25, 45, 34], // These should match your stat card values
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Service Type'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    
     </script>
 </body>
 </html>

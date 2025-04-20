@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Academic Qualifications</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .rank-selector {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .rank-selector select {
+            padding: 10px 15px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: white;
+            width: 300px;
+            max-width: 100%;
+        }
+        
+        .rank-section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: none; /* Hidden by default, shown when selected */
+        }
+        
+        .rank-header {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .rank-count {
+            background: white;
+            color: #3498db;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .qualifications-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .qualifications-table th {
+            background-color: #f1f8fe;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .qualifications-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+        
+        .qualifications-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .qualifications-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .staff-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .qualification-badge {
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 5px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background-color: #e8f4fc;
+            color: #2980b9;
+            position: relative;
+        }
+        
+        .qualification-badge.counted::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        
+        .phd {
+            background-color: #e8f6f3;
+            color: #16a085;
+        }
+        
+        .masters {
+            background-color: #f5eef8;
+            color: #8e44ad;
+        }
+        
+        .first-class {
+            background-color: #e8f8f5;
+            color: #27ae60;
+        }
+        
+        .second-class {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        
+        .pagination button {
+            padding: 8px 15px;
+            margin: 0 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .pagination button:hover {
+            background-color: #2980b9;
+        }
+        
+        .pagination button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .current-page {
+            margin: 0 15px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Department of Computer Science - Staff Qualifications</h1>
+        
+        <div class="rank-selector">
+            <select id="rankSelect">
+                <option value="">-- Select a Staff Rank --</option>
+                <option value="professors">Professors</option>
+                <option value="associate-professors">Associate Professors</option>
+                <option value="senior-lecturers">Senior Lecturers</option>
+                <option value="lecturers">Lecturers</option>
+                <option value="assistant-lecturers">Assistant Lecturers</option>
+                <option value="teaching-assistants">Teaching Assistants</option>
+            </select>
+        </div>
+        
+        <!-- Professors -->
+        <div class="rank-section" id="professors" data-per-page="4" data-current-page="1">
+            <div class="rank-header">
+                <span>Professors</span>
+                <span class="rank-count">12 staff</span>
+            </div>
+            <table class="qualifications-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Qualifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="prof-page-1">
+                        <td class="staff-name">Prof. John Smith</td>
+                        <td>
+                            <span class="qualification-badge phd counted" data-count="2">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-1">
+                        <td class="staff-name">Prof. Alice Johnson</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-1">
+                        <td class="staff-name">Prof. Robert Brown</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-1">
+                        <td class="staff-name">Prof. Emily Wilson</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-2" style="display: none;">
+                        <td class="staff-name">Prof. Michael Davis</td>
+                        <td>
+                            <span class="qualification-badge phd counted" data-count="3">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-2" style="display: none;">
+                        <td class="staff-name">Prof. Sarah Miller</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-2" style="display: none;">
+                        <td class="staff-name">Prof. David Wilson</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-2" style="display: none;">
+                        <td class="staff-name">Prof. Jennifer Lee</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-3" style="display: none;">
+                        <td class="staff-name">Prof. Thomas Clark</td>
+                        <td>
+                            <span class="qualification-badge phd counted" data-count="2">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-3" style="display: none;">
+                        <td class="staff-name">Prof. Lisa Green</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-3" style="display: none;">
+                        <td class="staff-name">Prof. Kevin White</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="prof-page-3" style="display: none;">
+                        <td class="staff-name">Prof. Rachel Young</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="prev-btn" disabled>Previous</button>
+                <span class="current-page">Page 1 of 3</span>
+                <button class="next-btn">Next</button>
+            </div>
+        </div>
+        
+        <!-- Associate Professors -->
+        <div class="rank-section" id="associate-professors" data-per-page="3" data-current-page="1">
+            <div class="rank-header">
+                <span>Associate Professors</span>
+                <span class="rank-count">9 staff</span>
+            </div>
+            <table class="qualifications-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Qualifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="assoc-page-1">
+                        <td class="staff-name">Assoc. Prof. David Lee</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-1">
+                        <td class="staff-name">Assoc. Prof. Sarah Miller</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-1">
+                        <td class="staff-name">Assoc. Prof. James Taylor</td>
+                        <td>
+                            <span class="qualification-badge phd counted" data-count="3">PhD</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-2" style="display: none;">
+                        <td class="staff-name">Assoc. Prof. Angela Scott</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-2" style="display: none;">
+                        <td class="staff-name">Assoc. Prof. Brian Hill</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-2" style="display: none;">
+                        <td class="staff-name">Assoc. Prof. Rachel Young</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-3" style="display: none;">
+                        <td class="staff-name">Assoc. Prof. Jason Wright</td>
+                        <td>
+                            <span class="qualification-badge phd counted" data-count="2">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-3" style="display: none;">
+                        <td class="staff-name">Assoc. Prof. Olivia Carter</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="assoc-page-3" style="display: none;">
+                        <td class="staff-name">Assoc. Prof. Ethan Walker</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="prev-btn" disabled>Previous</button>
+                <span class="current-page">Page 1 of 3</span>
+                <button class="next-btn">Next</button>
+            </div>
+        </div>
+        
+        <!-- Senior Lecturers -->
+        <div class="rank-section" id="senior-lecturers" data-per-page="4" data-current-page="1">
+            <div class="rank-header">
+                <span>Senior Lecturers</span>
+                <span class="rank-count">16 staff</span>
+            </div>
+            <table class="qualifications-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Qualifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="senior-page-1">
+                        <td class="staff-name">Dr. Michael Clark</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-1">
+                        <td class="staff-name">Dr. Patricia Adams</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-1">
+                        <td class="staff-name">Dr. Richard Evans</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-1">
+                        <td class="staff-name">Dr. Lisa Wong</td>
+                        <td>
+                            <span class="qualification-badge first-class counted" data-count="3">First Class</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-2" style="display: none;">
+                        <td class="staff-name">Dr. Kevin White</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-2" style="display: none;">
+                        <td class="staff-name">Dr. Lisa Green</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-2" style="display: none;">
+                        <td class="staff-name">Dr. Daniel King</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-2" style="display: none;">
+                        <td class="staff-name">Dr. Rachel Young</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-3" style="display: none;">
+                        <td class="staff-name">Dr. Angela Scott</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-3" style="display: none;">
+                        <td class="staff-name">Dr. Brian Hill</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-3" style="display: none;">
+                        <td class="staff-name">Dr. Jason Wright</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-3" style="display: none;">
+                        <td class="staff-name">Dr. Olivia Carter</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-4" style="display: none;">
+                        <td class="staff-name">Dr. Ethan Walker</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-4" style="display: none;">
+                        <td class="staff-name">Dr. Sophia Chen</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-4" style="display: none;">
+                        <td class="staff-name">Dr. Nathan Brooks</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="senior-page-4" style="display: none;">
+                        <td class="staff-name">Dr. Emma Watson</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="prev-btn" disabled>Previous</button>
+                <span class="current-page">Page 1 of 4</span>
+                <button class="next-btn">Next</button>
+            </div>
+        </div>
+        
+        <!-- Lecturers -->
+        <div class="rank-section" id="lecturers" data-per-page="4" data-current-page="1">
+            <div class="rank-header">
+                <span>Lecturers</span>
+                <span class="rank-count">12 staff</span>
+            </div>
+            <table class="qualifications-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Qualifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="lect-page-1">
+                        <td class="staff-name">Dr. Kevin White</td>
+                        <td>
+                            <span class="qualification-badge phd">PhD</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-1">
+                        <td class="staff-name">Dr. Lisa Green</td>
+                        <td>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-1">
+                        <td class="staff-name">Mr. Daniel King</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-1">
+                        <td class="staff-name">Ms. Rachel Young</td>
+                        <td>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-2" style="display: none;">
+                        <td class="staff-name">Mr. Jason Wright</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-2" style="display: none;">
+                        <td class="staff-name">Ms. Olivia Carter</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-2" style="display: none;">
+                        <td class="staff-name">Mr. Ethan Walker</td>
+                        <td>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-2" style="display: none;">
+                        <td class="staff-name">Ms. Sophia Chen</td>
+                        <td>
+                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-3" style="display: none;">
+                        <td class="staff-name">Mr. Nathan Brooks</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-3" style="display: none;">
+                        <td class="staff-name">Ms. Emma Watson</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-3" style="display: none;">
+                        <td class="staff-name">Mr. Liam Johnson</td>
+                        <td>
+                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="lect-page-3" style="display: none;">
+                        <td class="staff-name">Ms. Ava Martinez</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="prev-btn" disabled>Previous</button>
+                <span class="current-page">Page 1 of 3</span>
+                <button class="next-btn">Next</button>
+            </div>
+        </div>
+        
+        <!-- Assistant Lecturers -->
+        <div class="rank-section" id="assistant-lecturers" data-per-page="3" data-current-page="1">
+            <div class="rank-header">
+                <span>Assistant Lecturers</span>
+                <span class="rank-count">6 staff</span>
+            </div>
+            <table class="qualifications-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Qualifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="asst-page-1">
+                        <td class="staff-name">Ms. Angela Scott</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="asst-page-1">
+                        <td class="staff-name">Mr. Brian Hill</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="asst-page-1">
+                        <td class="staff-name">Ms. Rachel Young</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="asst-page-2" style="display: none;">
+                        <td class="staff-name">Mr. Jason Wright</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="asst-page-2" style="display: none;">
+                        <td class="staff-name">Ms. Olivia Carter</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="asst-page-2" style="display: none;">
+                        <td class="staff-name">Mr. Ethan Walker</td>
+                        <td>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="prev-btn" disabled>Previous</button>
+                <span class="current-page">Page 1 of 2</span>
+                <button class="next-btn">Next</button>
+            </div>
+        </div>
+        
+        <!-- Teaching Assistants -->
+        <div class="rank-section" id="teaching-assistants" data-per-page="4" data-current-page="1">
+            <div class="rank-header">
+                <span>Teaching Assistants</span>
+                <span class="rank-count">8 staff</span>
+            </div>
+            <table class="qualifications-table">
+                <thead>
+                    <tr>
+                        <th>Staff Member</th>
+                        <th>Qualifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="ta-page-1">
+                        <td class="staff-name">Mr. Jason Wright</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-1">
+                        <td class="staff-name">Ms. Olivia Carter</td>
+                        <td>
+                            <span class="qualification-badge masters">Masters</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-1">
+                        <td class="staff-name">Mr. Ethan Walker</td>
+                        <td>
+                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-1">
+                        <td class="staff-name">Ms. Sophia Chen</td>
+                        <td>
+                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-2" style="display: none;">
+                        <td class="staff-name">Mr. Nathan Brooks</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-2" style="display: none;">
+                        <td class="staff-name">Ms. Emma Watson</td>
+                        <td>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-2" style="display: none;">
+                        <td class="staff-name">Mr. Liam Johnson</td>
+                        <td>
+                            <span class="qualification-badge first-class">First Class</span>
+                        </td>
+                    </tr>
+                    <tr class="ta-page-2" style="display: none;">
+                        <td class="staff-name">Ms. Ava Martinez</td>
+                        <td>
+                            <span class="qualification-badge second-class">Second Class</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="prev-btn" disabled>Previous</button>
+                <span class="current-page">Page 1 of 2</span>
+                <button class="next-btn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rankSelect = document.getElementById('rankSelect');
+            const rankSections = document.querySelectorAll('.rank-section');
+            
+            // Show/hide rank sections based on dropdown selection
+            rankSelect.addEventListener('change', function() {
+                const selectedRank = this.value;
+                
+                rankSections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                if (selectedRank) {
+                    document.getElementById(selectedRank).style.display = 'block';
+                }
+            });
+            
+            // Pagination functionality
+            rankSections.forEach(section => {
+                const prevBtn = section.querySelector('.prev-btn');
+                const nextBtn = section.querySelector('.next-btn');
+                const currentPageSpan = section.querySelector('.current-page');
+                const perPage = parseInt(section.getAttribute('data-per-page'));
+                let currentPage = parseInt(section.getAttribute('data-current-page'));
+                const rows = section.querySelectorAll('tbody tr');
+                
+                // Calculate total pages
+                const totalRows = rows.length;
+                const totalPages = Math.ceil(totalRows / perPage);
+                
+                // Update pagination display
+                function updatePagination() {
+                    // Update current page display
+                    currentPageSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+                    
+                    // Show/hide rows based on current page
+                    rows.forEach(row => {
+                        row.style.display = 'none';
+                    });
+                    
+                    const startIndex = (currentPage - 1) * perPage;
+                    const endIndex = startIndex + perPage;
+                    
+                    for (let i = startIndex; i < endIndex && i < rows.length; i++) {
+                        rows[i].style.display = '';
+                    }
+                    
+                    // Enable/disable buttons
+                    prevBtn.disabled = currentPage === 1;
+                    nextBtn.disabled = currentPage === totalPages;
+                    
+                    // Update data attribute
+                    section.setAttribute('data-current-page', currentPage);
+                }
+                
+                // Initial pagination setup
+                updatePagination();
+                
+                // Previous button click
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updatePagination();
+                    }
+                });
+                
+                // Next button click
+                nextBtn.addEventListener('click', function() {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        updatePagination();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
