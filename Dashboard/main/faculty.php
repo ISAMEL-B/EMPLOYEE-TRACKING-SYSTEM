@@ -1,3 +1,13 @@
+
+<?php
+    session_start();
+    // Check if user is NOT logged in OR not HRM
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+        header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -302,6 +312,12 @@
 
 </head>
 <body>
+
+    <!-- Top Navigation Bar -->
+    <?php include 'bars/nav_bar.php'; ?>
+
+    <!-- Sidebar -->
+    <?php include 'bars/side_bar.php'; ?>
     
     <div class="content-wrapper">
         <div class="dashboard">
@@ -316,6 +332,20 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="container mt-3" style="text-align: right;">
+                <a href="index2.php" 
+                style="display: inline-block; 
+                        padding: 8px 16px;
+                        background-color: #3498db;
+                        color: white;
+                        text-decoration: none;
+                        border-radius: 4px;
+                        font-weight: 500;
+                        transition: all 0.3s ease;
+                        padding-bottom: 3px;">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Faculty Dashboard
+                </a>
             </div>
 
             <div class="summary-cards">

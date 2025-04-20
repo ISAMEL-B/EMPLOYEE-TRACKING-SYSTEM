@@ -181,14 +181,14 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                     <div class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="facultyDropdown">
                         <input type="text" class="form-control search-box mb-2" placeholder="Search faculties..." id="facultySearch">
                         <div id="facultyList">
-                            <a class="dropdown-item" href="#" data-faculty="medicine">Faculty of Medicine</a>
-                            <a class="dropdown-item" href="#" data-faculty="science">Faculty of Science</a>
-                            <a class="dropdown-item" href="#" data-faculty="business">Faculty of Business & Management Sciences</a>
-                            <a class="dropdown-item" href="#" data-faculty="computing">Faculty of Computing & Informatics</a>
-                            <a class="dropdown-item" href="#" data-faculty="applied">Faculty of Applied Sciences & Technology</a>
-                            <a class="dropdown-item" href="#" data-faculty="interdisciplinary">Faculty of Interdisciplinary Studies</a>
-                            <a class="dropdown-item" href="#" data-faculty="nursing">Faculty of Nursing</a>
-                            <a class="dropdown-item" href="#" data-faculty="education">Faculty of Education</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="medicine">Faculty of Medicine</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="science">Faculty of Science</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="business">Faculty of Business & Management Sciences</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="computing">Faculty of Computing & Informatics</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="applied">Faculty of Applied Sciences & Technology</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="interdisciplinary">Faculty of Interdisciplinary Studies</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="nursing">Faculty of Nursing</a>
+                            <a class="dropdown-item" href="faculty.php" data-faculty="education">Faculty of Education</a>
                         </div>
                     </div>
                 </div>
@@ -279,7 +279,7 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                             </div>
 
                             <!-- Comparison Charts -->
-                            <div class="row mt-4">
+                            <!-- <div class="row mt-4">
                                 <div class="col-md-6">
                                     <div class="chart-container">
                                         <canvas id="facultySizeChart"></canvas>
@@ -290,14 +290,14 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                                         <canvas id="facultyResearchChart"></canvas>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Faculty Detail Section (Hidden by default) -->
-            <div class="row mb-4 d-none" id="detailSection">
+            <!-- <div class="row mb-4 d-none" id="detailSection">
                 <div class="col-12">
                     <div class="card faculty-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -306,9 +306,9 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                                 <i class="bi bi-arrow-left"></i> Back to Comparison
                             </button>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body"> -->
                             <!-- Key Metrics Summary -->
-                            <div class="row mb-4">
+                            <!-- <div class="row mb-4">
                                 <div class="col-md-3">
                                     <div class="stat-card">
                                         <div class="stat-value" id="facultyStaff">--</div>
@@ -333,24 +333,24 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                                         <div class="stat-label">Grant Funding</div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Detailed Performance Charts -->
-                            <div class="row">
+                            <!-- <div class="row"> -->
                                 <!-- Left Column Charts -->
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6"> -->
                                     <!-- Academic Performance Breakdown -->
-                                    <div class="card mb-4">
+                                    <!-- <div class="card mb-4">
                                         <div class="card-header">Academic Performance Breakdown</div>
                                         <div class="card-body">
                                             <div class="chart-container">
                                                 <canvas id="facultyAcademicChart"></canvas>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <!-- Community Engagement -->
-                                    <div class="card">
+                                    <!-- <div class="card">
                                         <div class="card-header">Community Engagement</div>
                                         <div class="card-body">
                                             <div class="chart-container">
@@ -358,22 +358,22 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <!-- Right Column Charts -->
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6"> -->
                                     <!-- Research Output by Type -->
-                                    <div class="card mb-4">
+                                    <!-- <div class="card mb-4">
                                         <div class="card-header">Research Output by Type</div>
                                         <div class="card-body">
                                             <div class="chart-container">
                                                 <canvas id="facultyResearchTypeChart"></canvas>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> -->
 
                                     <!-- Grant Funding Allocation -->
-                                    <div class="card">
+                                    <!-- <div class="card">
                                         <div class="card-header">Grant Funding Allocation</div>
                                         <div class="card-body">
                                             <div class="chart-container">
@@ -382,17 +382,17 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Recent Faculty Activity -->
-                            <div class="row mt-4">
+                            <!-- <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header">Recent Faculty Achievements</div>
                                         <div class="card-body">
-                                            <ul class="list-group list-group-flush" id="facultyActivity">
+                                            <ul class="list-group list-group-flush" id="facultyActivity"> -->
                                                 <!-- Activity items will be added here dynamically -->
-                                            </ul>
+                                            <!-- </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -400,10 +400,10 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Key Insights and Action Items -->
-            <div class="row">
+            <!-- <div class="row">
                 <div class="col-md-6">
                     <div class="card highlight-yellow">
                         <div class="card-header">Key Performance Insights</div>
@@ -447,12 +447,27 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
+        document.getElementById('facultySearch').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('#facultyList .dropdown-item');
+
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <!--<script>
         /**
          * Faculty Performance Data
          * This object contains performance metrics for all faculties at Mbarara University
@@ -1086,7 +1101,7 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
         // Initialize the dashboard with Medicine faculty data by default
         document.addEventListener('DOMContentLoaded', function() {
             showFacultyDetails('medicine');
-        });
+        }); -->
     </script>
 </body>
 

@@ -1,3 +1,11 @@
+<?php
+    session_start();
+    // Check if user is NOT logged in OR not HRM
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+        header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+        exit();
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <style>    </style>
+    <style>  </style>
 <link rel="stylesheet" href="styles/department_styles.css">
 <link rel="stylesheet" href="styles/individual_style.css">
 
@@ -16,10 +24,10 @@
 </head>
 <body>
     <!-- navigation bar -->
-    <?php //include 'bars/nav_bar.php'; ?>
+    <?php include 'bars/nav_bar.php'; ?>
 
     <!-- sidebar -->
-    <?php //include 'bars/side_bar.php'; ?>
+    <?php include 'bars/side_bar.php'; ?>
     
 <div class="content-wrapper">
     <div class="container-fluid py-4">
@@ -34,6 +42,20 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="container mt-3" style="text-align: right;">
+            <a href="index3.php" 
+            style="display: inline-block; 
+                    padding: 8px 16px;
+                    background-color: #3498db;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 4px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    padding-bottom: 3px;">
+                <i class="fas fa-arrow-left me-2"></i>Back to Department Dashboard
+            </a>
         </div>
         
         <div class="row mb-4">
