@@ -64,14 +64,14 @@ class TotalScore {
         // Teaching Experience
         $teach_details = method_exists($this->teachingExperienceScore, 'get_score_details') 
                         ? $this->teachingExperienceScore->get_score_details() 
-                        : ['score' => $this->teachingExperienceScore->get_score()];
+                        : ['score' => $this->teachingExperienceScore->calculate_score()];
         $total_score += $teach_details['score'];
         $breakdown['Teaching Experience'] = $teach_details;
 
         // Grants
         $grants_details = method_exists($this->researchGrantsScore, 'get_score_details') 
                         ? $this->researchGrantsScore->get_score_details() 
-                        : ['score' => $this->researchGrantsScore->total_score()];
+                        : ['score' => $this->researchGrantsScore->calculate_score()];
         $total_score += $grants_details['score'];
         $breakdown['Research Grants'] = $grants_details;
 

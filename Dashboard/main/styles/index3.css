@@ -1,0 +1,163 @@
+
+        :root {
+            --must-green: #006633;
+            --must-yellow: #FFCC00;
+            --must-blue: #003366;
+            --must-light-green: #e6f2ec;
+            --must-light-yellow: #fff9e6;
+            --must-light-blue: #e6ecf2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            margin-top: 5%;
+            padding: 20px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--must-blue);
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .department-card {
+            border-left: 4px solid var(--must-green);
+            transition: all 0.3s ease;
+        }
+
+        .department-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--must-green);
+        }
+
+        .stat-card .stat-label {
+            color: var(--must-blue);
+            font-weight: 500;
+        }
+
+        .highlight-yellow {
+            background-color: var(--must-light-yellow);
+            border-left: 4px solid var(--must-yellow);
+        }
+
+        .highlight-blue {
+            background-color: var(--must-light-blue);
+            border-left: 4px solid var(--must-blue);
+        }
+
+        .dropdown-menu {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .comparison-table th {
+            background-color: var(--must-green);
+            color: white;
+        }
+
+        .department-title {
+            color: var(--must-green);
+            font-weight: 700;
+            border-bottom: 2px solid var(--must-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            border: 2px solid var(--must-green);
+            border-radius: 5px;
+        }
+
+        .btn-must {
+            background-color: var(--must-green);
+            color: white;
+        }
+
+        .btn-must:hover {
+            background-color: var(--must-blue);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 0.9rem;
+            }
+
+            .navbar-brand img {
+                height: 25px;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+            /* Make rows appear clickable */
+            .clickable-row {
+                cursor: pointer;
+                transition: background-color 0.2s ease;
+            }
+
+            .clickable-row:hover {
+                background-color: rgba(52, 152, 219, 0.1); /* Light blue hover */
+            }
+
+            /* Position the anchor to cover entire cell */
+            .clickable-row td:first-child {
+                position: relative;
+            }
+
+            /* Style the visible link */
+            .department-link {
+                color: #3498db;
+                text-decoration: none;
+                display: block; /* Makes the link fill the cell */
+                padding: 8px 0; /* Match your table cell padding */
+            }
+
+            /* Prevent double hover effects */
+            .clickable-row:hover .department-link {
+                color: #2c3e50;
+                text-decoration: underline;
+            }
