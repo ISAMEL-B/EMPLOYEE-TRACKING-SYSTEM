@@ -85,14 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['staff_id'])) {
 }
 
 if ($staff_id) {
-    // Get staff details
-    // $stmt = $conn->prepare("SELECT s.*, d.department_name, r.role_name, u.photo_path 
-    //                       FROM staff s
-    //                       JOIN departments d ON s.department_id = d.department_id
-    //                       JOIN roles r ON s.role_id = r.role_id
-    //                       WHERE s.staff_id = ?");
-    // $stmt->bind_param("i", $staff_id);
-    // $stmt->execute();
     // $staff_details = $stmt->get_result()->fetch_assoc();
     $stmt = $conn->prepare("SELECT s.*, d.department_name, r.role_name 
                         FROM staff s

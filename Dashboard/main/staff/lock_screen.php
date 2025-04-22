@@ -1,11 +1,16 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST ETS - Screen Locked</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
+    <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
+    <!-- Style-->
+    <link rel="stylesheet" href="../../components/bootstrap/css/bootstrap.min.css">
+
     <style>
         :root {
             --must-green: #006633;
@@ -199,11 +204,12 @@
                 Please authenticate to continue accessing the system.
             </p>
             
-            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'User'); ?>&background=006633&color=fff" 
+            <!-- <img src="https://ui-avatars.com/api/?name=<?php //echo urlencode($_SESSION['user_name'] ?? 'User'); ?>&background=006633&color=fff"  -->
+            <img src="../<?php echo $_SESSION['path']; ?>&background=006633&color=fff" 
                  class="user-avatar" 
                  alt="User Avatar">
-            
-            <div class="user-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></div>
+            <div><p><?php echo $_SESSION['path']; ?></p></div>
+            <div class="user-name"><?php echo htmlspecialchars($_SESSION['employee_id'] ?? 'User'); ?></div>
             <div class="user-role"><?php echo htmlspecialchars($_SESSION['user_role'] ?? 'Staff'); ?></div>
             
             <form action="unlock.php" method="post">

@@ -1,7 +1,7 @@
 <?php
 session_start();
 // Check if user is logged in, otherwise redirect to login
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['staff_id'])) {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit;
 }

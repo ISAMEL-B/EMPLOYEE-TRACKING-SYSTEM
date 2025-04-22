@@ -137,15 +137,30 @@ foreach ($menu_structure as $parent => $data) {
             /* Space between logo and hamburger */
             align-items: center;
             /* Center items vertically */
-            padding: 15px;
+            padding: 2px;
             /* Padding around the logo box */
             background-color: #388e3c;
             /* Darker green for logo area */
         }
 
+        .logo {
+            margin-left: 1px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
         .logo img {
-            max-height: 40px;
-            /* Logo size */
+            height: 80px !important;
+        }
+        .logo h2 {
+            text-align: center;
+            font-size: 24px !important;
+        }
+        @media (max-widith : 600px) {
+            .logo{
+                flex-direction: column;
+                text-align: center;
+            }
         }
 
         .hamburger {
@@ -452,6 +467,9 @@ foreach ($menu_structure as $parent => $data) {
             }
         }
     </style>
+    <style>
+       
+    </style>
 </head>
 
 <body>
@@ -461,6 +479,7 @@ foreach ($menu_structure as $parent => $data) {
         <div class="logo-box">
             <div class="logo">
                 <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png" alt="MUST Logo">
+                <h2>MUST SCORECARD</h2>
             </div>
             <button class="hamburger" id="hamburger" aria-label="Toggle sidebar">
                 <i class="fa fa-bars"></i>

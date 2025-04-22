@@ -77,6 +77,7 @@ if (isset($_POST['login'])) {
             $_SESSION['employee_id'] = $row['employee_id'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['user_role'] = $row['system_role'];
+            $_SESSION['path'] = $row['photo_path'];
 
             // Redirect based on role
             if ($_SESSION['user_role'] === 'hrm') {
@@ -84,7 +85,6 @@ if (isset($_POST['login'])) {
             } elseif ($_SESSION['user_role'] === 'staff') {
                 // Redirect based on role to upload.php with role as a query parameter
                 header("Location: ../Dashboard/main/staff/for_staff_profile.php");
-
             } else {
                 // Redirect based on role to upload.php with role as a query parameter
                 header("Location: ../Dashboard/main/head/upload_csv.php?role=" . urlencode($_SESSION['user_role']));

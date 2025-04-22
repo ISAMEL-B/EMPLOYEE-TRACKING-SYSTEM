@@ -274,7 +274,7 @@ include "processes/hrm_profile_process.php";
                                                 <h4 class="mb-0">Manage</h4>
                                             </div>
                                             <p class="card-text">Employee Records</p>
-                                            <a href="/EMPLOYEE-TRACKING-SYSTEM/hrm/employees.php" class="btn btn-sm must-bg-primary text-white">
+                                            <a href="#" class="btn btn-sm must-bg-primary text-white">
                                                 <i class="fas fa-arrow-right me-1"></i> Access
                                             </a>
                                         </div>
@@ -292,7 +292,7 @@ include "processes/hrm_profile_process.php";
                                                 <h4 class="mb-0">Recruitment</h4>
                                             </div>
                                             <p class="card-text">Hiring & Onboarding</p>
-                                            <a href="/EMPLOYEE-TRACKING-SYSTEM/hrm/recruitment.php" class="btn btn-sm must-bg-primary text-white">
+                                            <a href="#" class="btn btn-sm must-bg-primary text-white">
                                                 <i class="fas fa-arrow-right me-1"></i> Access
                                             </a>
                                         </div>
@@ -310,7 +310,7 @@ include "processes/hrm_profile_process.php";
                                                 <h4 class="mb-0">Performance</h4>
                                             </div>
                                             <p class="card-text">Reviews & Appraisals</p>
-                                            <a href="/EMPLOYEE-TRACKING-SYSTEM/hrm/performance.php" class="btn btn-sm must-bg-primary text-white">
+                                            <a href="#" class="btn btn-sm must-bg-primary text-white">
                                                 <i class="fas fa-arrow-right me-1"></i> Access
                                             </a>
                                         </div>
@@ -328,7 +328,7 @@ include "processes/hrm_profile_process.php";
                                                 <h4 class="mb-0">Reports</h4>
                                             </div>
                                             <p class="card-text">Analytics & Insights</p>
-                                            <a href="/EMPLOYEE-TRACKING-SYSTEM/hrm/reports.php" class="btn btn-sm must-bg-primary text-white">
+                                            <a href="#" class="btn btn-sm must-bg-primary text-white">
                                                 <i class="fas fa-arrow-right me-1"></i> Access
                                             </a>
                                         </div>

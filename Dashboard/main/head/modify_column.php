@@ -1,4 +1,6 @@
-<?php session_start(); ?>
+<?php session_start(); 
+$current_pag = basename($_SERVER['PHP_SELF']);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
