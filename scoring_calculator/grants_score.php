@@ -13,7 +13,8 @@ class ResearchGrants {
         '100M - 500M' => 0,
         'Below 100M' => 0,
         'score' => 0,
-        'total_grant_amount' => 0
+        'total_grant_amount' => 0,
+        'grant_count' => 0
     ];
 
     public function __construct($conn, $staff_id) {
@@ -28,6 +29,9 @@ class ResearchGrants {
             $this->grants[] = $amount;
             $this->breakdown['total_grant_amount'] += $amount;
         }
+
+        // Count total number of grants
+        $this->breakdown['grant_count'] = count($this->grants);
     }
 
     public function get_score_details() {
@@ -62,6 +66,7 @@ class ResearchGrants {
         return $this->breakdown['total_grant_amount'];
     }
 }
+
 
 // Query the staff name from the database
 // function get_staff_name($conn, $staff_id) {

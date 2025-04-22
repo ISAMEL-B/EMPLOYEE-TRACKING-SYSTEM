@@ -1,5 +1,31 @@
-<?php
 
+
+<?php
+/**
+ * Retrieves the count of staff members in each department.
+ *
+ * This function queries the `departments` table to get all department IDs and names,
+ * then for each department, it counts how many staff members are associated with it
+ * in the `staff` table using the department_id as a reference.
+ *
+ * @param mysqli $conn The active MySQLi database connection.
+ * 
+ * @return array An associative array where the keys are department names and
+ *               the values are the count of staff members in each department.
+ *
+ * Example return value:
+ * [
+ *     "Computer Science" => 25,
+ *     "Mathematics" => 18,
+ *     "Physics" => 10,
+ * ]
+ *
+ * How it works:
+ * 1. Fetches all departments from the `departments` table.
+ * 2. For each department, runs a query to count the number of staff in the `staff` table
+ *    whose `department_id` matches the current department.
+ * 3. Stores this count in an associative array with the department name as the key.
+ */
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

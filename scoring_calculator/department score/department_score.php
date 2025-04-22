@@ -23,10 +23,10 @@ function get_department_performance($conn, $department_id) {
         'PhD' => 0, 'Masters' => 0, 'First Class' => 0, 'Second Upper' => 0, 'Other' => 0, 'academic_score' => 0,
 
         // Grants
-        'Over 1B' => 0, '500M - 1B' => 0, '100M - 500M' => 0, 'Below 100M' => 0, 'grant_score' => 0, 'total_grant_amount' => 0, 'total_innovations' => 0,
+        'Over 1B' => 0, '500M - 1B' => 0, '100M - 500M' => 0, 'Below 100M' => 0, 'grant_score' => 0, 'total_grant_amount' => 0, 
 
         // Innovations
-        'Patent' => 0, 'Utility Model' => 0, 'Copyright' => 0, 'Product' => 0, 'Trademark' => 0, 'innovation_score' => 0,
+        'Patent' => 0, 'Utility Model' => 0, 'Copyright' => 0, 'Product' => 0, 'Trademark' => 0, 'innovation_score' => 0, 'total_innovations' => 0,
 
         // Publications    
         'Journal Articles (First Author)' => 0,
@@ -170,6 +170,7 @@ function get_department_performance($conn, $department_id) {
 }
 
 
+//get the department name
 function get_department_name($conn, $department_id) {
     $stmt = $conn->prepare("SELECT department_name FROM departments WHERE department_id = ?");
     $stmt->bind_param("i", $department_id);
@@ -178,15 +179,27 @@ function get_department_name($conn, $department_id) {
     return ($row = $result->fetch_assoc()) ? $row['department_name'] : 'Unknown Department';
 }
 
+//get the count of employees in the department.
+function get_department_staff_count($conn, $department_id) {
+    $stmt = $conn->prepare("SELECT COUNT(*) AS total FROM staff WHERE department_id = ?");
+    $stmt->bind_param("i", $department_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        return $row['total'];
+    }
+    return 0;
+}
 
 
 
 
 
 // Usage
-$department_id = 8;
-$dept_data = get_department_performance($conn, $department_id);
-$department_name = get_department_name($conn, $department_id);
+// $department_id = 8;
+// $dept_data = get_department_performance($conn, $department_id);
+// $department_name = get_department_name($conn, $department_id);
 
 // echo $dept_data['total_publications'] . "<br>";
 // // Output

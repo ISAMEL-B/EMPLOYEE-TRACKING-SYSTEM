@@ -5,6 +5,26 @@
         header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
         exit();
     }
+
+    //get department score
+    include '../../scoring_calculator/department score/department_score.php';
+
+    //get count of employees in a department
+    include '../../scoring_calculator/department score/department_employees.php';
+
+    
+    $department_id = $_GET['id'] ?? null;
+
+    if ($department_id) {
+        $dept_data = get_department_performance($conn, $department_id);
+        $dept_name = get_department_name($conn, $department_id);
+        $dept_staff_count = get_department_staff_count($conn, $department_id );
+
+
+        }else {
+            // Fallback
+            die("No department selected.");
+        }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +47,7 @@
     <?php include 'bars/nav_bar.php'; ?>
 
     <!-- sidebar -->
-    <?php include 'bars/side_bar.php'; ?>
+    <?php //include 'bars/side_bar.php'; ?>
     
 <div class="content-wrapper">
     <div class="container-fluid py-4">
@@ -35,7 +55,7 @@
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h1 class="display-5 fw-bold">Department of Computer Science</h1>
+                        <h1 class="display-5 fw-bold">Department of <?= htmlspecialchars($dept_name) ?></h1>
                     </div>
                     <div class="col-md-4 text-md-end">
                         <i class="fas fa-trophy fa-4x opacity-75"></i>
@@ -61,30 +81,30 @@
         <div class="row mb-4">
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-value">25</div>
+                    <div class="stat-value"><?= $dept_staff_count ?></div>
                     <div class="stat-label" style="font-size: 20px; font-weight: bold;">Total Staff</div>
                 </div>
             </div>            
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-value">45</div>
+                    <div class="stat-value"><?= $dept_data['total_publications'] ?></div>
                     <div class="stat-label" style="font-size: 20px; font-weight: bold;">Total Publications</div>
                     <div class="mt-2">
-                        <span class="badge bg-success me-1">Books with ISBN : 14</span>
-                        <span class="badge bg-success">Book chapters : 7</span>
-                        <span class="badge bg-success me-1">Journal Articles : 50</span>
+                        <span class="badge bg-success me-1">Books with ISBN : <?= $dept_data['Book with ISBN']?></span>
+                        <span class="badge bg-success">Book chapters : <?= $dept_data['Book Chapter']?></span>
+                        <span class="badge bg-success me-1">Journal Articles : <?= $dept_data['Journal Articles (Co-author)'] + $dept_data['Journal Articles (Corresponding Author)'] + $dept_data['Journal Articles (First Author)']?></span>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-value">UGX 800M</div>
+                    <div class="stat-value"><?= 'UGX ' . number_format($dept_data['total_grant_amount'] / 1_000_000) . 'M' ?></div>
                     <div class="stat-label" style="font-size: 20px; font-weight: bold;">Research Grants</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
-                    <div class="stat-value">72</div>
+                    <div class="stat-value"><?= $dept_data['total_innovations'] ?></div>
                     <div class="stat-label" style="font-size: 20px; font-weight: bold;">Total innovations</div>
                 </div>
             </div>
@@ -120,8 +140,9 @@
                                 <div class="rank-filter-container">
                                     <label for="rankFilter">Select Academic Rank:</label>
                                     <select id="rankFilter">
-                                        <option value="professor" selected>Professor</option>
-                                        <option value="associate">Associate Professor</option>
+                                        <option value="professor" selected>professor</option>
+                                        <option value="associate">AssociateProfessor</option>
+                                                                  
                                         <option value="senior">Senior Lecturer</option>
                                         <option value="lecturer">Lecturer</option>
                                         <option value="assistant">Assistant Lecturer</option>
@@ -610,104 +631,266 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
          // Academic staff data
-        const academicStaff = [
-            { name: 'Prof. A', rank: 'professor', experience: 12, publications: 10, grants: 8 },
-            { name: 'Prof. B', rank: 'professor', experience: 8, publications: 9, grants: 6 },
-            { name: 'Dr. C', rank: 'associate', experience: 6, publications: 8, grants: 4 },
-            { name: 'Dr. C', rank: 'associate', experience: 6, publications: 8, grants: 4 },
-            { name: 'Dr. D', rank: 'senior', experience: 5, publications: 7, grants: 3 },
-            { name: 'Dr. E', rank: 'lecturer', experience: 4, publications: 6, grants: 2 },
-            { name: 'Dr. F', rank: 'assistant', experience: 3, publications: 5, grants: 1 },
-            { name: 'Lect. G', rank: 'teaching', experience: 2, publications: 4, grants: 0 }
-        ];
+        // const academicStaff = [
+        //     { name: 'Prof. A', rank: 'professor', experience: 12, publications: 10, grants: 8 },
+        //     { name: 'Prof. B', rank: 'professor', experience: 8, publications: 9, grants: 6 },
+        //     { name: 'Dr. C', rank: 'associate', experience: 6, publications: 8, grants: 4 },
+        //     { name: 'Dr. C', rank: 'associate', experience: 6, publications: 8, grants: 4 },
+        //     { name: 'Dr. D', rank: 'senior', experience: 5, publications: 7, grants: 3 },
+        //     { name: 'Dr. E', rank: 'lecturer', experience: 4, publications: 6, grants: 2 },
+        //     { name: 'Dr. F', rank: 'assistant', experience: 3, publications: 5, grants: 1 },
+        //     { name: 'Lect. G', rank: 'teaching', experience: 2, publications: 4, grants: 0 }
+        // ];
 
-        // Filter staff by rank
-        function filterDataByRank(rank) {
-            return academicStaff.filter(staff => staff.rank === rank);
+        // // Filter staff by rank
+        // function filterDataByRank(rank) {
+        //     return academicStaff.filter(staff => staff.rank === rank);
+        // }
+
+        // // Chart setup
+        // const chartCanvas = document.getElementById('performanceChart');
+        // const noDataMessage = document.getElementById('noDataMessage');
+        // let performanceChart;
+
+        // function initializeChart(data) {
+        //     if (performanceChart) {
+        //         performanceChart.destroy();
+        //     }
+
+        //     if (data.length === 0) {
+        //         chartCanvas.style.display = 'none';
+        //         noDataMessage.style.display = 'block';
+        //         return;
+        //     }
+
+        //     chartCanvas.style.display = 'block';
+        //     noDataMessage.style.display = 'none';
+
+        //     const ctx = chartCanvas.getContext('2d');
+        //     performanceChart = new Chart(ctx, {
+        //         type: 'bar',
+        //         data: {
+        //             labels: data.map(staff => staff.name),
+        //             datasets: [
+        //                 {
+        //                     label: 'Years of Experience',
+        //                     data: data.map(staff => staff.experience),
+        //                     backgroundColor: '#3498db',
+        //                     barPercentage: 0.6
+        //                 },
+        //                 {
+        //                     label: 'Publications',
+        //                     data: data.map(staff => staff.publications),
+        //                     backgroundColor: '#2ecc71',
+        //                     barPercentage: 0.6
+        //                 },
+        //                 {
+        //                     label: 'Grants Won',
+        //                     data: data.map(staff => staff.grants),
+        //                     backgroundColor: '#e74c3c',
+        //                     barPercentage: 0.6
+        //                 }
+        //             ]
+        //         },
+        //         options: {
+        //             responsive: true,
+        //             maintainAspectRatio: false,
+        //             plugins: {
+        //                 legend: {
+        //                     position: 'top',
+        //                 }
+        //             },
+        //             scales: {
+        //                 x: {
+        //                     stacked: false,
+        //                     grid: {
+        //                         display: false
+        //                     }
+        //                 },
+        //                 y: {
+        //                     beginAtZero: true,
+        //                     grid: {
+        //                         color: '#f5f5f5'
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     });
+        // }
+
+        // // Initial chart load
+        // initializeChart(filterDataByRank('professor'));
+
+        // // Update chart on rank selection
+        // document.getElementById('rankFilter').addEventListener('change', function () {
+        //     const selectedRank = this.value;
+        //     const filteredData = filterDataByRank(selectedRank);
+        //     initializeChart(filteredData);
+        // });
+
+        
+
+        document.addEventListener('DOMContentLoaded', function() {
+        let performanceChart;
+        const rankFilter = document.getElementById('rankFilter');
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        // Load data for the DEFAULT selected rank (e.g., "Professor")
+        fetchAndUpdateChart(rankFilter.value);
+
+        // Update chart when rank changes
+        rankFilter.addEventListener('change', function() {
+            fetchAndUpdateChart(this.value);
+        });
+
+        function fetchAndUpdateChart(rank) {
+            console.log(`Fetching data for rank: ${rank}`); // Debugging
+            fetch(`get_performance_data.php?rank=${encodeURIComponent(rank)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error || !data.length) {
+                        noDataMessage.style.display = 'block';
+                        if (performanceChart) performanceChart.destroy();
+                        return;
+                    }
+                    noDataMessage.style.display = 'none';
+                    updateChart(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    noDataMessage.style.display = 'block';
+                    if (performanceChart) performanceChart.destroy();
+                });
         }
 
-        // Chart setup
-        const chartCanvas = document.getElementById('performanceChart');
-        const noDataMessage = document.getElementById('noDataMessage');
-        let performanceChart;
+        function updateChart(staffData) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            if (performanceChart) performanceChart.destroy();
 
-        function initializeChart(data) {
-            if (performanceChart) {
-                performanceChart.destroy();
-            }
-
-            if (data.length === 0) {
-                chartCanvas.style.display = 'none';
-                noDataMessage.style.display = 'block';
-                return;
-            }
-
-            chartCanvas.style.display = 'block';
-            noDataMessage.style.display = 'none';
-
-            const ctx = chartCanvas.getContext('2d');
             performanceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: data.map(staff => staff.name),
+                    labels: staffData.map(staff => staff.name),
                     datasets: [
                         {
-                            label: 'Years of Experience',
-                            data: data.map(staff => staff.experience),
-                            backgroundColor: '#3498db',
-                            barPercentage: 0.6
+                            label: 'Experience (years)',
+                            data: staffData.map(staff => staff.experience),
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)'
                         },
                         {
                             label: 'Publications',
-                            data: data.map(staff => staff.publications),
-                            backgroundColor: '#2ecc71',
-                            barPercentage: 0.6
+                            data: staffData.map(staff => staff.publications),
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)'
                         },
                         {
-                            label: 'Grants Won',
-                            data: data.map(staff => staff.grants),
-                            backgroundColor: '#e74c3c',
-                            barPercentage: 0.6
+                            label: 'Grants',
+                            data: staffData.map(staff => staff.grants),
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)'
                         }
                     ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
                     scales: {
-                        x: {
-                            stacked: false,
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#f5f5f5'
-                            }
-                        }
+                        y: { beginAtZero: true }
                     }
                 }
             });
         }
+    })
 
-        // Initial chart load
-        initializeChart(filterDataByRank('professor'));
+        //DRAFT                     DRAFT
+    //     document.addEventListener('DOMContentLoaded', function () {
+    //     const rankSelect = document.getElementById('rankFilter');
+    //     const noDataMessage = document.getElementById('noDataMessage');
+    //     const ctx = document.getElementById('performanceChart').getContext('2d');
+    //     let chartInstance;
 
-        // Update chart on rank selection
-        document.getElementById('rankFilter').addEventListener('change', function () {
-            const selectedRank = this.value;
-            const filteredData = filterDataByRank(selectedRank);
-            initializeChart(filteredData);
-        });
+    //     // 🔍 Get department_id from URL
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const departmentId = urlParams.get('id');
 
-        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+    //     function fetchAndRenderChart(rank) {
+    //         fetch(`get_performance_data.php?rank=${encodeURIComponent(rank)}&department_id=${encodeURIComponent(departmentId)}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 if (!Array.isArray(data) || data.length === 0) {
+    //                     noDataMessage.style.display = 'block';
+    //                     if (chartInstance) chartInstance.destroy();
+    //                     return;
+    //                 }
+
+    //                 noDataMessage.style.display = 'none';
+
+    //                 const labels = data.map(staff => staff.name);
+    //                 const experience = data.map(staff => staff.experience);
+    //                 const publications = data.map(staff => staff.publications);
+    //                 const grants = data.map(staff => staff.grants);
+
+    //                 if (chartInstance) {
+    //                     chartInstance.destroy();
+    //                 }
+
+    //                 chartInstance = new Chart(ctx, {
+    //                     type: 'bar',
+    //                     data: {
+    //                         labels: labels,
+    //                         datasets: [
+    //                             {
+    //                                 label: 'Experience',
+    //                                 data: experience,
+    //                                 backgroundColor: '#3498db'
+    //                             },
+    //                             {
+    //                                 label: 'Publications',
+    //                                 data: publications,
+    //                                 backgroundColor: '#2ecc71'
+    //                             },
+    //                             {
+    //                                 label: 'Grants',
+    //                                 data: grants,
+    //                                 backgroundColor: '#e74c3c'
+    //                             }
+    //                         ]
+    //                     },
+    //                     options: {
+    //                         responsive: true,
+    //                         plugins: {
+    //                             title: {
+    //                                 display: true,
+    //                                 text: 'Staff Performance by Rank & Department'
+    //                             }
+    //                         },
+    //                         scales: {
+    //                             y: {
+    //                                 beginAtZero: true
+    //                             }
+    //                         }
+    //                     }
+    //                 });
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error fetching performance data:', error);
+    //             });
+    //     }
+
+    //     // Load chart on page load
+    //     fetchAndRenderChart(rankSelect.value);
+
+    //     // Update chart on rank change
+    //     rankSelect.addEventListener('change', function () {
+    //         fetchAndRenderChart(this.value);
+    //     });
+    // });
+
+
+        
+
+
+    const trendsCtx = document.getElementById('trendsChart').getContext('2d');
         const trendsChart = new Chart(trendsCtx, {
             type: 'line',
             data: {
@@ -749,8 +932,6 @@
                 }
             }
         });
-
-        
 
         const grantsCtx = document.getElementById('grantsChart').getContext('2d');
         const grantsChart = new Chart(grantsCtx, {

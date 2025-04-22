@@ -148,7 +148,8 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
                                         <tr class="clickable-row" data-href="department.php?name=<?= urlencode($dept) ?>">
                                             <td>
                                                 <strong>
-                                                    <a href="department.php?name=<?= urlencode($dept) ?>" 
+                                                    <!-- send the department id in the url -->
+                                                    <a href="department.php?id=<?= $department_id ?>"    
                                                     class="department-link"
                                                     title="View <?= htmlspecialchars($dept) ?> details">
                                                         <?= htmlspecialchars($dept) ?>

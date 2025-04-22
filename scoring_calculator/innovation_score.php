@@ -23,7 +23,8 @@ class InnovationScore {
         'Copyright' => 0,
         'Product' => 0,
         'Trademark' => 0,
-        'score' => 0
+        'score' => 0,
+        'total_innovations' => 0
     ];
 
     // Constructor to initialize with database connection and staff ID
@@ -42,6 +43,8 @@ class InnovationScore {
         while ($row = $result->fetch_assoc()) {
             $type_raw = strtolower(trim($row['innovation_type']));
             $type_normalized = preg_replace('/[^a-z]/', '', $type_raw); // remove all non-letter chars
+
+            $this->breakdown['total_innovations'] += 1;//update the total
 
             switch ($type_normalized) {
                 case 'patent':

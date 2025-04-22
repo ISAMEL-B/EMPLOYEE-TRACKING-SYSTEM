@@ -27,7 +27,8 @@ class PublicationScore {
         'Journal Articles (Co-author)' => 0,
         'Book with ISBN' => 0,
         'Book Chapter' => 0,
-        'score' => 0
+        'score' => 0,
+        'total_publications' => 0
     ];
 
     // Constructor to initialize with DB connection and staff ID
@@ -45,6 +46,9 @@ class PublicationScore {
         while ($row = $result->fetch_assoc()) {
             $pub_type = strtolower(trim($row['publication_type']));
             $author_role = strtolower(trim($row['role']));
+
+            // Count every publication towards total
+            $this->breakdown['total_publications'] += 1;
 
             if ($pub_type == PublicationType::JOURNAL_ARTICLE) {
                 switch ($author_role) {
