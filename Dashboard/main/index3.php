@@ -9,16 +9,35 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
 //get count of employees in a department
 include '../../scoring_calculator/department score/department_employees.php';
 
+//get department score
+include '../../scoring_calculator/department score/department_score.php';
+
 //get count of employees in a department
 $department_counts = get_all_department_staff_counts($conn);
 
-//total staff in each department
-$software_engineering = $department_counts['Software Engineering'];
-$computer_science = $department_counts['Computer Science'];
-$information_technology = $department_counts['Information Technology'];
-$biology = $department_counts['Biology'];
-$chemistry = $department_counts['Chemistry'];
+// Pagination parameters
+$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$items_per_page = 10;
+$total_items = count($department_counts);
+$total_pages = ceil($total_items / $items_per_page);
 
+// Validate current page
+if ($current_page < 1) {
+    $current_page = 1;
+} elseif ($current_page > $total_pages && $total_pages > 0) {
+    $current_page = $total_pages;
+}
+
+// Get only the items for the current page
+$offset = ($current_page - 1) * $items_per_page;
+$paginated_departments = array_slice($department_counts, $offset, $items_per_page, true);
+
+//total staff in each department (keeping your existing variables)
+$software_engineering = $department_counts['Software Engineering'] ?? 0;
+$computer_science = $department_counts['Computer Science'] ?? 0;
+$information_technology = $department_counts['Information Technology'] ?? 0;
+$biology = $department_counts['Biology'] ?? 0;
+$chemistry = $department_counts['Chemistry'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,170 +53,10 @@ $chemistry = $department_counts['Chemistry'];
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        :root {
-            --must-green: #006633;
-            --must-yellow: #FFCC00;
-            --must-blue: #003366;
-            --must-light-green: #e6f2ec;
-            --must-light-yellow: #fff9e6;
-            --must-light-blue: #e6ecf2;
-        }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .main-content {
-            margin-left: 250px;
-            margin-top: 5%;
-            padding: 20px;
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
-
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-            border: none;
-        }
-
-        .card-header {
-            background-color: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: 600;
-            font-size: 20px;
-            color: var(--must-blue);
-            border-radius: 10px 10px 0 0 !important;
-        }
-
-        .department-card {
-            border-left: 4px solid var(--must-green);
-            transition: all 0.3s ease;
-        }
-
-        .department-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-card .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--must-green);
-        }
-
-        .stat-card .stat-label {
-            color: var(--must-blue);
-            font-weight: 500;
-        }
-
-        .highlight-yellow {
-            background-color: var(--must-light-yellow);
-            border-left: 4px solid var(--must-yellow);
-        }
-
-        .highlight-blue {
-            background-color: var(--must-light-blue);
-            border-left: 4px solid var(--must-blue);
-        }
-
-        .dropdown-menu {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 250px;
-            width: 100%;
-        }
-
-        .comparison-table th {
-            background-color: var(--must-green);
-            color: white;
-        }
-
-        .department-title {
-            color: var(--must-green);
-            font-weight: 700;
-            border-bottom: 2px solid var(--must-yellow);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .search-box {
-            border: 2px solid var(--must-green);
-            border-radius: 5px;
-        }
-
-        .btn-must {
-            background-color: var(--must-green);
-            color: white;
-        }
-
-        .btn-must:hover {
-            background-color: var(--must-blue);
-            color: white;
-        }
-
-        @media (max-width: 768px) {
-            .navbar-brand {
-                font-size: 0.9rem;
-            }
-
-            .navbar-brand img {
-                height: 25px;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-        }
-            /* Make rows appear clickable */
-            .clickable-row {
-                cursor: pointer;
-                transition: background-color 0.2s ease;
-            }
-
-            .clickable-row:hover {
-                background-color: rgba(52, 152, 219, 0.1); /* Light blue hover */
-            }
-
-            /* Position the anchor to cover entire cell */
-            .clickable-row td:first-child {
-                position: relative;
-            }
-
-            /* Style the visible link */
-            .department-link {
-                color: #3498db;
-                text-decoration: none;
-                display: block; /* Makes the link fill the cell */
-                padding: 8px 0; /* Match your table cell padding */
-            }
-
-            /* Prevent double hover effects */
-            .clickable-row:hover .department-link {
-                color: #2c3e50;
-                text-decoration: underline;
-            }
-    </style>
+    <!-- link it to its css -->
+    <link rel="stylesheet" href="styles/index3.css">
+    
 </head>
 
 <body>
@@ -255,12 +114,37 @@ $chemistry = $department_counts['Chemistry'];
                                             <th>Total Publications</th>
                                             <th>Total Research Grant amount</th>
                                             <th>Total innovations</th>
-                                            <th>Average Score</th>
+                                            <th>Total Score</th>
                                             <!-- <th>Budget Utilization</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    <?php foreach ($department_counts as $dept => $count): ?>
+                                    <?php foreach ($paginated_departments as $dept => $count): 
+                                         // Get department ID from department name
+                                        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE department_name = ?");
+                                        $stmt->bind_param("s", $dept);
+                                        $stmt->execute();
+                                        $result = $stmt->get_result();
+                                        $department_id = $result->fetch_assoc()['department_id'] ?? null;
+
+                                        // Now call your existing function dynamically
+                                        $dept_data = $department_id ? get_department_performance($conn, $department_id) : [];
+
+                                        // get the total score for the department
+                                        $total_department_score = 
+                                                $dept_data['academic_score'] +
+                                                $dept_data['grant_score'] +
+                                                $dept_data['innovation_score'] +
+                                                $dept_data['publication_score'] +
+                                                $dept_data['supervision_score'] +
+                                                $dept_data['membership_score'] +
+                                                $dept_data['community_service_score'] +
+                                                $dept_data['other_academic_score'] +
+                                                $dept_data['teaching_experience_score'] +
+                                                $dept_data['university_service_score'];
+
+                                    ?>
+
                                         <tr class="clickable-row" data-href="department.php?name=<?= urlencode($dept) ?>">
                                             <td>
                                                 <strong>
@@ -272,210 +156,50 @@ $chemistry = $department_counts['Chemistry'];
                                                 </strong>
                                             </td>
                                             <td><?= htmlspecialchars($count) ?></td>
-                                            <td>100</td>
-                                            <td>700 UGX</td>
-                                            <td>35</td>
-                                            <td>76</td>
+                                            <td><?= $dept_data['total_publications'] ?></td>
+                                            <td><?= $dept_data['total_grant_amount'] ?></td>
+                                            <td><?= $dept_data['total_innovations'] ?></td>
+                                            <td><?= $total_department_score ?></td>
                                         </tr>
                                     <?php endforeach; ?>
-                                        <!-- <tr>
-                                            <td><strong>Computer Science</strong></td>
-                                            <td>28</td>
-                                            <td>5.1 years</td>
-                                            <td>4.3</td>
-                                            <td>28</td>
-                                            <td>5%</td>
-                                            <td>82%</td>
-                                        </tr> -->
-                                        <!-- <tr>
-                                            <td><strong>Iformation Technology</strong></td>
-                                            <td>2</td>
-                                            <td>4.7 years</td>
-                                            <td>4.5</td>
-                                            <td>42</td>
-                                            <td>3%</td>
-                                            <td>75%</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Biology</strong></td>
-                                            <td>156</td>
-                                            <td>6.3 years</td>
-                                            <td>4.2</td>
-                                            <td>25</td>
-                                            <td>12%</td>
-                                            <td>88%</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Chemistry</strong></td>
-                                            <td>37</td>
-                                            <td>4.2 years</td>
-                                            <td>4.4</td>
-                                            <td>48</td>
-                                            <td>15%</td>
-                                            <td>92%</td>
-                                        </tr> -->
                                     </tbody>
                                 </table>
                             </div>
 
-                            <!-- <div class="row mt-4">
-                                <div class="col-md-6">
-                                    <div class="chart-container">
-                                        <canvas id="deptSizeChart"></canvas>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="chart-container">
-                                        <canvas id="deptRatingChart"></canvas>
-                                    </div>
-                                </div>
-                            </div> -->
+                            <!-- Pagination Controls -->
+                            <?php if ($total_pages > 1): ?>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center mt-4">
+                                    <?php if ($current_page > 1): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<?= $current_page - 1 ?>" aria-label="Previous">
+                                                <span aria-hidden="true">«</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    
+                                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                        <li class="page-item <?= $i == $current_page ? 'active' : '' ?>">
+                                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    
+                                    <?php if ($current_page < $total_pages): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<?= $current_page + 1 ?>" aria-label="Next">
+                                                <span aria-hidden="true">»</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </nav>
+                            <?php endif; ?>
+
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Department Detail Section (Hidden by default) -->
-            <!-- <div class="row mb-4 d-none" id="detailSection">
-                <div class="col-12">
-                    <div class="card department-card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span id="deptDetailTitle">Department Details</span>
-                            <button class="btn btn-sm btn-outline-secondary" id="backToComparison">
-                                <i class="bi bi-arrow-left"></i> Back to Comparison
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div class="row mb-4">
-                                <div class="col-md-3">
-                                    <div class="stat-card">
-                                        <div class="stat-value" id="deptEmployees">--</div>
-                                        <div class="stat-label">Total Employees</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="stat-card highlight-yellow">
-                                        <div class="stat-value" id="deptAvgTenure">--</div>
-                                        <div class="stat-label">Avg. Tenure</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="stat-card highlight-blue">
-                                        <div class="stat-value" id="deptAvgRating">--</div>
-                                        <div class="stat-label">Avg. Performance</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="stat-card">
-                                        <div class="stat-value" id="deptVacancy">--</div>
-                                        <div class="stat-label">Vacancy Rate</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card mb-4">
-                                        <div class="card-header">Employee Distribution</div>
-                                        <div class="card-body">
-                                            <div class="chart-container">
-                                                <canvas id="deptPositionChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card">
-                                        <div class="card-header">Training Completion</div>
-                                        <div class="card-body">
-                                            <div class="chart-container">
-                                                <canvas id="deptTrainingChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="card mb-4">
-                                        <div class="card-header">Gender Diversity</div>
-                                        <div class="card-body">
-                                            <div class="chart-container">
-                                                <canvas id="deptGenderChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="card">
-                                        <div class="card-header">Budget Allocation vs Utilization</div>
-                                        <div class="card-body">
-                                            <div class="chart-container">
-                                                <canvas id="deptBudgetChart"></canvas>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-4">
-                                <div class="col-12">
-                                    <div class="card">
-                                        <div class="card-header">Recent Department Activity</div>
-                                        <div class="card-body">
-                                            <ul class="list-group list-group-flush" id="deptActivity">
-                                                
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
-            <!-- Key Insights Section -->
-            <!-- <div class="row">
-                <div class="col-md-6">
-                    <div class="card highlight-yellow">
-                        <div class="card-header">Key Insights</div>
-                        <div class="card-body">
-                            <div class="alert alert-info">
-                                <strong>Software Engineering Department:</strong> High training hours with excellent performance ratings. Consider expanding team to reduce workload.
-                            </div>
-                            <div class="alert alert-warning">
-                                <strong>Computer Science Department:</strong> Lowest vacancy rate indicates good retention. Budget utilization could be improved.
-                            </div>
-                            <div class="alert alert-success">
-                                <strong>Electrical Eng. Department:</strong> Highest performance ratings. Model department for others.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card highlight-blue">
-                        <div class="card-header">Action Items</div>
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Review Research Department vacancies
-                                    <span class="badge bg-must-green rounded-pill">High Priority</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Plan Finance Department training
-                                    <span class="badge bg-warning rounded-pill">Medium Priority</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Analyze Academics Department budget
-                                    <span class="badge bg-must-green rounded-pill">High Priority</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Schedule HR best practices session
-                                    <span class="badge bg-primary rounded-pill">Low Priority</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
         </div>
     </div>
 
@@ -483,547 +207,5 @@ $chemistry = $department_counts['Chemistry'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-
-    <script>
-        // // Department data
-        // const departments = {
-        //     it: {
-        //         name: "Software Engineering",
-        //         employees: 4,
-        //         avgTenure: "3.2 years",
-        //         avgRating: 4.1,
-        //         vacancy: "8%",
-        //         positions: {
-        //             labels: ["Developers", "Sys Admins", "Support", "Managers", "Analysts"],
-        //             data: [18, 8, 10, 3, 3]
-        //         },
-        //         training: {
-        //             completed: 78,
-        //             inProgress: 15,
-        //             notStarted: 7
-        //         },
-        //         gender: {
-        //             male: 65,
-        //             female: 35
-        //         },
-        //         budget: {
-        //             allocated: 1200000,
-        //             utilized: 936000
-        //         },
-        //         activity: [
-        //             "New help desk system implemented (April 2025)",
-        //             "3 new developers hired",
-        //             "Quarterly security training completed",
-        //             "Server upgrade scheduled for next month"
-        //         ]
-        //     },
-        //     finance: {
-        //         name: "Computer Science",
-        //         employees: 28,
-        //         avgTenure: "5.1 years",
-        //         avgRating: 4.3,
-        //         vacancy: "5%",
-        //         positions: {
-        //             labels: ["Accountants", "Analysts", "Clerks", "Managers", "Auditors"],
-        //             data: [10, 6, 8, 2, 2]
-        //         },
-        //         training: {
-        //             completed: 65,
-        //             inProgress: 20,
-        //             notStarted: 15
-        //         },
-        //         gender: {
-        //             male: 45,
-        //             female: 55
-        //         },
-        //         budget: {
-        //             allocated: 850000,
-        //             utilized: 697000
-        //         },
-        //         activity: [
-        //             "Annual budget review completed",
-        //             "New accounting software training",
-        //             "2 analysts promoted",
-        //             "Quarterly audit scheduled"
-        //         ]
-        //     },
-        //     hr: {
-        //         name: "Civil",
-        //         employees: 18,
-        //         avgTenure: "4.7 years",
-        //         avgRating: 4.5,
-        //         vacancy: "3%",
-        //         positions: {
-        //             labels: ["Generalists", "Recruiters", "Compensation", "Managers", "Training"],
-        //             data: [6, 5, 3, 2, 2]
-        //         },
-        //         training: {
-        //             completed: 92,
-        //             inProgress: 5,
-        //             notStarted: 3
-        //         },
-        //         gender: {
-        //             male: 30,
-        //             female: 70
-        //         },
-        //         budget: {
-        //             allocated: 600000,
-        //             utilized: 450000
-        //         },
-        //         activity: [
-        //             "New employee onboarding program launched",
-        //             "Annual benefits review completed",
-        //             "Diversity training scheduled",
-        //             "Recruitment drive for tech positions"
-        //         ]
-        //     },
-        //     academics: {
-        //         name: "Electrical",
-        //         employees: 156,
-        //         avgTenure: "6.3 years",
-        //         avgRating: 4.2,
-        //         vacancy: "12%",
-        //         positions: {
-        //             labels: ["Professors", "Lecturers", "Assistants", "Deans", "Researchers"],
-        //             data: [45, 70, 25, 10, 6]
-        //         },
-        //         training: {
-        //             completed: 60,
-        //             inProgress: 25,
-        //             notStarted: 15
-        //         },
-        //         gender: {
-        //             male: 55,
-        //             female: 45
-        //         },
-        //         budget: {
-        //             allocated: 3500000,
-        //             utilized: 3080000
-        //         },
-        //         activity: [
-        //             "New curriculum development underway",
-        //             "10 new faculty positions approved",
-        //             "Research grant applications up 15%",
-        //             "Student evaluation process updated"
-        //         ]
-        //     },
-        //     research: {
-        //         name: "Accounting & Finance",
-        //         employees: 37,
-        //         avgTenure: "4.2 years",
-        //         avgRating: 4.4,
-        //         vacancy: "15%",
-        //         positions: {
-        //             labels: ["Auditors", "Balancers", "Technicians", "Managers", "Analysts"],
-        //             data: [15, 10, 8, 2, 2]
-        //         },
-        //         training: {
-        //             completed: 85,
-        //             inProgress: 10,
-        //             notStarted: 5
-        //         },
-        //         gender: {
-        //             male: 70,
-        //             female: 30
-        //         },
-        //         budget: {
-        //             allocated: 2500000,
-        //             utilized: 2300000
-        //         },
-        //         activity: [
-        //             "3 new Acounting filed this quarter",
-        //             "Collaboration with industry partners",
-        //             "New lab equipment installed",
-        //             "5 research papers published"
-        //         ]
-        //     }
-        // };
-
-        // // Initialize comparison charts
-        // // const deptSizeCtx = document.getElementById('deptSizeChart').getContext('2d');
-        // // const deptSizeChart = new Chart(deptSizeCtx, {
-        // //     type: 'bar',
-        // //     data: {
-        // //         labels: ['BSE', 'BCS', 'Civil', 'Electrical', 'Accounting & Finance'],
-        // //         datasets: [{
-        // //             label: 'Number of Employees',
-        // //             data:   [
-        // //                 <?= $department_counts['Software Engineering'] ?>, 
-        // //                 <?= $department_counts['Computer Science'] ?>, 
-        // //                 <?= $department_counts['Civil Engineering'] ?>,
-        // //                 <?= $department_counts['Electrical Engineering'] ?>,
-        // //                 <?= $department_counts['Accounting'] ?>
-        // //             ],
-        // //             backgroundColor: [
-        // //                 'rgba(0, 102, 51, 0.7)',
-        // //                 'rgba(0, 51, 102, 0.7)',
-        // //                 'rgba(255, 204, 0, 0.7)',
-        // //                 'rgba(0, 102, 51, 0.5)',
-        // //                 'rgba(0, 51, 102, 0.5)'
-        // //             ],
-        // //             borderColor: [
-        // //                 'rgba(0, 102, 51, 1)',
-        // //                 'rgba(0, 51, 102, 1)',
-        // //                 'rgba(255, 204, 0, 1)',
-        // //                 'rgba(0, 102, 51, 1)',
-        // //                 'rgba(0, 51, 102, 1)'
-        // //             ],
-        // //             borderWidth: 1
-        // //         }]
-        // //     },
-        // //     options: {
-        // //         responsive: true,
-        // //         maintainAspectRatio: false,
-        // //         plugins: {
-        // //             title: {
-        // //                 display: true,
-        // //                 text: 'Department Size Comparison',
-        // //                 font: {
-        // //                     size: 14,
-        // //                     weight: 'bold'
-        // //                 }
-        // //             },
-        // //             legend: {
-        // //                 display: false
-        // //             }
-        // //         },
-        // //         scales: {
-        // //             y: {
-        // //                 beginAtZero: true,
-        // //                 title: {
-        // //                     display: true,
-        // //                     text: 'Number of Employees'
-        // //                 }
-        // //             }
-        // //         }
-        // //     }
-        // // });
-
-        // // const deptRatingCtx = document.getElementById('deptRatingChart').getContext('2d');
-        // // const deptRatingChart = new Chart(deptRatingCtx, {
-        // //     type: 'radar',
-        // //     data: {
-        // //         labels: ['Performance', 'Productivity', 'Collaboration', 'Innovation', 'Satisfaction'],
-        // //         datasets: [{
-        // //                 label: 'IT Department',
-        // //                 data: [4.1, 4.3, 3.9, 4.5, 3.8],
-        // //                 backgroundColor: 'rgba(0, 102, 51, 0.2)',
-        // //                 borderColor: 'rgba(0, 102, 51, 1)',
-        // //                 borderWidth: 2,
-        // //                 pointBackgroundColor: 'rgba(0, 102, 51, 1)'
-        // //             },
-        // //             {
-        // //                 label: 'Finance Department',
-        // //                 data: [4.3, 4.5, 4.2, 3.8, 4.1],
-        // //                 backgroundColor: 'rgba(0, 51, 102, 0.2)',
-        // //                 borderColor: 'rgba(0, 51, 102, 1)',
-        // //                 borderWidth: 2,
-        // //                 pointBackgroundColor: 'rgba(0, 51, 102, 1)'
-        // //             },
-        // //             {
-        // //                 label: 'HR Department',
-        // //                 data: [4.5, 4.4, 4.7, 4.2, 4.6],
-        // //                 backgroundColor: 'rgba(255, 204, 0, 0.2)',
-        // //                 borderColor: 'rgba(255, 204, 0, 1)',
-        // //                 borderWidth: 2,
-        // //                 pointBackgroundColor: 'rgba(255, 204, 0, 1)'
-        // //             }
-        // //         ]
-        // //     },
-        // //     options: {
-        // //         responsive: true,
-        // //         maintainAspectRatio: false,
-        // //         plugins: {
-        // //             title: {
-        // //                 display: true,
-        // //                 text: 'Department Performance Metrics',
-        // //                 font: {
-        // //                     size: 14,
-        // //                     weight: 'bold'
-        // //                 }
-        // //             },
-        // //             legend: {
-        // //                 position: 'bottom'
-        // //             }
-        // //         },
-        // //         scales: {
-        // //             r: {
-        // //                 angleLines: {
-        // //                     display: true
-        // //                 },
-        // //                 deptRatingChart               suggestedMin: 0,
-        // //                 suggestedMax: 5
-        // //             }
-        // //         }
-        // //     }
-        // // });
-
-        // // Department detail charts (will be initialized when department is selected)
-        // let deptPositionChart, deptTrainingChart, deptGenderChart, deptBudgetChart;
-
-        // // Search functionality for department dropdown
-        // document.getElementById('departmentSearch').addEventListener('input', function(e) {
-        //     const searchTerm = e.target.value.toLowerCase();
-        //     const items = document.querySelectorAll('#departmentList .dropdown-item');
-
-        //     items.forEach(item => {
-        //         const text = item.textContent.toLowerCase();
-        //         if (text.includes(searchTerm)) {
-        //             item.style.display = 'block';
-        //         } else {
-        //             item.style.display = 'none';
-        //         }
-        //     });
-        // });
-
-        // // Department selection
-        // document.querySelectorAll('#departmentList .dropdown-item').forEach(item => {
-        //     item.addEventListener('click', function(e) {
-        //         e.preventDefault();
-        //         const deptId = this.getAttribute('data-dept');
-        //         showDepartmentDetails(deptId);
-        //     });
-        // });
-
-        // // Back to comparison button
-        // document.getElementById('backToComparison').addEventListener('click', function() {
-        //     document.getElementById('comparisonSection').classList.remove('d-none');
-        //     document.getElementById('detailSection').classList.add('d-none');
-        // });
-
-        // // Show department details
-        // function showDepartmentDetails(deptId) {
-        //     const dept = departments[deptId];
-
-        //     // Update basic info
-        //     document.getElementById('deptDetailTitle').textContent = dept.name + " Department Analytics";
-        //     document.getElementById('deptEmployees').textContent = dept.employees;
-        //     document.getElementById('deptAvgTenure').textContent = dept.avgTenure;
-        //     document.getElementById('deptAvgRating').textContent = dept.avgRating;
-        //     document.getElementById('deptVacancy').textContent = dept.vacancy;
-
-        //     // Update activity list
-        //     const activityList = document.getElementById('deptActivity');
-        //     activityList.innerHTML = '';
-        //     dept.activity.forEach(activity => {
-        //         const li = document.createElement('li');
-        //         li.className = 'list-group-item';
-        //         li.textContent = activity;
-        //         activityList.appendChild(li);
-        //     });
-
-        //     // Initialize or update charts
-        //     updateDepartmentCharts(dept);
-
-        //     // Show detail section and hide comparison
-        //     document.getElementById('comparisonSection').classList.add('d-none');
-        //     document.getElementById('detailSection').classList.remove('d-none');
-        // }
-
-        // // Update department detail charts
-        // function updateDepartmentCharts(dept) {
-        //     // Position distribution chart
-        //     if (deptPositionChart) {
-        //         deptPositionChart.data.labels = dept.positions.labels;
-        //         deptPositionChart.data.datasets[0].data = dept.positions.data;
-        //         deptPositionChart.update();
-        //     } else {
-        //         const deptPositionCtx = document.getElementById('deptPositionChart').getContext('2d');
-        //         deptPositionChart = new Chart(deptPositionCtx, {
-        //             type: 'doughnut',
-        //             data: {
-        //                 labels: dept.positions.labels,
-        //                 datasets: [{
-        //                     data: dept.positions.data,
-        //                     backgroundColor: [
-        //                         'rgba(0, 102, 51, 0.7)',
-        //                         'rgba(0, 51, 102, 0.7)',
-        //                         'rgba(255, 204, 0, 0.7)',
-        //                         'rgba(0, 102, 51, 0.5)',
-        //                         'rgba(0, 51, 102, 0.5)'
-        //                     ],
-        //                     borderWidth: 1
-        //                 }]
-        //             },
-        //             options: {
-        //                 responsive: true,
-        //                 maintainAspectRatio: false,
-        //                 plugins: {
-        //                     title: {
-        //                         display: true,
-        //                         text: 'Position Distribution',
-        //                         font: {
-        //                             size: 14,
-        //                             weight: 'bold'
-        //                         }
-        //                     },
-        //                     legend: {
-        //                         position: 'bottom'
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //     // Training completion chart
-        //     if (deptTrainingChart) {
-        //         deptTrainingChart.data.datasets[0].data = [
-        //             dept.training.completed,
-        //             dept.training.inProgress,
-        //             dept.training.notStarted
-        //         ];
-        //         deptTrainingChart.update();
-        //     } else {
-        //         const deptTrainingCtx = document.getElementById('deptTrainingChart').getContext('2d');
-        //         deptTrainingChart = new Chart(deptTrainingCtx, {
-        //             type: 'bar',
-        //             data: {
-        //                 labels: ['Completed', 'In Progress', 'Not Started'],
-        //                 datasets: [{
-        //                     label: '% of Employees',
-        //                     data: [
-        //                         dept.training.completed,
-        //                         dept.training.inProgress,
-        //                         dept.training.notStarted
-        //                     ],
-        //                     backgroundColor: [
-        //                         'rgba(0, 102, 51, 0.7)',
-        //                         'rgba(255, 204, 0, 0.7)',
-        //                         'rgba(204, 0, 0, 0.7)'
-        //                     ],
-        //                     borderWidth: 1
-        //                 }]
-        //             },
-        //             options: {
-        //                 responsive: true,
-        //                 maintainAspectRatio: false,
-        //                 plugins: {
-        //                     title: {
-        //                         display: true,
-        //                         text: 'Training Completion Status',
-        //                         font: {
-        //                             size: 14,
-        //                             weight: 'bold'
-        //                         }
-        //                     },
-        //                     legend: {
-        //                         display: false
-        //                     }
-        //                 },
-        //                 scales: {
-        //                     y: {
-        //                         beginAtZero: true,
-        //                         max: 100,
-        //                         title: {
-        //                             display: true,
-        //                             text: '% of Employees'
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //     // Gender diversity chart
-        //     if (deptGenderChart) {
-        //         deptGenderChart.data.datasets[0].data = [
-        //             dept.gender.male,
-        //             dept.gender.female
-        //         ];
-        //         deptGenderChart.update();
-        //     } else {
-        //         const deptGenderCtx = document.getElementById('deptGenderChart').getContext('2d');
-        //         deptGenderChart = new Chart(deptGenderCtx, {
-        //             type: 'pie',
-        //             data: {
-        //                 labels: ['Male', 'Female'],
-        //                 datasets: [{
-        //                     data: [
-        //                         dept.gender.male,
-        //                         dept.gender.female
-        //                     ],
-        //                     backgroundColor: [
-        //                         'rgba(0, 51, 102, 0.7)',
-        //                         'rgba(255, 204, 0, 0.7)'
-        //                     ],
-        //                     borderWidth: 1
-        //                 }]
-        //             },
-        //             options: {
-        //                 responsive: true,
-        //                 maintainAspectRatio: false,
-        //                 plugins: {
-        //                     title: {
-        //                         display: true,
-        //                         text: 'Gender Distribution',
-        //                         font: {
-        //                             size: 14,
-        //                             weight: 'bold'
-        //                         }
-        //                     },
-        //                     legend: {
-        //                         position: 'bottom'
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     }
-
-        //     // Budget chart
-        //     if (deptBudgetChart) {
-        //         deptBudgetChart.data.datasets[0].data = [dept.budget.allocated];
-        //         deptBudgetChart.data.datasets[1].data = [dept.budget.utilized];
-        //         deptBudgetChart.update();
-        //     } else {
-        //         const deptBudgetCtx = document.getElementById('deptBudgetChart').getContext('2d');
-        //         deptBudgetChart = new Chart(deptBudgetCtx, {
-        //             type: 'bar',
-        //             data: {
-        //                 labels: ['Budget'],
-        //                 datasets: [{
-        //                         label: 'Allocated',
-        //                         data: [dept.budget.allocated],
-        //                         backgroundColor: 'rgba(0, 102, 51, 0.7)',
-        //                         borderWidth: 1
-        //                     },
-        //                     {
-        //                         label: 'Utilized',
-        //                         data: [dept.budget.utilized],
-        //                         backgroundColor: 'rgba(0, 51, 102, 0.7)',
-        //                         borderWidth: 1
-        //                     }
-        //                 ]
-        //             },
-        //             options: {
-        //                 responsive: true,
-        //                 maintainAspectRatio: false,
-        //                 plugins: {
-        //                     title: {
-        //                         display: true,
-        //                         text: 'Budget Allocation vs Utilization',
-        //                         font: {
-        //                             size: 14,
-        //                             weight: 'bold'
-        //                         }
-        //                     },
-        //                     legend: {
-        //                         position: 'bottom'
-        //                     }
-        //                 },
-        //                 scales: {
-        //                     y: {
-        //                         beginAtZero: true,
-        //                         title: {
-        //                             display: true,
-        //                             text: 'Amount (UGX)'
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-    </script>
 </body>
-
 </html>

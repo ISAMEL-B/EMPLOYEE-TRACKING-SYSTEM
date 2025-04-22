@@ -23,18 +23,19 @@ function get_department_performance($conn, $department_id) {
         'PhD' => 0, 'Masters' => 0, 'First Class' => 0, 'Second Upper' => 0, 'Other' => 0, 'academic_score' => 0,
 
         // Grants
-        'Over 1B' => 0, '500M - 1B' => 0, '100M - 500M' => 0, 'Below 100M' => 0, 'grant_score' => 0, 'total_grant_amount' => 0,
+        'Over 1B' => 0, '500M - 1B' => 0, '100M - 500M' => 0, 'Below 100M' => 0, 'grant_score' => 0, 'total_grant_amount' => 0, 'total_innovations' => 0,
 
         // Innovations
         'Patent' => 0, 'Utility Model' => 0, 'Copyright' => 0, 'Product' => 0, 'Trademark' => 0, 'innovation_score' => 0,
 
-        // Publications`    
+        // Publications    
         'Journal Articles (First Author)' => 0,
         'Journal Articles (Corresponding Author)' => 0,
         'Journal Articles (Co-author)' => 0,
         'Book with ISBN' => 0,
         'Book Chapter' => 0,
         'publication_score' => 0,
+        'total_publications' => 0,
 
         // Supervision
         'PhD Supervised' => 0,
@@ -62,7 +63,10 @@ function get_department_performance($conn, $department_id) {
 
         // Service to University
         'University Service Roles' => 0,
-        'university_service_score' => 0
+        'university_service_score' => 0, 
+
+        // Total Score
+        'total_score' => 0
     ];
 
     $stmt = $conn->prepare("SELECT staff_id FROM staff WHERE department_id = ?");
@@ -95,7 +99,10 @@ function get_department_performance($conn, $department_id) {
         try {
             $innovation_details = $innovation->get_score_details();
             foreach (['Patent', 'Utility Model', 'Copyright', 'Product', 'Trademark'] as $type) {
+                $count = $innovation_details[$type] ?? 0;
                 $department_data[$type] += $innovation_details[$type] ?? 0;
+                $department_data['total_innovations'] += $count; // add total innovation score to the count of the innovations
+                
             }
             $department_data['innovation_score'] += $innovation_details['score'] ?? 0;
         } catch (Exception $e) {
@@ -112,7 +119,9 @@ function get_department_performance($conn, $department_id) {
             'Book with ISBN',
             'Book Chapter'
         ] as $pub_type) {
-            $department_data[$pub_type] += $publication_details[$pub_type] ?? 0;
+            $count = $publication_details[$pub_type] ?? 0;
+            $department_data[$pub_type] += $count;
+            $department_data['total_publications'] += $count;
         }
         $department_data['publication_score'] += $publication_details['score'] ?? 0;
 
@@ -160,6 +169,7 @@ function get_department_performance($conn, $department_id) {
     return $department_data;
 }
 
+
 function get_department_name($conn, $department_id) {
     $stmt = $conn->prepare("SELECT department_name FROM departments WHERE department_id = ?");
     $stmt->bind_param("i", $department_id);
@@ -168,11 +178,17 @@ function get_department_name($conn, $department_id) {
     return ($row = $result->fetch_assoc()) ? $row['department_name'] : 'Unknown Department';
 }
 
+
+
+
+
+
 // Usage
-$department_id = 2;
+$department_id = 8;
 $dept_data = get_department_performance($conn, $department_id);
 $department_name = get_department_name($conn, $department_id);
 
+// echo $dept_data['total_publications'] . "<br>";
 // // Output
 // echo "<h2>Performance Summary for Department of $department_name</h2>";
 

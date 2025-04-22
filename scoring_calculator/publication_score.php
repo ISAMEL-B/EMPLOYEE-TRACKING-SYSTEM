@@ -13,9 +13,9 @@ abstract class PublicationType {
 
 // Enum for Author Roles
 abstract class AuthorRole {
-    const FIRST_AUTHOR = 'first author';
-    const CORRESPONDING_AUTHOR = 'corresponding author';
-    const CO_AUTHOR = 'co author';
+    const FIRST_AUTHOR = 'first-author';
+    const CORRESPONDING_AUTHOR = 'corresponding-author';
+    const CO_AUTHOR = 'co-author';
 }
 
 class PublicationScore {
