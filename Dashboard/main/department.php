@@ -1,5 +1,10 @@
 <?php
     session_start();
+
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+    ini_set('display_errors', 1);
     // Check if user is NOT logged in OR not HRM
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
         header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
@@ -25,7 +30,43 @@
             // Fallback
             die("No department selected.");
         }
+        //department graphs
+            //overview 
+                //grants pie   & research grants under research and innovations
+                $grants_pie = [
+                $dept_data['Over 1B'],
+                $dept_data['500M - 1B'],
+                $dept_data['100M - 500M'],
+                $dept_data['Below 100M'],
+                ];
+       
+            //publications
+                //donought
+                $total_peer_reviewed = $dept_data['Journal Articles (First Author)'] + $dept_data['Journal Articles (Corresponding Author)'] + $dept_data['Journal Articles (Co-author)'];
+                $publication_types = [
+                    $total_peer_reviewed,
+                    $dept_data['Book Chapter'],
+                    $dept_data['Book with ISBN']
+                ];
+
+            //research and innovations
+                //post graduate supervisions
+                $postgraduate_supervisions = [
+                    $dept_data['PhD Supervised'], 
+                    $dept_data['Masters Supervised']
+                ];
+
+                //innovations
+                $dept_innovations = [
+                    $dept_data['Patent'], 
+                    $dept_data['Product'],
+                    $dept_data['Copyright'],
+                    $dept_data['Utility Model'],
+                    $dept_data['Trademark']
+                ];
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -186,19 +227,19 @@
                 <div class="row mb-4">
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $dept_data['Journal Articles (First Author)']; ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">First Author Peer reviewed Publications</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $dept_data['Journal Articles (Co-author)'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Co-Authored Publications in Peer reviewed Publications</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $total_peer_reviewed ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Peer-Reviewed Publications</div>
                         </div>
                     </div>
@@ -629,7 +670,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- <script> const departmentData = <?php echo json_encode($dept_data); ?>; </script> -->
+
     <script>
+        // Pass PHP data to JavaScript
+        // const departmentData = <?php// echo json_encode($dept_data); ?>;
+
+
          // Academic staff data
         // const academicStaff = [
         //     { name: 'Prof. A', rank: 'professor', experience: 12, publications: 10, grants: 8 },
@@ -933,13 +980,14 @@
             }
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
         const grantsCtx = document.getElementById('grantsChart').getContext('2d');
         const grantsChart = new Chart(grantsCtx, {
             type: 'pie',
             data: {
                 labels: ['>1B UGX', '500M-1B UGX', '100M-500M UGX', '<100M UGX'],
                 datasets: [{
-                    data: [2, 3, 5, 10],
+                    data: <?php echo json_encode($grants_pie); ?>,
                     backgroundColor: [
                         '#2ecc71',
                         '#3498db',
@@ -959,13 +1007,14 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.label}: ${context.raw} projects`;
+                                return `${context.label}: ${context.raw} project${context.raw !== 1 ? 's' : ''}`;
                             }
                         }
                     }
                 }
             }
         });
+    });
 
         const pubTypesCtx = document.getElementById('publicationTypesChart').getContext('2d');
         const pubTypesChart = new Chart(pubTypesCtx, {
@@ -973,7 +1022,7 @@
             data: {
                 labels: ['Journal Articles', 'Book Chapters', 'Books with isbn'],
                 datasets: [{
-                    data: [30, 48, 62],
+                    data: <?php echo json_encode($publication_types); ?>,
                     backgroundColor: [
                         '#3498db',
                         '#2ecc71',
@@ -1034,7 +1083,7 @@
                 datasets: [
                     {
                         label: 'Grant Amount',
-                        data: [1, 2, 4, 8],
+                        data: <?php echo json_encode($grants_pie); ?>,
                         backgroundColor: 'rgba(46, 204, 113, 0.7)',
                         borderColor: '#2ecc71',
                         borderWidth: 1
@@ -1075,15 +1124,14 @@
         const supervisionChart = new Chart(supervisionCtx, {
             type: 'bar',
             data: {
-                labels: ['PhD Completions', 'Masters Completions', 'Ongoing PhD', 'Ongoing Masters'],
+                labels: ['PhD Completions', 'Masters Completions'],
                 datasets: [{
                     label: 'Supervision',
-                    data: [5, 15, 8, 20],
+                    data: <?php echo json_encode($postgraduate_supervisions); ?>,
                     backgroundColor: [
                         '#3498db',
                         '#2ecc71',
-                        '#f39c12',
-                        '#e74c3c'
+                        
                     ],
                     borderWidth: 1
                 }]
@@ -1105,7 +1153,7 @@
             data: {
                 labels: ['Patent', 'Product', 'Copyright', 'Utility Model', 'Trademark'],
                 datasets: [{
-                    data: [35, 25, 20, 10, 10],
+                    data: <?php echo json_encode($dept_innovations); ?>,
                     backgroundColor: [
                         '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'
                     ],
