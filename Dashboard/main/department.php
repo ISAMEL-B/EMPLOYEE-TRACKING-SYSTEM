@@ -1,10 +1,11 @@
 <?php
+error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+    ini_set('display_errors', 1);
     session_start();
 
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-
-    ini_set('display_errors', 1);
+    
     // Check if user is NOT logged in OR not HRM
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
         header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
@@ -64,6 +65,117 @@
                     $dept_data['Utility Model'],
                     $dept_data['Trademark']
                 ];
+
+            //academic performance
+                //academic qualifications by rank table
+                // get all staff by their roles from the database
+                // Initialize variables safely
+                
+
+                // Initialize empty roles array with all possible academic ranks
+                $roles = [
+                    'Professor' => [],
+                    'Associate Professor' => [],
+                    'Senior Lecturer' => [],
+                    'Lecturer' => [],
+                    'Assistant Lecturer' => [],
+                    'Teaching Assistant' => []
+                ];
+
+                // Initialize role map
+                $roleMap = [];
+
+                try {
+                    // Get all roles first to map role_id to role_name
+                    $roleQuery = $conn->query("SELECT role_id, role_name FROM roles");
+                    if ($roleQuery) {
+                        while ($row = $roleQuery->fetch_assoc()) {
+                            $roleMap[$row['role_id']] = $row['role_name'];
+                        }
+                    }
+
+                    // Get all staff in this department with their roles
+                    $staffQuery = $conn->prepare("
+                        SELECT s.staff_id, s.first_name, s.last_name, s.role_id, r.role_name 
+                        FROM staff s
+                        JOIN roles r ON s.role_id = r.role_id
+                        WHERE s.department_id = ?
+                        ORDER BY 
+                            CASE r.role_name 
+                                WHEN 'Professor' THEN 1
+                                WHEN 'Associate Professor' THEN 2
+                                WHEN 'Senior Lecturer' THEN 3
+                                WHEN 'Lecturer' THEN 4
+                                WHEN 'Assistant Lecturer' THEN 5
+                                WHEN 'Teaching Assistant' THEN 6
+                                ELSE 7
+                            END,
+                            s.last_name, s.first_name
+                    ");
+                    
+                    if ($staffQuery) {
+                        $staffQuery->bind_param("i", $department_id);
+                        $staffQuery->execute();
+                        $staffResult = $staffQuery->get_result();
+
+                        // Organize staff by their roles
+                        while ($staff = $staffResult->fetch_assoc()) {
+                            $roleName = $staff['role_name'] ?? 'Unknown';
+                            if (isset($roles[$roleName])) {
+                                $roles[$roleName][] = $staff;
+                            }
+                        }
+                    }
+
+                    // Get degrees for all staff in this department
+                    $staffDegrees = [];
+                    $degreesQuery = $conn->prepare("
+                        SELECT d.staff_id, d.degree_name, d.degree_classification
+                        FROM degrees d
+                        JOIN staff s ON d.staff_id = s.staff_id
+                        WHERE s.department_id = ?
+                    ");
+                    
+                    if ($degreesQuery) {
+                        $degreesQuery->bind_param("i", $department_id);
+                        $degreesQuery->execute();
+                        $degreesResult = $degreesQuery->get_result();
+
+                        // Organize degrees by staff_id and type
+                        while ($degree = $degreesResult->fetch_assoc()) {
+                            $staffId = $degree['staff_id'] ?? 0;
+                            if (!$staffId) continue;
+                            
+                            $classification = $degree['degree_classification'] ?? '';
+                            $degreeName = $degree['degree_name'] ?? '';
+                            
+                            // Normalize classifications
+                            if (stripos($classification, 'First') !== false || stripos($classification, 'Second Class Upper') !== false) {
+                                $type = 'Bachelor';
+                            } elseif (stripos($degreeName, 'Master') !== false) {
+                                $type = 'Master';
+                            } elseif (stripos($degreeName, 'PhD') !== false || stripos($degreeName, 'Doctor') !== false) {
+                                $type = 'PhD';
+                            } else {
+                                $type = 'Other';
+                            }
+                            
+                            if (!isset($staffDegrees[$staffId])) {
+                                $staffDegrees[$staffId] = [];
+                            }
+                            
+                            if (!isset($staffDegrees[$staffId][$type])) {
+                                $staffDegrees[$staffId][$type] = 0;
+                            }
+                            
+                            $staffDegrees[$staffId][$type]++;
+                        }
+                    }
+                } catch (Exception $e) {
+                    error_log("Database error: " . $e->getMessage());
+                    // Continue execution with empty data rather than breaking
+                }
+            
 ?>
 
 
@@ -306,25 +418,25 @@
                 <div class="row mb-4">
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">25</div>
+                            <div class="stat-value"><?= $dept_data['PhD'] ?> </div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Phd's</div>
                         </div>
                     </div>            
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">45</div>
+                            <div class="stat-value"><?= $dept_data['Masters'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Masters</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">34</div>
+                            <div class="stat-value"><?= $dept_data['First Class'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">First class</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $dept_data['Second Upper'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Second Class</div>
                         </div>
                     </div>
@@ -333,264 +445,75 @@
                 <!-- Staff Academic Qualifications Section -->
                 <div class="row">
                     <div class="col-12">
-                        <!-- Professors -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Professors</span>
-                                <span class="rank-count">8 staff</span>
+                        <?php foreach ($roles as $roleName => $staffMembers): ?>
+                            <div class="rank-section">
+                                <div class="rank-header">
+                                    <span><?= htmlspecialchars($roleName) ?>s</span>
+                                    <span class="rank-count"><?= count($staffMembers) ?> staff</span>
+                                </div>
+                                
+                                <?php if (!empty($staffMembers)): ?>
+                                    <table class="qualifications-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Staff Member</th>
+                                                <th>Qualifications</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($staffMembers as $staff): ?>
+                                                <?php 
+                                                $staffId = $staff['staff_id'] ?? 0;
+                                                $firstName = $staff['first_name'] ?? '';
+                                                $lastName = $staff['last_name'] ?? '';
+                                                ?>
+                                                <tr>
+                                                    <td class="staff-name">
+                                                        <?php
+                                                        $prefix = '';
+                                                        if ($roleName === 'Professor') {
+                                                            $prefix = 'Prof. ';
+                                                        } elseif ($roleName === 'Associate Professor') {
+                                                            $prefix = 'Assoc. Prof. ';
+                                                        } elseif (in_array($roleName, ['Senior Lecturer', 'Lecturer'])) {
+                                                            $prefix = 'Dr. ';
+                                                        } elseif ($roleName === 'Teaching Assistant') {
+                                                            $hasPhD = isset($staffDegrees[$staffId]['PhD']);
+                                                            $prefix = $hasPhD ? 'Dr. ' : '';
+                                                        }
+                                                        echo htmlspecialchars($prefix . $firstName . ' ' . $lastName);
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (isset($staffDegrees[$staffId]) && !empty($staffDegrees[$staffId])): ?>
+                                                            <?php foreach ($staffDegrees[$staffId] as $degreeType => $count): ?>
+                                                                <?php 
+                                                                $badgeClass = strtolower($degreeType);
+                                                                $displayText = $degreeType;
+                                                                
+                                                                if ($degreeType === 'Bachelor') {
+                                                                    $displayText = "Bachelor's";
+                                                                }
+                                                                ?>
+                                                                <span class="qualification-badge <?= $badgeClass ?> <?= $count > 1 ? 'counted' : '' ?>" 
+                                                                    <?= $count > 1 ? 'data-count="' . $count . '"' : '' ?>>
+                                                                    <?= htmlspecialchars($displayText) ?>
+                                                                </span>
+                                                            <?php endforeach; ?>
+                                                        <?php else: ?>
+                                                            <span class="no-qualifications">No qualifications recorded</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                    <!-- <a href="#" class="more-link">View all <?//= count($staffMembers) ?> <?//= strtolower($roleName) ?>s →</a> -->
+                                <?php else: ?>
+                                    <div class="no-staff-message">No <?= strtolower($roleName) ?>s found in this department</div>
+                                <?php endif; ?>
                             </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Prof. John Smith</td>
-                                        <td>
-                                            <span class="qualification-badge phd counted" data-count="2">PhD</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Prof. Alice Johnson</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Prof. Robert Brown</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Prof. Emily Wilson</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 8 professors →</a>
-                        </div>
-                        
-                        <!-- Associate Professors -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Associate Professors</span>
-                                <span class="rank-count">5 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Assoc. Prof. David Lee</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Assoc. Prof. Sarah Miller</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge masters">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Assoc. Prof. James Taylor</td>
-                                        <td>
-                                            <span class="qualification-badge phd counted" data-count="3">PhD</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 5 associate professors →</a>
-                        </div>
-                        
-                        <!-- Senior Lecturers -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Senior Lecturers</span>
-                                <span class="rank-count">10 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Dr. Michael Clark</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Patricia Adams</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Richard Evans</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Lisa Wong</td>
-                                        <td>
-                                            <span class="qualification-badge first-class counted" data-count="3">First Class</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 10 senior lecturers →</a>
-                        </div>
-                        
-                        <!-- Lecturers -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Lecturers</span>
-                                <span class="rank-count">12 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Dr. Kevin White</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Lisa Green</td>
-                                        <td>
-                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Mr. Daniel King</td>
-                                        <td>
-                                            <span class="qualification-badge masters">Masters</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Rachel Young</td>
-                                        <td>
-                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 12 lecturers →</a>
-                        </div>
-                        
-                        <!-- Assistant Lecturers -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Assistant Lecturers</span>
-                                <span class="rank-count">5 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Ms. Angela Scott</td>
-                                        <td>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Mr. Brian Hill</td>
-                                        <td>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Rachel Young</td>
-                                        <td>
-                                            <span class="qualification-badge masters">Masters</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 5 assistant lecturers →</a>
-                        </div>
-                        
-                        <!-- Teaching Assistants -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Teaching Assistants</span>
-                                <span class="rank-count">8 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Mr. Jason Wright</td>
-                                        <td>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Olivia Carter</td>
-                                        <td>
-                                            <span class="qualification-badge masters">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Mr. Ethan Walker</td>
-                                        <td>
-                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Sophia Chen</td>
-                                        <td>
-                                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 8 teaching assistants →</a>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
