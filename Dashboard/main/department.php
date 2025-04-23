@@ -176,6 +176,57 @@ error_reporting(E_ALL);
                     // Continue execution with empty data rather than breaking
                 }
             
+                // community service
+                    // Initialize community service metrics
+                    $community_scores = [
+                        'student_supervision' => 0,
+                        'outreach_programs' => 0,
+                        'beneficiaries' => 0
+                    ];
+
+                    try {
+                        // Query community services for this department
+                        $serviceQuery = $conn->prepare("
+                            SELECT cs.description, cs.beneficiaries 
+                            FROM communityservice cs
+                            JOIN staff s ON cs.staff_id = s.staff_id
+                            WHERE s.department_id = ?
+                        ");
+                        
+                        if ($serviceQuery) {
+                            $serviceQuery->bind_param("i", $department_id);
+                            $serviceQuery->execute();
+                            $serviceResult = $serviceQuery->get_result();
+
+                            while ($service = $serviceResult->fetch_assoc()) {
+                                $description = strtolower(trim($service['description'] ?? ''));
+                                $beneficiaries = intval($service['beneficiaries'] ?? 0);
+                                
+                                // Categorize the service
+                                if (strpos($description, 'student') !== false && strpos($description, 'supervision') !== false) {
+                                    $community_scores['student_supervision']++;
+                                } else {
+                                    $community_scores['outreach_programs']++;
+                                }
+                                
+                                // Add beneficiaries count
+                                $community_scores['beneficiaries'] += $beneficiaries;
+                            }
+                        }
+                    } catch (Exception $e) {
+                        error_log("Community service query error: " . $e->getMessage());
+                    }
+
+                    // community service data
+                    $community_service_scores = [
+                        $community_scores['student_supervision'],
+                        $community_scores['outreach_programs'],
+                        $community_scores['beneficiaries']
+                    ];
+
+                    echo $community_scores['student_supervision'];
+                    echo $community_scores['outreach_programs'];
+                    echo $community_scores['beneficiaries'];
 ?>
 
 
@@ -517,24 +568,25 @@ error_reporting(E_ALL);
                     </div>
                 </div>
             </div>
+
             <!-- community service -->
             <div class="tab-pane fade" id="communityservice" role="tabpanel" aria-labelledby="communityservice-tab">
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="stat-card">
-                            <div class="stat-value">25</div>
+                            <div class="stat-value"><?= $community_scores['student_supervision'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Industrial Placement Supervision</div>
                         </div>
                     </div>            
                     <div class="col-md-4">
                         <div class="stat-card">
-                            <div class="stat-value">45</div>
+                            <div class="stat-value"><?= $community_scores['outreach_programs'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Community Outreach Programs</div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="stat-card">
-                            <div class="stat-value">34</div>
+                            <div class="stat-value"><?= $community_scores['beneficiaries'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total number of beneficiaries</div>
                         </div>
                     </div>
@@ -1116,7 +1168,7 @@ error_reporting(E_ALL);
                 labels: ['Industrial Placements', 'Outreach Programs', 'Beneficiaries'],
                 datasets: [{
                     label: 'Community Service Metrics',
-                    data: [25, 45, 34], // These should match your stat card values
+                    data: <?php echo json_encode($community_service_scores); ?>, // These should match your stat card values
                     backgroundColor: [
                         'rgba(54, 162, 235, 0.7)',
                         'rgba(75, 192, 192, 0.7)',
