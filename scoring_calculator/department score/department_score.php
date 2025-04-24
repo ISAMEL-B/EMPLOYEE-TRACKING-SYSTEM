@@ -197,9 +197,9 @@ function get_department_staff_count($conn, $department_id) {
 
 
 // Usage
-$department_id = 17;
-$dept_data = get_department_performance($conn, $department_id);
-$department_name = get_department_name($conn, $department_id);
+// $department_id = 17;
+// $dept_data = get_department_performance($conn, $department_id);
+// $department_name = get_department_name($conn, $department_id);
 
 // echo $dept_data['total_publications'] . "<br>";
 // // Output
