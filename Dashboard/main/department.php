@@ -353,7 +353,7 @@ error_reporting(E_ALL);
     <?php include 'bars/nav_bar.php'; ?>
 
     <!-- sidebar -->
-    <?php //include 'bars/side_bar.php'; ?>
+    <?php include 'bars/side_bar.php'; ?>
     
 <div class="content-wrapper">
     <div class="container-fluid py-4">
