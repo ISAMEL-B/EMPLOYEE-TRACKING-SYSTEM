@@ -1,0 +1,170 @@
+:root {
+    --must-green: #006633;
+    --must-gold: #FFCC00;
+    --must-light: #f8f9fa;
+    --must-dark: #343a40;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas: 
+        "sidebar navbar"
+        "sidebar main";
+}
+
+#sidebar {
+    grid-area: sidebar;
+    background-color: white;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.navbar {
+    grid-area: navbar;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 5;
+}
+
+.navbar img {
+    height: 40px;
+}
+
+.main-content {
+    grid-area: main;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    overflow-y: auto;
+}
+
+.lock-screen-container {
+    max-width: 500px;
+    width: 100%;
+    max-height: 600px; /* Adjust this value to your preference */
+    padding: 1.5rem 2.5rem; /* Reduced vertical padding */
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow-y: auto; /* Adds scroll if content exceeds the height */
+}
+
+.lock-icon {
+    font-size: 3rem;
+    color: var(--must-green);
+    margin-bottom: 1.5rem;
+}
+
+.lock-screen-container h2 {
+    color: var(--must-green);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.security-message {
+    color: #666;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--must-green);
+    margin-bottom: 1rem;
+}
+
+.user-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--must-dark);
+    margin-bottom: 0.25rem;
+}
+
+.user-role {
+    color: var(--must-green);
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border-radius: 50px;
+    margin: 1.5rem 0;
+    font-size: 1rem;
+}
+
+.btn-unlock {
+    background-color: var(--must-green);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 250px;
+}
+
+.btn-unlock:hover {
+    background-color: #004d26;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 102, 51, 0.2);
+}
+
+.system-branding {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.text-danger {
+    color: #dc3545;
+    font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr;
+        grid-template-areas: 
+            "navbar"
+            "main";
+    }
+    
+    #sidebar {
+        display: none;
+    }
+    
+    .lock-screen-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+}
+
+/* Animation for the lock icon */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.lock-icon i {
+    animation: pulse 2s infinite;
+}

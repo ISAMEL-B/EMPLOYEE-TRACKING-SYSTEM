@@ -35,7 +35,6 @@ Automated score calculations based on predefined criteria
 
 Data visualization tools for performance analysis
 
-AI-powered performance improvement suggestions
 
 Role-specific dashboards for all university staff
 
@@ -47,40 +46,6 @@ PHP 7.4+
 
 MySQL 5.7+
 
-Composer (for dependency management)
 
-Installation Steps
-Clone the repository:
 
-bash
-Copy
-git clone https://github.com/must-hrm/scorecard-system.git
-cd scorecard-system
-Install dependencies:
 
-bash
-Copy
-composer install
-npm install
-Configure environment:
-
-bash
-Copy
-cp .env.example .env
-php artisan key:generate
-Set up database:
-
-bash
-Copy
-php artisan migrate --seed
-Build assets:
-
-bash
-Copy
-npm run prod
-Set up cron job for automated tasks:
-
-bash
-Copy
-
-- - - - - cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1

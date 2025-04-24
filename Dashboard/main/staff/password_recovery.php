@@ -1,6 +1,13 @@
 <?php
 session_start();
 require_once '../head/approve/config.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+// Load PHPMailer (adjust paths as needed)
+require '../PHPMailer/src/Exception.php';
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -8,42 +15,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Step 1: Request password reset
         $email = $conn->real_escape_string($_POST['email']);
         
-        $query = "SELECT user_id, email, phone_number FROM users WHERE email = '$email' OR personal_email = '$email'";
+        $query = "SELECT staff_id, employee_id, email, first_name, last_name FROM staff WHERE personal_email = '$email'";
         $result = $conn->query($query);
         
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
             
-            // Generate token (valid for 1 hour)
-            $token = bin2hex(random_bytes(32));
-            $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+            // Generate 6-digit verification code
+            $verification_code = sprintf('%06d', mt_rand(0, 999999));
+            $expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
             
-            $update = "UPDATE users SET 
-                      reset_token = '$token', 
-                      reset_token_expiry = '$expiry' 
-                      WHERE user_id = {$user['user_id']}";
+            // Store code in session and database
+            $_SESSION['recovery_email'] = $email;
+            $_SESSION['verification_code'] = $verification_code;
+            $_SESSION['code_expiry'] = $expiry;
+            
+            $update = "UPDATE staff SET 
+                      reset_code = '$verification_code', 
+                      reset_code_expiry = '$expiry' 
+                      WHERE email = '$email'";
             
             if ($conn->query($update)) {
-                // Send email with reset link (in production)
-                $_SESSION['recovery_email'] = $email;
-                $_SESSION['recovery_token'] = $token;
+                // Send email with verification code
+                $mail = new PHPMailer(true);
                 
-                // For demo, we'll just proceed to verification
-                header('Location: password-recovery.php?step=verify');
-                exit();
+                try {
+                    // Configure your SMTP settings here
+                    $mail->isSMTP();
+                    $mail->Host       = 'smtp.example.com'; // Your SMTP server
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = 'noreply@example.com';
+                    $mail->Password   = 'your_email_password';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port       = 587;
+                    
+                    // Recipients
+                    $mail->setFrom('noreply@example.com', 'MUST HRM System');
+                    $mail->addAddress($email, $user['first_name']);
+                    
+                    // Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Password Reset Verification Code';
+                    $mail->Body    = "
+                        <h2>Password Reset Request</h2>
+                        <p>Hello {$user['first_name']},</p>
+                        <p>You have requested to reset your password for the MUST HRM System.</p>
+                        <p>Your verification code is: <strong>{$verification_code}</strong></p>
+                        <p>This code will expire in 15 minutes.</p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                        <p>Best regards,<br>MUST HRM Team</p>
+                    ";
+                    
+                    $mail->send();
+                    header('Location: password-recovery.php?step=verify');
+                    exit();
+                } catch (Exception $e) {
+                    $_SESSION['error'] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+                }
+            } else {
+                $_SESSION['error'] = "Database error. Please try again.";
             }
         } else {
             $_SESSION['error'] = "No account found with that email address";
         }
     }
     elseif (isset($_POST['verify_code'])) {
-        // Step 2: Verify code (simplified for demo)
-        if ($_POST['code'] === '123456') { // In production, send real SMS code
+        // Step 2: Verify code
+        $entered_code = implode('', [
+            $_POST['digit1'], $_POST['digit2'], $_POST['digit3'],
+            $_POST['digit4'], $_POST['digit5'], $_POST['digit6']
+        ]);
+        
+        $email = $_SESSION['recovery_email'] ?? '';
+        
+        // Check if code matches and isn't expired
+        $query = "SELECT reset_code, reset_code_expiry FROM staff 
+                  WHERE email = '$email' 
+                  AND reset_code = '$entered_code' 
+                  AND reset_code_expiry > NOW()";
+        $result = $conn->query($query);
+        
+        if ($result->num_rows > 0) {
             $_SESSION['verified'] = true;
             header('Location: password-recovery.php?step=reset');
             exit();
         } else {
-            $_SESSION['error'] = "Invalid verification code";
+            $_SESSION['error'] = "Invalid or expired verification code";
+            header('Location: password-recovery.php?step=verify');
+            exit();
         }
     }
     elseif (isset($_POST['reset_password'])) {
@@ -56,16 +115,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $email = $_SESSION['recovery_email'];
         
-        $update = "UPDATE users SET 
+        $update = "UPDATE staff SET 
                   password = '$password',
-                  reset_token = NULL,
-                  reset_token_expiry = NULL
+                  reset_code = NULL,
+                  reset_code_expiry = NULL
                   WHERE email = '$email'";
         
         if ($conn->query($update)) {
-            $_SESSION['success'] = "Password updated successfully!";
-            unset($_SESSION['recovery_email'], $_SESSION['recovery_token'], $_SESSION['verified']);
+            // Log the password change
+            $log_query = "INSERT INTO password_change_log (staff_email, change_date) 
+                         VALUES ('$email', NOW())";
+            $conn->query($log_query);
+            
+            $_SESSION['success'] = "Password updated successfully! You can now login with your new password.";
+            unset($_SESSION['recovery_email'], $_SESSION['verification_code'], $_SESSION['code_expiry'], $_SESSION['verified']);
             header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+            exit();
+        } else {
+            $_SESSION['error'] = "Failed to update password. Please try again.";
+            header('Location: password-recovery.php?step=reset');
+            exit();
+        }
+    }
+    elseif (isset($_POST['resend_code'])) {
+        // Handle AJAX resend code request
+        $email = $_SESSION['recovery_email'] ?? '';
+        
+        if (!empty($email)) {
+            // Generate new 6-digit verification code
+            $verification_code = sprintf('%06d', mt_rand(0, 999999));
+            $expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+            
+            // Update session and database
+            $_SESSION['verification_code'] = $verification_code;
+            $_SESSION['code_expiry'] = $expiry;
+            
+            $update = "UPDATE staff SET 
+                      reset_code = '$verification_code', 
+                      reset_code_expiry = '$expiry' 
+                      WHERE email = '$email'";
+            
+            if ($conn->query($update)) {
+                // Get user details
+                $query = "SELECT full_name FROM staff WHERE email = '$email'";
+                $result = $conn->query($query);
+                $user = $result->fetch_assoc();
+                
+                // Send email with new verification code
+                $mail = new PHPMailer(true);
+                
+                try {
+                    // Configure your SMTP settings here
+                    $mail->isSMTP();
+                    $mail->Host       = 'smtp.example.com';
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = 'noreply@example.com';
+                    $mail->Password   = 'your_email_password';
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port       = 587;
+                    
+                    // Recipients
+                    $mail->setFrom('noreply@example.com', 'MUST HRM System');
+                    $mail->addAddress($email, $user['full_name']);
+                    
+                    // Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'New Password Reset Verification Code';
+                    $mail->Body    = "
+                        <h2>New Verification Code</h2>
+                        <p>Hello {$user['full_name']},</p>
+                        <p>Your new verification code is: <strong>{$verification_code}</strong></p>
+                        <p>This code will expire in 15 minutes.</p>
+                        <p>If you didn't request this, please contact support.</p>
+                        <p>Best regards,<br>MUST HRM Team</p>
+                    ";
+                    
+                    $mail->send();
+                    echo json_encode(['success' => true]);
+                    exit();
+                } catch (Exception $e) {
+                    echo json_encode(['success' => false, 'message' => "Mailer Error: {$mail->ErrorInfo}"]);
+                    exit();
+                }
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Database error']);
+                exit();
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid request']);
             exit();
         }
     }
@@ -74,7 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Determine current step
 $step = isset($_GET['step']) ? $_GET['step'] : 'request';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -319,28 +455,38 @@ $step = isset($_GET['step']) ? $_GET['step'] : 'request';
                 
                 <!-- Step 2: Verify Identity -->
                 <?php if ($step === 'verify'): ?>
-                    <form method="POST">
+                    <form method="POST" id="verifyForm">
                         <div class="mb-4 text-center">
                             <i class="fas fa-mobile-alt fa-3x mb-3" style="color: var(--must-blue);"></i>
                             <h4>Verify Your Identity</h4>
-                            <p class="text-muted">We sent a verification code to your registered phone number</p>
-                            <small class="text-muted">(Demo: Use code <strong>123456</strong>)</small>
+                            <p class="text-muted">We sent a 6-digit verification code to your email address</p>
                         </div>
                         
                         <div class="mb-3">
                             <label class="form-label">Verification Code</label>
                             <div class="verification-input">
-                                <input type="text" maxlength="1" pattern="\d" required>
-                                <input type="text" maxlength="1" pattern="\d" required>
-                                <input type="text" maxlength="1" pattern="\d" required>
-                                <input type="text" maxlength="1" pattern="\d" required>
-                                <input type="text" maxlength="1" pattern="\d" required>
-                                <input type="text" maxlength="1" pattern="\d" required>
+                                <input type="text" name="digit1" maxlength="1" pattern="\d" required class="verification-digit">
+                                <input type="text" name="digit2" maxlength="1" pattern="\d" required class="verification-digit">
+                                <input type="text" name="digit3" maxlength="1" pattern="\d" required class="verification-digit">
+                                <input type="text" name="digit4" maxlength="1" pattern="\d" required class="verification-digit">
+                                <input type="text" name="digit5" maxlength="1" pattern="\d" required class="verification-digit">
+                                <input type="text" name="digit6" maxlength="1" pattern="\d" required class="verification-digit">
                             </div>
-                            <input type="hidden" name="code" value="123456">
                             
                             <div class="text-center mt-3">
-                                <a href="#" class="text-decoration-none">Resend Code</a>
+                                <a href="#" id="resendCode" class="text-decoration-none">Resend Code</a>
+                                <div id="countdown" class="text-muted small mt-1">
+                                    <?php 
+                                    if (isset($_SESSION['code_expiry'])) {
+                                        $remaining = strtotime($_SESSION['code_expiry']) - time();
+                                        if ($remaining > 0) {
+                                            $minutes = floor($remaining / 60);
+                                            $seconds = $remaining % 60;
+                                            echo "Code expires in $minutes:".str_pad($seconds, 2, '0', STR_PAD_LEFT);
+                                        }
+                                    }
+                                    ?>
+                                </div>
                             </div>
                         </div>
                         
@@ -396,7 +542,7 @@ $step = isset($_GET['step']) ? $_GET['step'] : 'request';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Password strength checker
-        document.getElementById('password').addEventListener('input', function() {
+        document.getElementById('password')?.addEventListener('input', function() {
             const password = this.value;
             const strengthBar = document.getElementById('passwordStrengthBar');
             let strength = 0;
@@ -428,7 +574,7 @@ $step = isset($_GET['step']) ? $_GET['step'] : 'request';
         });
         
         // Password confirmation check
-        document.getElementById('confirm_password').addEventListener('input', function() {
+        document.getElementById('confirm_password')?.addEventListener('input', function() {
             const password = document.getElementById('password').value;
             const confirmPassword = this.value;
             const errorElement = document.getElementById('passwordMatchError');
@@ -443,7 +589,7 @@ $step = isset($_GET['step']) ? $_GET['step'] : 'request';
         });
         
         // Form submission validation
-        document.getElementById('resetForm').addEventListener('submit', function(e) {
+        document.getElementById('resetForm')?.addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
             
@@ -455,21 +601,105 @@ $step = isset($_GET['step']) ? $_GET['step'] : 'request';
         });
         
         // Verification code input auto-focus
-        const verificationInputs = document.querySelectorAll('.verification-input input');
-        if (verificationInputs.length > 0) {
-            verificationInputs.forEach((input, index) => {
-                input.addEventListener('input', function() {
-                    if (this.value.length === 1 && index < verificationInputs.length - 1) {
-                        verificationInputs[index + 1].focus();
+        const verificationDigits = document.querySelectorAll('.verification-digit');
+        if (verificationDigits.length > 0) {
+            verificationDigits[0].focus();
+            
+            verificationDigits.forEach((digit, index) => {
+                digit.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < verificationDigits.length - 1) {
+                        verificationDigits[index + 1].focus();
                     }
                 });
                 
-                input.addEventListener('keydown', function(e) {
+                digit.addEventListener('keydown', function(e) {
                     if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
-                        verificationInputs[index - 1].focus();
+                        verificationDigits[index - 1].focus();
                     }
                 });
             });
+            
+            // Resend code functionality
+            document.getElementById('resendCode').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Disable resend link and show countdown
+                this.style.pointerEvents = 'none';
+                this.style.opacity = '0.5';
+                
+                let seconds = 60;
+                const countdownElement = document.getElementById('countdown');
+                
+                const countdown = setInterval(() => {
+                    seconds--;
+                    countdownElement.textContent = `Resend available in ${seconds} seconds`;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdown);
+                        countdownElement.textContent = '';
+                        this.style.pointerEvents = 'auto';
+                        this.style.opacity = '1';
+                    }
+                }, 1000);
+                
+                // AJAX request to resend code
+                fetch('password-recovery.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'resend_code=true'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('New verification code sent to your email', 'success');
+                    } else {
+                        showAlert(data.message || 'Failed to resend code', 'danger');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Error resending code', 'danger');
+                });
+            });
+            
+            // Start countdown for code expiry
+            const countdownElement = document.getElementById('countdown');
+            if (countdownElement.textContent.includes('expires')) {
+                let timeParts = countdownElement.textContent.split(' ')[2].split(':');
+                let seconds = parseInt(timeParts[0]) * 60 + parseInt(timeParts[1]);
+                
+                const countdown = setInterval(() => {
+                    seconds--;
+                    const minutes = Math.floor(seconds / 60);
+                    const remainingSeconds = seconds % 60;
+                    
+                    countdownElement.textContent = `Code expires in ${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+                    
+                    if (seconds <= 0) {
+                        clearInterval(countdown);
+                        countdownElement.textContent = 'Code expired';
+                    }
+                }, 1000);
+            }
+        }
+        
+        // Helper function to show alerts
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            const container = document.querySelector('.recovery-body');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                setTimeout(() => alertDiv.remove(), 150);
+            }, 5000);
         }
     </script>
 </body>
