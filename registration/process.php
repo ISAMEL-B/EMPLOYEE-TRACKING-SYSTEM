@@ -77,7 +77,7 @@ if (isset($_POST['login'])) {
             $_SESSION['employee_id'] = $row['employee_id'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['user_role'] = $row['system_role'];
-            $_SESSION['path'] = $row['photo_path'];
+            $_SESSION['phone_number'] = $row['phone_number'];
 
             // Redirect based on role
             if ($_SESSION['user_role'] === 'hrm') {
