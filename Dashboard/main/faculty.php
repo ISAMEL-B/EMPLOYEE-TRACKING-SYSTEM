@@ -158,6 +158,30 @@
             
         }
 
+        //innovations
+        $innovationData = [];
+
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $dept_id = $row['department_id'];
+            $dept_name = get_department_name($conn, $dept_id);
+            $innovation_scores = get_department_performance($conn, $dept_id);
+
+            $innovationData[] = [
+                'department' => $dept_name,
+                'patents' => isset($innovation_scores['Patent']) ? $innovation_scores['Patent'] : 0,
+                'utility_models' => isset($innovation_scores['Utility Model']) ? $innovation_scores['Utility Model'] : 0,
+                'copyrights' => isset($innovation_scores['Copyright']) ? $innovation_scores['Copyright'] : 0,
+                'products' => isset($innovation_scores['Product']) ? $innovation_scores['Product'] : 0,
+                'trademarks' => isset($innovation_scores['Trademark']) ? $innovation_scores['Trademark'] : 0
+            ];
+        }
+
+
 
     ?>
             <pre><?php print_r($overviewData); ?></pre>
@@ -1235,44 +1259,54 @@
             });
 
             // Innovations Chart
-            const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
-            new Chart(innovationsCtx, {
+            const innovationsData = <?php echo json_encode($innovationData); ?>;
+            const departmentsLabels_innov = innovationsData.map(item => item.department);
+
+            const patentsData = innovationsData.map(item => item.patents);
+            const utilityModelsData = innovationsData.map(item => item.utility_models);
+            const copyrightsData = innovationsData.map(item => item.copyrights);
+            const productsData = innovationsData.map(item => item.products);
+            const trademarksData = innovationsData.map(item => item.trademarks);
+
+            const innovationsCtxChart = document.getElementById('innovationsChart').getContext('2d');
+
+            new Chart(innovationsCtxChart, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Surgery', 'Public Health'], // Departments on x-axis
+                    labels: departmentsLabels_innov,
                     datasets: [
                         {
                             label: 'Patents',
-                            data: [3, 2, 3], // Medicine, Surgery, Public Health
-                            backgroundColor: 'rgba(75, 192, 192, 0.8)',  // Teal
+                            data: patentsData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Utility Models',
-                            data: [5, 3, 4],
-                            backgroundColor: 'rgba(255, 159, 64, 0.8)',   // Orange
+                            data: utilityModelsData,
+                            backgroundColor: 'rgba(255, 159, 64, 0.8)',
                             borderColor: 'rgba(255, 159, 64, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Copyrights',
-                            data: [6, 4, 5],
-                            backgroundColor: 'rgba(54, 162, 235, 0.8)',  // Blue
+                            data: copyrightsData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Products',
-                            data: [2, 1, 2],
-                            backgroundColor: 'rgba(153, 102, 255, 0.8)',  // Purple
+                            data: productsData,
+                            backgroundColor: 'rgba(153, 102, 255, 0.8)',
                             borderColor: 'rgba(153, 102, 255, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Trademarks',
-                            data: [1, 1, 1],
-                            backgroundColor: 'rgba(255, 99, 132, 0.8)',  // Pink
+                            data: trademarksData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
                         }
@@ -1327,6 +1361,7 @@
                     categoryPercentage: 0.9
                 }
             });
+
 
             // Community Engagement Chart
             const communityCtx = document.getElementById('communityEngagementChart').getContext('2d');
