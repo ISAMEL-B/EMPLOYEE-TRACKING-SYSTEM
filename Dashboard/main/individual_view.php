@@ -1,5 +1,10 @@
 <?php  
     include 'processes/individual_view_process.php';
+
+    //include the total score of the individual
+    include '../../scoring_calculator/individual score/total_individual_score.php';
+    //include citations
+    include '../../scoring_calculator/individual score/total_citations.php'
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -562,7 +567,31 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script>
+  
+
+        
+<?php
+// data to draw citations and publications chart
+$individual_data = get_individual_performance_breakdown($conn, $staff_id);
+$publication_count = $individual_data['total_publications'];
+
+// Get total citations
+$citation_count = get_total_citations($conn, $staff_id);
+
+$datafor2025 = [
+    $publication_count,
+    $citation_count
+];
+
+echo $publication_count;
+echo $citation_count;
+
+    
+?>
+
+
+<script>
+    
         // Initialize Select2
         $(document).ready(function() {
             $('.select2').select2({
@@ -585,14 +614,14 @@
                         datasets: [
                             {
                                 label: 'Publications',
-                                data: [3, 5, 7, 6, 8],
+                                data: [3, 5, 7, 6, <?= $publication_count ?>],
                                 backgroundColor: '#3498db',
                                 borderColor: '#2980b9',
                                 borderWidth: 1
                             },
                             {
                                 label: 'Citations',
-                                data: [15, 22, 30, 28, 35],
+                                data: [15, 22, 30, 28, <?= $citation_count ?>],
                                 backgroundColor: '#2ecc71',
                                 borderColor: '#27ae60',
                                 borderWidth: 1

@@ -2,17 +2,17 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-include __DIR__ . '/config.php'; // Include database configuration
-include __DIR__ . '/publication_score.php';
-include __DIR__ . '/post_graduate_supervision_score.php';
-include __DIR__ . '/grants_score.php';
-include __DIR__ . '/academic_score.php';
-include __DIR__ . '/community_service_score.php';
-include __DIR__ . '/innovation_score.php';
-include __DIR__ . '/membership_to_professional_bodies_score.php';
-include __DIR__ . '/other_academic_activities_score.php';
-include __DIR__ . '/service_to_university_score.php';
-include __DIR__ . '/teaching_experience_score.php';
+include __DIR__ . '/../config.php'; // Include database configuration
+include __DIR__ . '/../publication_score.php';
+include __DIR__ . '/../post_graduate_supervision_score.php';
+include __DIR__ . '/../grants_score.php';
+include __DIR__ . '/../academic_score.php';
+include __DIR__ . '/../community_service_score.php';
+include __DIR__ . '/../innovation_score.php';
+include __DIR__ . '/../membership_to_professional_bodies_score.php';
+include __DIR__ . '/../other_academic_activities_score.php';
+include __DIR__ . '/../service_to_university_score.php';
+include __DIR__ . '/../teaching_experience_score.php';
 
 
 function get_individual_performance_breakdown($conn, $staff_id) {
@@ -165,3 +165,5 @@ function get_individual_performance_breakdown($conn, $staff_id) {
 // $staff_id = 2;
 // $individual_breakdown = get_individual_performance_breakdown($conn, $staff_id);
 // print_r($individual_breakdown);
+
+?>

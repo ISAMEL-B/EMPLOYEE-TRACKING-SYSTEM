@@ -1,5 +1,11 @@
 <?php
+error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
+    ini_set('display_errors', 1);
     session_start();
+
+    
     // Check if user is NOT logged in OR not HRM
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
         header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
@@ -25,7 +31,307 @@
             // Fallback
             die("No department selected.");
         }
-?>
+        //department graphs
+            //overview 
+                //grants pie   & research grants under research and innovations
+                $grants_pie = [
+                $dept_data['Over 1B'],
+                $dept_data['500M - 1B'],
+                $dept_data['100M - 500M'],
+                $dept_data['Below 100M'],
+                ];
+       
+            //publications
+                //publications vs citations
+                // Get department publications and citations by year
+                
+                $chartData = [
+                    'years' => [],
+                    'publications' => [],
+                    'citations' => []
+                ];
+
+                
+                try {
+                    // Query to get yearly publication and citation counts
+                    $stmt = $conn->prepare("
+                        SELECT 
+                            YEAR(p.publication_date) AS year,
+                            COUNT(*) AS publication_count,
+                            SUM(p.citations) AS citation_sum
+                        FROM publications p
+                        JOIN staff s ON p.staff_id = s.staff_id
+                        WHERE s.department_id = ?
+                        GROUP BY YEAR(p.publication_date)
+                        ORDER BY year ASC
+                    ");
+                    
+                    $stmt->bind_param("i", $department_id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    
+                    while ($row = $result->fetch_assoc()) {
+                        $chartData['years'][] = $row['year'];
+                        $chartData['publications'][] = $row['publication_count'];
+                        $chartData['citations'][] = $row['citation_sum'];
+                    }
+                    
+                    $stmt->close();
+                } catch (Exception $e) {
+                    error_log("Error fetching publication data: " . $e->getMessage());
+                }
+
+                //get total citations for this year.
+                // Get current year citations for the department
+                $currentYear = date('Y');
+                $totalCitations = 0; // Default value if no data exists
+
+                if ($department_id) {
+                    try {
+                        $stmt = $conn->prepare("
+                            SELECT SUM(p.citations) AS total_citations
+                            FROM publications p
+                            JOIN staff s ON p.staff_id = s.staff_id
+                            WHERE s.department_id = ?
+                            AND YEAR(p.publication_date) = ?
+                        ");
+                        
+                        $stmt->bind_param("ii", $department_id, $currentYear);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        
+                        if ($row = $result->fetch_assoc()) {
+                            $totalCitations = $row['total_citations'] ?? 0;
+                        }
+                        
+                        $stmt->close();
+                    } catch (Exception $e) {
+                        error_log("Error fetching current year citations: " . $e->getMessage());
+                    }
+                }
+                
+                
+                //donought
+                $total_peer_reviewed = $dept_data['Journal Articles (First Author)'] + $dept_data['Journal Articles (Corresponding Author)'] + $dept_data['Journal Articles (Co-author)'];
+                $publication_types = [
+                    $total_peer_reviewed,
+                    $dept_data['Book Chapter'],
+                    $dept_data['Book with ISBN']
+                ];
+
+            //research and innovations
+                //post graduate supervisions
+                $postgraduate_supervisions = [
+                    $dept_data['PhD Supervised'], 
+                    $dept_data['Masters Supervised']
+                ];
+
+                //innovations
+                $dept_innovations = [
+                    $dept_data['Patent'], 
+                    $dept_data['Product'],
+                    $dept_data['Copyright'],
+                    $dept_data['Utility Model'],
+                    $dept_data['Trademark']
+                ];
+
+            //academic performance
+                //academic qualifications by rank table
+                // get all staff by their roles from the database
+                // Initialize variables safely
+                
+
+                // Initialize empty roles array with all possible academic ranks
+                $roles = [
+                    'Professor' => [],
+                    'Associate Professor' => [],
+                    'Senior Lecturer' => [],
+                    'Lecturer' => [],
+                    'Assistant Lecturer' => [],
+                    'Teaching Assistant' => []
+                ];
+
+                // Initialize role map
+                $roleMap = [];
+
+                try {
+                    // Get all roles first to map role_id to role_name
+                    $roleQuery = $conn->query("SELECT role_id, role_name FROM roles");
+                    if ($roleQuery) {
+                        while ($row = $roleQuery->fetch_assoc()) {
+                            $roleMap[$row['role_id']] = $row['role_name'];
+                        }
+                    }
+
+                    // Get all staff in this department with their roles
+                    $staffQuery = $conn->prepare("
+                        SELECT s.staff_id, s.first_name, s.last_name, s.role_id, r.role_name 
+                        FROM staff s
+                        JOIN roles r ON s.role_id = r.role_id
+                        WHERE s.department_id = ?
+                        ORDER BY 
+                            CASE r.role_name 
+                                WHEN 'Professor' THEN 1
+                                WHEN 'Associate Professor' THEN 2
+                                WHEN 'Senior Lecturer' THEN 3
+                                WHEN 'Lecturer' THEN 4
+                                WHEN 'Assistant Lecturer' THEN 5
+                                WHEN 'Teaching Assistant' THEN 6
+                                ELSE 7
+                            END,
+                            s.last_name, s.first_name
+                    ");
+                    
+                    if ($staffQuery) {
+                        $staffQuery->bind_param("i", $department_id);
+                        $staffQuery->execute();
+                        $staffResult = $staffQuery->get_result();
+
+                        // Organize staff by their roles
+                        while ($staff = $staffResult->fetch_assoc()) {
+                            $roleName = $staff['role_name'] ?? 'Unknown';
+                            if (isset($roles[$roleName])) {
+                                $roles[$roleName][] = $staff;
+                            }
+                        }
+                    }
+
+                    // Get degrees for all staff in this department
+                    $staffDegrees = [];
+                    $degreesQuery = $conn->prepare("
+                        SELECT d.staff_id, d.degree_name, d.degree_classification
+                        FROM degrees d
+                        JOIN staff s ON d.staff_id = s.staff_id
+                        WHERE s.department_id = ?
+                    ");
+                    
+                    if ($degreesQuery) {
+                        $degreesQuery->bind_param("i", $department_id);
+                        $degreesQuery->execute();
+                        $degreesResult = $degreesQuery->get_result();
+
+                        // Organize degrees by staff_id and type
+                        while ($degree = $degreesResult->fetch_assoc()) {
+                            $staffId = $degree['staff_id'] ?? 0;
+                            if (!$staffId) continue;
+                            
+                            $classification = $degree['degree_classification'] ?? '';
+                            $degreeName = $degree['degree_name'] ?? '';
+                            
+                            // Normalize classifications
+                            if (stripos($classification, 'First') !== false || stripos($classification, 'Second Class Upper') !== false) {
+                                $type = 'Bachelor';
+                            } elseif (stripos($degreeName, 'Master') !== false) {
+                                $type = 'Master';
+                            } elseif (stripos($degreeName, 'PhD') !== false || stripos($degreeName, 'Doctor') !== false) {
+                                $type = 'PhD';
+                            } else {
+                                $type = 'Other';
+                            }
+                            
+                            if (!isset($staffDegrees[$staffId])) {
+                                $staffDegrees[$staffId] = [];
+                            }
+                            
+                            if (!isset($staffDegrees[$staffId][$type])) {
+                                $staffDegrees[$staffId][$type] = 0;
+                            }
+                            
+                            $staffDegrees[$staffId][$type]++;
+                        }
+                    }
+                } catch (Exception $e) {
+                    error_log("Database error: " . $e->getMessage());
+                    // Continue execution with empty data rather than breaking
+                }
+            
+                // community service
+                    // Initialize community service metrics
+                    $community_scores = [
+                        'student_supervision' => 0,
+                        'outreach_programs' => 0,
+                        'beneficiaries' => 0
+                    ];
+
+                    try {
+                        // Query community services for this department
+                        $serviceQuery = $conn->prepare("
+                            SELECT cs.description, cs.beneficiaries 
+                            FROM communityservice cs
+                            JOIN staff s ON cs.staff_id = s.staff_id
+                            WHERE s.department_id = ?
+                        ");
+                        
+                        if ($serviceQuery) {
+                            $serviceQuery->bind_param("i", $department_id);
+                            $serviceQuery->execute();
+                            $serviceResult = $serviceQuery->get_result();
+
+                            while ($service = $serviceResult->fetch_assoc()) {
+                                $description = strtolower(trim($service['description'] ?? ''));
+                                $beneficiaries = intval($service['beneficiaries'] ?? 0);
+                                
+                                // Categorize the service
+                                if (strpos($description, 'student') !== false && strpos($description, 'supervision') !== false) {
+                                    $community_scores['student_supervision']++;
+                                } else {
+                                    $community_scores['outreach_programs']++;
+                                }
+                                
+                                // Add beneficiaries count
+                                $community_scores['beneficiaries'] += $beneficiaries;
+                            }
+                        }
+                    } catch (Exception $e) {
+                        error_log("Community service query error: " . $e->getMessage());
+                    }
+
+                    // community service data
+                    $community_service_scores = [
+                        $community_scores['student_supervision'],
+                        $community_scores['outreach_programs'],
+                        $community_scores['beneficiaries']
+                    ];
+
+                    echo $community_scores['student_supervision'];
+                    echo $community_scores['outreach_programs'];
+                    echo $community_scores['beneficiaries'];
+     
+            // top performers
+            // Query to get top 5 performers in the department
+            $topPerformers = [];
+            try {
+                $performerQuery = $conn->prepare("
+                    SELECT s.staff_id, s.first_name, s.last_name, s.performance_score, r.role_name
+                    FROM staff s
+                    JOIN roles r ON s.role_id = r.role_id
+                    WHERE s.department_id = ?
+                    ORDER BY s.performance_score DESC
+                    LIMIT 5
+                ");
+
+                if ($performerQuery) {
+                    $performerQuery->bind_param("i", $department_id);
+                    $performerQuery->execute();
+                    $performerResult = $performerQuery->get_result();
+                    
+                    while ($performer = $performerResult->fetch_assoc()) {
+                        $topPerformers[] = [
+                            'staff_id' => $performer['staff_id'], // THIS WAS MISSING
+                            'first_name' => $performer['first_name'] ?? '',
+                            'last_name' => $performer['last_name'] ?? '',
+                            'score' => $performer['performance_score'] ?? 0,
+                            'role' => $performer['role_name'] ?? ''
+                        ];
+                    }
+                }
+
+            } catch (Exception $e) {
+                error_log("Top performers query error: " . $e->getMessage());
+            }      
+?> 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -186,26 +492,28 @@
                 <div class="row mb-4">
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $dept_data['Journal Articles (First Author)']; ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">First Author Peer reviewed Publications</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $dept_data['Journal Articles (Co-author)'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Co-Authored Publications in Peer reviewed Publications</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $total_peer_reviewed ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Peer-Reviewed Publications</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
-                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Citations</div>
+                            <div class="stat-value"><?= $totalCitations ?></div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">
+                                Total Citations (<?= $currentYear ?>)
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -265,25 +573,25 @@
                 <div class="row mb-4">
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">25</div>
+                            <div class="stat-value"><?= $dept_data['PhD'] ?> </div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Phd's</div>
                         </div>
                     </div>            
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">45</div>
+                            <div class="stat-value"><?= $dept_data['Masters'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Masters</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">34</div>
+                            <div class="stat-value"><?= $dept_data['First Class'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">First class</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
+                            <div class="stat-value"><?= $dept_data['Second Upper'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Second Class</div>
                         </div>
                     </div>
@@ -292,285 +600,97 @@
                 <!-- Staff Academic Qualifications Section -->
                 <div class="row">
                     <div class="col-12">
-                        <!-- Professors -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Professors</span>
-                                <span class="rank-count">8 staff</span>
+                        <?php foreach ($roles as $roleName => $staffMembers): ?>
+                            <div class="rank-section">
+                                <div class="rank-header">
+                                    <span><?= htmlspecialchars($roleName) ?>s</span>
+                                    <span class="rank-count"><?= count($staffMembers) ?> staff</span>
+                                </div>
+                                
+                                <?php if (!empty($staffMembers)): ?>
+                                    <table class="qualifications-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Staff Member</th>
+                                                <th>Qualifications</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($staffMembers as $staff): ?>
+                                                <?php 
+                                                $staffId = $staff['staff_id'] ?? 0;
+                                                $firstName = $staff['first_name'] ?? '';
+                                                $lastName = $staff['last_name'] ?? '';
+                                                ?>
+                                                <tr>
+                                                    <td class="staff-name">
+                                                        <?php
+                                                        $prefix = '';
+                                                        if ($roleName === 'Professor') {
+                                                            $prefix = 'Prof. ';
+                                                        } elseif ($roleName === 'Associate Professor') {
+                                                            $prefix = 'Assoc. Prof. ';
+                                                        } elseif (in_array($roleName, ['Senior Lecturer', 'Lecturer'])) {
+                                                            $prefix = 'Dr. ';
+                                                        } elseif ($roleName === 'Teaching Assistant') {
+                                                            $hasPhD = isset($staffDegrees[$staffId]['PhD']);
+                                                            $prefix = $hasPhD ? 'Dr. ' : '';
+                                                        }
+                                                        echo htmlspecialchars($prefix . $firstName . ' ' . $lastName);
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php if (isset($staffDegrees[$staffId]) && !empty($staffDegrees[$staffId])): ?>
+                                                            <?php foreach ($staffDegrees[$staffId] as $degreeType => $count): ?>
+                                                                <?php 
+                                                                $badgeClass = strtolower($degreeType);
+                                                                $displayText = $degreeType;
+                                                                
+                                                                if ($degreeType === 'Bachelor') {
+                                                                    $displayText = "Bachelor's";
+                                                                }
+                                                                ?>
+                                                                <span class="qualification-badge <?= $badgeClass ?> <?= $count > 1 ? 'counted' : '' ?>" 
+                                                                    <?= $count > 1 ? 'data-count="' . $count . '"' : '' ?>>
+                                                                    <?= htmlspecialchars($displayText) ?>
+                                                                </span>
+                                                            <?php endforeach; ?>
+                                                        <?php else: ?>
+                                                            <span class="no-qualifications">No qualifications recorded</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                    <!-- <a href="#" class="more-link">View all <?//= count($staffMembers) ?> <?//= strtolower($roleName) ?>s →</a> -->
+                                <?php else: ?>
+                                    <div class="no-staff-message">No <?= strtolower($roleName) ?>s found in this department</div>
+                                <?php endif; ?>
                             </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Prof. John Smith</td>
-                                        <td>
-                                            <span class="qualification-badge phd counted" data-count="2">PhD</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Prof. Alice Johnson</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Prof. Robert Brown</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Prof. Emily Wilson</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 8 professors →</a>
-                        </div>
-                        
-                        <!-- Associate Professors -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Associate Professors</span>
-                                <span class="rank-count">5 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Assoc. Prof. David Lee</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Assoc. Prof. Sarah Miller</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge masters">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Assoc. Prof. James Taylor</td>
-                                        <td>
-                                            <span class="qualification-badge phd counted" data-count="3">PhD</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 5 associate professors →</a>
-                        </div>
-                        
-                        <!-- Senior Lecturers -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Senior Lecturers</span>
-                                <span class="rank-count">10 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Dr. Michael Clark</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Patricia Adams</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Richard Evans</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Lisa Wong</td>
-                                        <td>
-                                            <span class="qualification-badge first-class counted" data-count="3">First Class</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 10 senior lecturers →</a>
-                        </div>
-                        
-                        <!-- Lecturers -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Lecturers</span>
-                                <span class="rank-count">12 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Dr. Kevin White</td>
-                                        <td>
-                                            <span class="qualification-badge phd">PhD</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Dr. Lisa Green</td>
-                                        <td>
-                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Mr. Daniel King</td>
-                                        <td>
-                                            <span class="qualification-badge masters">Masters</span>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Rachel Young</td>
-                                        <td>
-                                            <span class="qualification-badge masters counted" data-count="2">Masters</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 12 lecturers →</a>
-                        </div>
-                        
-                        <!-- Assistant Lecturers -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Assistant Lecturers</span>
-                                <span class="rank-count">5 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Ms. Angela Scott</td>
-                                        <td>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Mr. Brian Hill</td>
-                                        <td>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                            <span class="qualification-badge second-class">Second Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Rachel Young</td>
-                                        <td>
-                                            <span class="qualification-badge masters">Masters</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 5 assistant lecturers →</a>
-                        </div>
-                        
-                        <!-- Teaching Assistants -->
-                        <div class="rank-section">
-                            <div class="rank-header">
-                                <span>Teaching Assistants</span>
-                                <span class="rank-count">8 staff</span>
-                            </div>
-                            <table class="qualifications-table">
-                                <thead>
-                                    <tr>
-                                        <th>Staff Member</th>
-                                        <th>Qualifications</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="staff-name">Mr. Jason Wright</td>
-                                        <td>
-                                            <span class="qualification-badge first-class">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Olivia Carter</td>
-                                        <td>
-                                            <span class="qualification-badge masters">Masters</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Mr. Ethan Walker</td>
-                                        <td>
-                                            <span class="qualification-badge first-class counted" data-count="2">First Class</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="staff-name">Ms. Sophia Chen</td>
-                                        <td>
-                                            <span class="qualification-badge second-class counted" data-count="2">Second Class</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <a href="#" class="more-link">View all 8 teaching assistants →</a>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
             </div>
+
             <!-- community service -->
             <div class="tab-pane fade" id="communityservice" role="tabpanel" aria-labelledby="communityservice-tab">
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="stat-card">
-                            <div class="stat-value">25</div>
+                            <div class="stat-value"><?= $community_scores['student_supervision'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Industrial Placement Supervision</div>
                         </div>
                     </div>            
                     <div class="col-md-4">
                         <div class="stat-card">
-                            <div class="stat-value">45</div>
+                            <div class="stat-value"><?= $community_scores['outreach_programs'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Community Outreach Programs</div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="stat-card">
-                            <div class="stat-value">34</div>
+                            <div class="stat-value"><?= $community_scores['beneficiaries'] ?></div>
                             <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total number of beneficiaries</div>
                         </div>
                     </div>
@@ -593,31 +713,36 @@
             <div class="col-lg-8">
                 <div class="leaderboard">
                     <h3 class="chart-title">Top Performers</h3>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">1</div>
-                        <div class="leaderboard-name">Dr. Jane Smith</div>
-                        <div class="leaderboard-score">92 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">2</div>
-                        <div class="leaderboard-name">Prof. John Doe</div>
-                        <div class="leaderboard-score">88 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">3</div>
-                        <div class="leaderboard-name">Dr. Alice Johnson</div>
-                        <div class="leaderboard-score">85 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">4</div>
-                        <div class="leaderboard-name">Dr. Robert Brown</div>
-                        <div class="leaderboard-score">80 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">5</div>
-                        <div class="leaderboard-name">Dr. Emily Wilson</div>
-                        <div class="leaderboard-score">78 pts</div>
-                    </div>
+                    
+                    <?php if (!empty($topPerformers)): ?>
+                        <?php foreach ($topPerformers as $index => $performer): ?>
+                            <?php
+                            // Determine appropriate title prefix
+                            $prefix = '';
+                            if (stripos($performer['role'], 'professor') !== false) {
+                                $prefix = 'Prof. ';
+                            } elseif (stripos($performer['role'], 'lecturer') !== false || 
+                                    stripos($performer['role'], 'assistant') !== false) {
+                                $prefix = 'Dr. ';
+                            }
+                            
+                            // Get staff ID safely
+                            $staff_id = $performer['staff_id'] ?? 0;
+                            ?>
+                            <div class="leaderboard-item">
+                                <div class="leaderboard-rank"><?= $index + 1 ?></div>
+                                <div class="leaderboard-name">
+                                    <a href="individual_view.php?id=<?= $staff_id ?>" class="staff-link">
+                                        <?= htmlspecialchars($prefix . $performer['first_name'] . ' ' . $performer['last_name']) ?>
+                                    </a>
+                                </div>
+                                <div class="leaderboard-score"><?= round($performer['score']) ?> pts</div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="no-performers">No performance data available</div>
+                    <?php endif; ?>
+                    
                     <div class="text-end mt-2">
                         <a href="#" class="text-primary">View Full Ranking →</a>
                     </div>
@@ -629,7 +754,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <!-- <script> const departmentData = <?php echo json_encode($dept_data); ?>; </script> -->
+
     <script>
+        // Pass PHP data to JavaScript
+        // const departmentData = <?php// echo json_encode($dept_data); ?>;
+
+
          // Academic staff data
         // const academicStaff = [
         //     { name: 'Prof. A', rank: 'professor', experience: 12, publications: 10, grants: 8 },
@@ -933,13 +1064,14 @@
             }
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
         const grantsCtx = document.getElementById('grantsChart').getContext('2d');
         const grantsChart = new Chart(grantsCtx, {
             type: 'pie',
             data: {
                 labels: ['>1B UGX', '500M-1B UGX', '100M-500M UGX', '<100M UGX'],
                 datasets: [{
-                    data: [2, 3, 5, 10],
+                    data: <?php echo json_encode($grants_pie); ?>,
                     backgroundColor: [
                         '#2ecc71',
                         '#3498db',
@@ -959,13 +1091,14 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.label}: ${context.raw} projects`;
+                                return `${context.label}: ${context.raw} project${context.raw !== 1 ? 's' : ''}`;
                             }
                         }
                     }
                 }
             }
         });
+    });
 
         const pubTypesCtx = document.getElementById('publicationTypesChart').getContext('2d');
         const pubTypesChart = new Chart(pubTypesCtx, {
@@ -973,7 +1106,7 @@
             data: {
                 labels: ['Journal Articles', 'Book Chapters', 'Books with isbn'],
                 datasets: [{
-                    data: [30, 48, 62],
+                    data: <?php echo json_encode($publication_types); ?>,
                     backgroundColor: [
                         '#3498db',
                         '#2ecc71',
@@ -993,37 +1126,74 @@
             }
         });
 
-        const citationsCtx = document.getElementById('citationsChart').getContext('2d');
-        const citationsChart = new Chart(citationsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['2021', '2022', '2023', '2024', '2025'],
-                datasets: [
-                    {
-                        label: 'Publications',
-                        data: [12, 8, 6, 5, 4],
-                        backgroundColor: '#3498db',
+
+        // Pass PHP data to JavaScript
+        const chartData = <?php echo json_encode($chartData); ?>;
+
+        // Initialize the chart when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const citationsCtx = document.getElementById('citationsChart').getContext('2d');
+            const citationsChart = new Chart(citationsCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.years,
+                    datasets: [
+                        {
+                            label: 'Publications',
+                            data: chartData.publications,
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Citations',
+                            data: chartData.citations,
+                            backgroundColor: '#2ecc71',
+                            borderColor: '#27ae60',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
                     },
-                    {
-                        label: 'Citations',
-                        data: [120, 85, 45, 30, 25],
-                        backgroundColor: '#2ecc71',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        stacked: false,
-                    },
-                    y: {
-                        stacked: false,
-                        beginAtZero: true
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
                     }
                 }
-            }
+            });
+            
+            // Function to update chart if needed
+            window.updateChartData = function(newData) {
+                citationsChart.data.labels = newData.years;
+                citationsChart.data.datasets[0].data = newData.publications;
+                citationsChart.data.datasets[1].data = newData.citations;
+                citationsChart.update();
+            };
         });
 
         const researchGrantsCtx = document.getElementById('researchGrantsChart').getContext('2d');
@@ -1034,7 +1204,7 @@
                 datasets: [
                     {
                         label: 'Grant Amount',
-                        data: [1, 2, 4, 8],
+                        data: <?php echo json_encode($grants_pie); ?>,
                         backgroundColor: 'rgba(46, 204, 113, 0.7)',
                         borderColor: '#2ecc71',
                         borderWidth: 1
@@ -1075,15 +1245,14 @@
         const supervisionChart = new Chart(supervisionCtx, {
             type: 'bar',
             data: {
-                labels: ['PhD Completions', 'Masters Completions', 'Ongoing PhD', 'Ongoing Masters'],
+                labels: ['PhD Completions', 'Masters Completions'],
                 datasets: [{
                     label: 'Supervision',
-                    data: [5, 15, 8, 20],
+                    data: <?php echo json_encode($postgraduate_supervisions); ?>,
                     backgroundColor: [
                         '#3498db',
                         '#2ecc71',
-                        '#f39c12',
-                        '#e74c3c'
+                        
                     ],
                     borderWidth: 1
                 }]
@@ -1105,7 +1274,7 @@
             data: {
                 labels: ['Patent', 'Product', 'Copyright', 'Utility Model', 'Trademark'],
                 datasets: [{
-                    data: [35, 25, 20, 10, 10],
+                    data: <?php echo json_encode($dept_innovations); ?>,
                     backgroundColor: [
                         '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'
                     ],
@@ -1145,7 +1314,7 @@
                 labels: ['Industrial Placements', 'Outreach Programs', 'Beneficiaries'],
                 datasets: [{
                     label: 'Community Service Metrics',
-                    data: [25, 45, 34], // These should match your stat card values
+                    data: <?php echo json_encode($community_service_scores); ?>, // These should match your stat card values
                     backgroundColor: [
                         'rgba(54, 162, 235, 0.7)',
                         'rgba(75, 192, 192, 0.7)',
