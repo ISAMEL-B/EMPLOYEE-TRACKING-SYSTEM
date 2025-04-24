@@ -2,6 +2,9 @@
 session_start();
 require_once 'head/approve/config.php'; // Database connection
 
+// Get current page for active menu highlighting
+$current_page = basename($_SERVER['PHP_SELF']);
+
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -146,13 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_password'])) {
         $update_query = $conn->prepare("UPDATE staff SET first_name = ?, last_name = ?, email = ?, phone_number = ?, personal_email = ? WHERE staff_id = ?");
         $update_query->bind_param("sssssi", $first_name, $last_name, $email, $phone_number, $personal_email, $user_id);
         $update_query->execute();
-        
+
         if ($update_query->affected_rows > 0) {
             $_SESSION['update_success'] = "Profile updated successfully!";
         } else {
             $_SESSION['update_error'] = "No changes were made. Did you modify any fields?";
         }
-        
+
         $conn->commit();
     } catch (Exception $e) {
         $conn->rollback();
@@ -200,11 +203,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['current_password'])) {
 
             // Hash new password
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            
+
             // Update password
             $update_query = $conn->prepare("UPDATE staff SET password = ? WHERE staff_id = ?");
             $update_query->bind_param("si", $hashed_password, $user_id);
-            
+
             if ($update_query->execute()) {
                 if ($update_query->affected_rows > 0) {
                     $_SESSION['password_success'] = "Password changed successfully!";
@@ -236,9 +239,6 @@ if ($user_id) {
     $user_data = $user_result->fetch_assoc();
 }
 
-// Get current page for active menu highlighting
-$current_page = basename($_SERVER['PHP_SELF']);
-
 // Clear flash messages after displaying them
 $upload_success = $_SESSION['upload_success'] ?? null;
 $upload_error = $_SESSION['upload_error'] ?? null;
@@ -255,4 +255,3 @@ unset($_SESSION['update_error']);
 unset($_SESSION['password_success']);
 unset($_SESSION['password_error']);
 unset($_SESSION['password_warning']);
-?>
