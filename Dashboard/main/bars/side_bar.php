@@ -520,7 +520,7 @@ foreach ($menu_structure as $parent => $data) {
                             </span>
                         </a>
                         <ul class="treeview-menu">
-                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php" class="<?= ($current_pag == 'upload_csv.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i> CSV Upload</a></li>
+                            <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/csv_receiver/upload_csv.php" class="<?= ($current_pag == 'upload_csv.php') ? 'active-submenu' : '' ?>"><i class="fa fa-file-upload"></i> CSV Upload</a></li>
                             <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/approve/approve.php" class="<?= ($current_pag == 'approve.php') ? 'active-submenu' : '' ?>"><i class="fa fa-check-circle"></i> Approve</a></li>
                             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
                                 <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/view_criteria.php" class="<?= ($current_pag == 'view_criteria.php') ? 'active-submenu' : '' ?>"><i class="fa fa-edit"></i> View | Edit Criteria</a></li>
