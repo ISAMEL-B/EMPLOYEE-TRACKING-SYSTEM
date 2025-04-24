@@ -42,6 +42,75 @@ error_reporting(E_ALL);
                 ];
        
             //publications
+                //publications vs citations
+                // Get department publications and citations by year
+                
+                $chartData = [
+                    'years' => [],
+                    'publications' => [],
+                    'citations' => []
+                ];
+
+                
+                try {
+                    // Query to get yearly publication and citation counts
+                    $stmt = $conn->prepare("
+                        SELECT 
+                            YEAR(p.publication_date) AS year,
+                            COUNT(*) AS publication_count,
+                            SUM(p.citations) AS citation_sum
+                        FROM publications p
+                        JOIN staff s ON p.staff_id = s.staff_id
+                        WHERE s.department_id = ?
+                        GROUP BY YEAR(p.publication_date)
+                        ORDER BY year ASC
+                    ");
+                    
+                    $stmt->bind_param("i", $department_id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    
+                    while ($row = $result->fetch_assoc()) {
+                        $chartData['years'][] = $row['year'];
+                        $chartData['publications'][] = $row['publication_count'];
+                        $chartData['citations'][] = $row['citation_sum'];
+                    }
+                    
+                    $stmt->close();
+                } catch (Exception $e) {
+                    error_log("Error fetching publication data: " . $e->getMessage());
+                }
+
+                //get total citations for this year.
+                // Get current year citations for the department
+                $currentYear = date('Y');
+                $totalCitations = 0; // Default value if no data exists
+
+                if ($department_id) {
+                    try {
+                        $stmt = $conn->prepare("
+                            SELECT SUM(p.citations) AS total_citations
+                            FROM publications p
+                            JOIN staff s ON p.staff_id = s.staff_id
+                            WHERE s.department_id = ?
+                            AND YEAR(p.publication_date) = ?
+                        ");
+                        
+                        $stmt->bind_param("ii", $department_id, $currentYear);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+                        
+                        if ($row = $result->fetch_assoc()) {
+                            $totalCitations = $row['total_citations'] ?? 0;
+                        }
+                        
+                        $stmt->close();
+                    } catch (Exception $e) {
+                        error_log("Error fetching current year citations: " . $e->getMessage());
+                    }
+                }
+                
+                
                 //donought
                 $total_peer_reviewed = $dept_data['Journal Articles (First Author)'] + $dept_data['Journal Articles (Corresponding Author)'] + $dept_data['Journal Articles (Co-author)'];
                 $publication_types = [
@@ -227,7 +296,40 @@ error_reporting(E_ALL);
                     echo $community_scores['student_supervision'];
                     echo $community_scores['outreach_programs'];
                     echo $community_scores['beneficiaries'];
-?>
+     
+            // top performers
+            // Query to get top 5 performers in the department
+            $topPerformers = [];
+            try {
+                $performerQuery = $conn->prepare("
+                    SELECT s.staff_id, s.first_name, s.last_name, s.performance_score, r.role_name
+                    FROM staff s
+                    JOIN roles r ON s.role_id = r.role_id
+                    WHERE s.department_id = ?
+                    ORDER BY s.performance_score DESC
+                    LIMIT 5
+                ");
+
+                if ($performerQuery) {
+                    $performerQuery->bind_param("i", $department_id);
+                    $performerQuery->execute();
+                    $performerResult = $performerQuery->get_result();
+                    
+                    while ($performer = $performerResult->fetch_assoc()) {
+                        $topPerformers[] = [
+                            'staff_id' => $performer['staff_id'], // THIS WAS MISSING
+                            'first_name' => $performer['first_name'] ?? '',
+                            'last_name' => $performer['last_name'] ?? '',
+                            'score' => $performer['performance_score'] ?? 0,
+                            'role' => $performer['role_name'] ?? ''
+                        ];
+                    }
+                }
+
+            } catch (Exception $e) {
+                error_log("Top performers query error: " . $e->getMessage());
+            }      
+?> 
 
 
 <!DOCTYPE html>
@@ -408,8 +510,10 @@ error_reporting(E_ALL);
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card">
-                            <div class="stat-value">72</div>
-                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Citations</div>
+                            <div class="stat-value"><?= $totalCitations ?></div>
+                            <div class="stat-label" style="font-size: 15px; font-weight: bold;">
+                                Total Citations (<?= $currentYear ?>)
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -609,31 +713,36 @@ error_reporting(E_ALL);
             <div class="col-lg-8">
                 <div class="leaderboard">
                     <h3 class="chart-title">Top Performers</h3>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">1</div>
-                        <div class="leaderboard-name">Dr. Jane Smith</div>
-                        <div class="leaderboard-score">92 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">2</div>
-                        <div class="leaderboard-name">Prof. John Doe</div>
-                        <div class="leaderboard-score">88 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">3</div>
-                        <div class="leaderboard-name">Dr. Alice Johnson</div>
-                        <div class="leaderboard-score">85 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">4</div>
-                        <div class="leaderboard-name">Dr. Robert Brown</div>
-                        <div class="leaderboard-score">80 pts</div>
-                    </div>
-                    <div class="leaderboard-item">
-                        <div class="leaderboard-rank">5</div>
-                        <div class="leaderboard-name">Dr. Emily Wilson</div>
-                        <div class="leaderboard-score">78 pts</div>
-                    </div>
+                    
+                    <?php if (!empty($topPerformers)): ?>
+                        <?php foreach ($topPerformers as $index => $performer): ?>
+                            <?php
+                            // Determine appropriate title prefix
+                            $prefix = '';
+                            if (stripos($performer['role'], 'professor') !== false) {
+                                $prefix = 'Prof. ';
+                            } elseif (stripos($performer['role'], 'lecturer') !== false || 
+                                    stripos($performer['role'], 'assistant') !== false) {
+                                $prefix = 'Dr. ';
+                            }
+                            
+                            // Get staff ID safely
+                            $staff_id = $performer['staff_id'] ?? 0;
+                            ?>
+                            <div class="leaderboard-item">
+                                <div class="leaderboard-rank"><?= $index + 1 ?></div>
+                                <div class="leaderboard-name">
+                                    <a href="individual_view.php?id=<?= $staff_id ?>" class="staff-link">
+                                        <?= htmlspecialchars($prefix . $performer['first_name'] . ' ' . $performer['last_name']) ?>
+                                    </a>
+                                </div>
+                                <div class="leaderboard-score"><?= round($performer['score']) ?> pts</div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="no-performers">No performance data available</div>
+                    <?php endif; ?>
+                    
                     <div class="text-end mt-2">
                         <a href="#" class="text-primary">View Full Ranking →</a>
                     </div>
@@ -1017,37 +1126,74 @@ error_reporting(E_ALL);
             }
         });
 
-        const citationsCtx = document.getElementById('citationsChart').getContext('2d');
-        const citationsChart = new Chart(citationsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['2021', '2022', '2023', '2024', '2025'],
-                datasets: [
-                    {
-                        label: 'Publications',
-                        data: [12, 8, 6, 5, 4],
-                        backgroundColor: '#3498db',
+
+        // Pass PHP data to JavaScript
+        const chartData = <?php echo json_encode($chartData); ?>;
+
+        // Initialize the chart when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const citationsCtx = document.getElementById('citationsChart').getContext('2d');
+            const citationsChart = new Chart(citationsCtx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.years,
+                    datasets: [
+                        {
+                            label: 'Publications',
+                            data: chartData.publications,
+                            backgroundColor: '#3498db',
+                            borderColor: '#2980b9',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Citations',
+                            data: chartData.citations,
+                            backgroundColor: '#2ecc71',
+                            borderColor: '#27ae60',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Count'
+                            }
+                        }
                     },
-                    {
-                        label: 'Citations',
-                        data: [120, 85, 45, 30, 25],
-                        backgroundColor: '#2ecc71',
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        stacked: false,
-                    },
-                    y: {
-                        stacked: false,
-                        beginAtZero: true
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        }
                     }
                 }
-            }
+            });
+            
+            // Function to update chart if needed
+            window.updateChartData = function(newData) {
+                citationsChart.data.labels = newData.years;
+                citationsChart.data.datasets[0].data = newData.publications;
+                citationsChart.data.datasets[1].data = newData.citations;
+                citationsChart.update();
+            };
         });
 
         const researchGrantsCtx = document.getElementById('researchGrantsChart').getContext('2d');
