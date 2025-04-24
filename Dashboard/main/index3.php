@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     exit();
 }
 
+// Database connection
+require_once 'head/approve/config.php';
+
 //get count of employees in a department
 include '../../scoring_calculator/department score/department_employees.php';
 
@@ -14,6 +17,13 @@ include '../../scoring_calculator/department score/department_score.php';
 
 //get count of employees in a department
 $department_counts = get_all_department_staff_counts($conn);
+
+// Get all departments for dropdown
+$departments = [];
+$stmt = $conn->query("SELECT department_id, department_name FROM departments");
+while ($row = $stmt->fetch_assoc()) {
+    $departments[$row['department_id']] = $row['department_name'];
+}
 
 // Pagination parameters
 $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -31,13 +41,6 @@ if ($current_page < 1) {
 // Get only the items for the current page
 $offset = ($current_page - 1) * $items_per_page;
 $paginated_departments = array_slice($department_counts, $offset, $items_per_page, true);
-
-//total staff in each department (keeping your existing variables)
-$software_engineering = $department_counts['Software Engineering'] ?? 0;
-$computer_science = $department_counts['Computer Science'] ?? 0;
-$information_technology = $department_counts['Information Technology'] ?? 0;
-$biology = $department_counts['Biology'] ?? 0;
-$chemistry = $department_counts['Chemistry'] ?? 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,16 +50,14 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST HRM - Department Analytics Dashboard</title>
     <!-- Bootstrap CSS -->
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
     <script src="../components/Chart.js/dist/Chart.min.js"></script>
-
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- link it to its css -->
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="styles/index3.css">
-    
 </head>
 
 <body>
@@ -65,6 +66,7 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
 
     <!-- Sidebar -->
     <?php include 'bars/side_bar.php'; ?>
+    
     <!-- Main Content -->
     <div class="main-content">
         <div class="container-fluid">
@@ -78,17 +80,9 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
                     <div class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="departmentDropdown">
                         <input type="text" class="form-control search-box mb-2" placeholder="Search departments..." id="departmentSearch">
                         <div id="departmentList">
-                            <a class="dropdown-item" href="department.php" data-dept="it">Software Engineering</a>
-                            <a class="dropdown-item" href="department.php" data-dept="finance">Computer Science</a>
-                            <a class="dropdown-item" href="department.php" data-dept="hr">Civil Engineering</a>
-                            <a class="dropdown-item" href="department.php" data-dept="academics">Electrical Engineering</a>
-                            <a class="dropdown-item" href="department.php" data-dept="research">Accounting & Finance</a>
-                            <a class="dropdown-item" href="department.php" data-dept="admin">Maths</a>
-                            <a class="dropdown-item" href="department.php" data-dept="facilities">Phyics</a>
-                            <a class="dropdown-item" href="department.php" data-dept="marketing">Civil & Building</a>
-                            <a class="dropdown-item" href="department.php" data-dept="library">Petroleum Engineering</a>
-                            <a class="dropdown-item" href="department.php" data-dept="health">Information Technology</a>
-                            <a class="dropdown-item" href="department.php" data-dept="health">Biology</a>
+                            <?php foreach ($departments as $id => $name): ?>
+                                <a class="dropdown-item" href="department.php?id=<?= $id ?>"><?= htmlspecialchars($name) ?></a>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -100,7 +94,7 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
                     <div class="card department-card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <span>Department Comparative Overview</span>
-                            <small class="text-muted">Last updated: Monday, 10:45 AM</small>
+                            <small class="text-muted">Last updated: <?= date('l, F j, Y h:i A') ?></small>
                         </div>
                         <div class="card-body">
                             <p class="text-muted mb-4">Select a department from the dropdown above to view detailed analytics. Below is a comparison of all departments across key metrics.</p>
@@ -115,7 +109,6 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
                                             <th>Total Research Grant amount</th>
                                             <th>Total innovations</th>
                                             <th>Total Score</th>
-                                            <!-- <th>Budget Utilization</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -132,23 +125,21 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
 
                                         // get the total score for the department
                                         $total_department_score = 
-                                                $dept_data['academic_score'] +
-                                                $dept_data['grant_score'] +
-                                                $dept_data['innovation_score'] +
-                                                $dept_data['publication_score'] +
-                                                $dept_data['supervision_score'] +
-                                                $dept_data['membership_score'] +
-                                                $dept_data['community_service_score'] +
-                                                $dept_data['other_academic_score'] +
-                                                $dept_data['teaching_experience_score'] +
-                                                $dept_data['university_service_score'];
-
+                                                ($dept_data['academic_score'] ?? 0) +
+                                                ($dept_data['grant_score'] ?? 0) +
+                                                ($dept_data['innovation_score'] ?? 0) +
+                                                ($dept_data['publication_score'] ?? 0) +
+                                                ($dept_data['supervision_score'] ?? 0) +
+                                                ($dept_data['membership_score'] ?? 0) +
+                                                ($dept_data['community_service_score'] ?? 0) +
+                                                ($dept_data['other_academic_score'] ?? 0) +
+                                                ($dept_data['teaching_experience_score'] ?? 0) +
+                                                ($dept_data['university_service_score'] ?? 0);
                                     ?>
 
-                                        <tr class="clickable-row" data-href="department.php?name=<?= urlencode($dept) ?>">
+                                        <tr class="clickable-row" data-href="department.php?id=<?= $department_id ?>">
                                             <td>
                                                 <strong>
-                                                    <!-- send the department id in the url -->
                                                     <a href="department.php?id=<?= $department_id ?>"    
                                                     class="department-link"
                                                     title="View <?= htmlspecialchars($dept) ?> details">
@@ -157,9 +148,9 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
                                                 </strong>
                                             </td>
                                             <td><?= htmlspecialchars($count) ?></td>
-                                            <td><?= $dept_data['total_publications'] ?></td>
-                                            <td><?= $dept_data['total_grant_amount'] ?></td>
-                                            <td><?= $dept_data['total_innovations'] ?></td>
+                                            <td><?= $dept_data['total_publications'] ?? 0 ?></td>
+                                            <td><?= $dept_data['total_grant_amount'] ?? 0 ?></td>
+                                            <td><?= $dept_data['total_innovations'] ?? 0 ?></td>
                                             <td><?= $total_department_score ?></td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -200,13 +191,40 @@ $chemistry = $department_counts['Chemistry'] ?? 0;
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Custom JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Department search functionality
+        const searchBox = document.getElementById('departmentSearch');
+        const departmentList = document.getElementById('departmentList');
+        const items = departmentList.getElementsByTagName('a');
+        
+        searchBox.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            Array.from(items).forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // Make table rows clickable
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', function() {
+                window.location.href = this.dataset.href;
+            });
+        });
+    });
+    </script>
 </body>
 </html>

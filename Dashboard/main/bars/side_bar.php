@@ -6,7 +6,7 @@
 // Define menu structure with parent-child relationships
 $menu_structure = [
     'Dashboard' => [
-        'pages' => ['index.php', 'index2.php', 'index3.php', 'individual_view.php', 'hrm_assistant.php'],
+        'pages' => ['index.php', 'index2.php', 'faculty.php', 'index3.php', 'department.php', 'individual_view.php', 'hrm_assistant.php'],
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [

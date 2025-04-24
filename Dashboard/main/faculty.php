@@ -314,7 +314,10 @@
 <body>
 
     <!-- Top Navigation Bar -->
-    <?php include 'bars/nav_bar.php'; ?>
+    <?php include 'bars/nav_bar.php'; 
+    $current_ur = 'index2.php';
+    $current_pag = 'index2';
+    ?>
 
     <!-- Sidebar -->
     <?php include 'bars/side_bar.php'; ?>
