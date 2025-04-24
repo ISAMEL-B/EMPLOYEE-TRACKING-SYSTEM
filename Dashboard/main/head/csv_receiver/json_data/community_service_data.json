@@ -1,0 +1,26 @@
+[
+    {
+        "community_service_id": "1",
+        "staff_name": "Byaruhanga Isamel",
+        "description": "Volunteer Teaching",
+        "points": "5"
+    },
+    {
+        "community_service_id": "2",
+        "staff_name": "Mugabi Praise",
+        "description": "Community Cleanup",
+        "points": "5"
+    },
+    {
+        "community_service_id": "3",
+        "staff_name": "Mutungi Felix",
+        "description": "Technical Workshop",
+        "points": "5"
+    },
+    {
+        "community_service_id": "4",
+        "staff_name": "Atwiine Achiever",
+        "description": "Health Awareness Campaign",
+        "points": "5"
+    }
+]
