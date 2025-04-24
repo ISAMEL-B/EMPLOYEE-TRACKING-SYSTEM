@@ -39,6 +39,33 @@
             color: red;
             display: none;
         }
+
+
+        .social {
+            font-size: 24px;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .social:hover {
+            transform: scale(1.2);
+        }
+
+        .social.facebook i {
+            color: #3b5998;
+            /* Facebook blue */
+        }
+
+        .social.google i {
+            color: #dd4b39;
+            /* Google Plus red */
+        }
+
+        .social.linkedin i {
+            color: #0077b5;
+            /* LinkedIn blue */
+        }
     </style>
     <script>
         window.onload = function() {
@@ -95,9 +122,16 @@
             <form action="process.php" method="POST" id="sign-up-form">
                 <h1>Create Account</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social facebook" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social google" title="Google Plus">
+                        <i class="fab fa-google-plus-g"></i>
+                    </a>
+                    <a href="#" class="social linkedin" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+
                 </div>
                 <!-- <span>or use your email for registration</span> -->
                 <input type="text" name="employee_id" id="employee_id" placeholder="Employee ID" required />
@@ -116,15 +150,22 @@
             <form action="process.php" method="POST">
                 <h1>Sign in</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
-                    <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social facebook" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social google" title="Google Plus">
+                        <i class="fab fa-google-plus-g"></i>
+                    </a>
+                    <a href="#" class="social linkedin" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+
                 </div>
                 <span>or use your account</span>
                 <input type="email" name="email" placeholder="Email" required />
                 <input type="password" name="password" placeholder="Password" required />
                 <p class="message" id="login-error-message" style="display:none;"></p> <!-- Error message -->
-                <a href="#">Forgot your password?</a>
+                <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/mailing/password_recovery.php">Forgot your password?</a>
                 <button type="submit" name="login">Sign In</button>
             </form>
         </div>

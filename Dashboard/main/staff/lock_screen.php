@@ -1,15 +1,16 @@
 <?php
 session_start();
 
-// Database configuration (replace with your actual credentials)
+// Database configuration
 include '../head/approve/config.php';
+
 // Handle unlock request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock'])) {
     $password = $_POST['password'] ?? '';
     $employee_id = $_SESSION['employee_id'] ?? '';
 
-    // Prepare SQL to fetch user's password hash
-    $stmt = $conn->prepare("SELECT password FROM staff WHERE employee_id = ?");
+    // Prepare SQL to fetch user's password hash and photo path
+    $stmt = $conn->prepare("SELECT password, photo_path FROM staff WHERE employee_id = ?");
     $stmt->bind_param("s", $employee_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -32,8 +33,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock'])) {
     $error = "Invalid password. Please try again.";
 }
 
-// If not handling unlock, display the lock screen
+// Fetch user details for display
+$employee_id = $_SESSION['employee_id'] ?? '';
+$user_role = $_SESSION['user_role'] ?? 'Staff';
+$phone_number = $_SESSION['phone_number'] ?? 'User';
+
+// Get profile picture path
+$profile_picture = '';
+if (!empty($employee_id)) {
+    $stmt = $conn->prepare("SELECT photo_path FROM staff WHERE employee_id = ?");
+    $stmt->bind_param("s", $employee_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+        $profile_picture = !empty($user['photo_path']) ? $user['photo_path'] : '';
+        
+        // If photo_path is relative, prepend the base URL
+        if (!empty($profile_picture) && !filter_var($profile_picture, FILTER_VALIDATE_URL)) {
+            $profile_picture = '../' . ltrim($profile_picture, '/');
+        }
+    }
+}
+
+// Default avatar if no picture exists
+if (empty($profile_picture)) {
+    $profile_picture = "https://ui-avatars.com/api/?name=" . urlencode($phone_number) . "&size=128&background=006633&color=fff";
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -43,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock'])) {
     <title>MUST ETS - Screen Locked</title>
     <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../../components/bootstrap/css/bootstrap.min.css">
- <link rel="stylesheet" href="lock_style.css">
+    <link rel="stylesheet" href="lock_style.css">
 </head>
 
 <body>
@@ -84,10 +112,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock'])) {
                 Please authenticate to continue accessing the system.
             </p>
 
-            <img src="../<?php echo $_SESSION['path'] ?? ''; ?>&background=006633&color=fff" class="user-avatar" alt="User Avatar">
+            <!-- User Avatar - shows actual profile picture or generated avatar -->
+            <img src="<?php echo htmlspecialchars($profile_picture); ?>" class="user-avatar" alt="User Avatar">
             
-            <div class="user-name"><?php echo htmlspecialchars($_SESSION['employee_id'] ?? 'User'); ?></div>
-            <div class="user-role"><?php echo htmlspecialchars($_SESSION['user_role'] ?? 'Staff'); ?></div>
+            <div class="user-name"><?php echo htmlspecialchars($phone_number); ?></div>
+            <div class="user-role">MUST - <?php echo htmlspecialchars(strtoupper($user_role)); ?></div>
 
             <form action="" method="post">
                 <div class="mb-3">
@@ -112,7 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unlock'])) {
         // Update current time
         function updateTime() {
             const now = new Date();
-            document.getElementById('current-time').textContent = now.toLocaleTimeString();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('current-time').textContent = timeString;
         }
         setInterval(updateTime, 1000);
         updateTime();
