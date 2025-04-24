@@ -56,7 +56,7 @@ function get_faculty_performance($conn, $faculty_id) {
 }
 
 function get_faculty_name($conn, $faculty_id) {
-    $stmt = $conn->prepare("SELECT faculty_name FROM faculty WHERE faculty_id = ?");
+    $stmt = $conn->prepare("SELECT faculty_name FROM faculties WHERE faculty_id = ?");
     $stmt->bind_param("i", $faculty_id);
     $stmt->execute();
     $result = $stmt->get_result();
