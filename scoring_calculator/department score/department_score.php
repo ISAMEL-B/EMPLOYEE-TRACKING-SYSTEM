@@ -199,88 +199,88 @@ function get_department_staff_count($conn, $department_id) {
 
 
 // Usage
-$department_id = 2;
-$dept_data = get_department_performance($conn, $department_id);
-$department_name = get_department_name($conn, $department_id);
+// $department_id = 2;
+// $dept_data = get_department_performance($conn, $department_id);
+// $department_name = get_department_name($conn, $department_id);
 
-echo $dept_data['total_publications'] . "<br>";
-// Output
-echo "<h2>Performance Summary for Department of $department_name</h2>";
+// echo $dept_data['total_publications'] . "<br>";
+// // Output
+// echo "<h2>Performance Summary for Department of $department_name</h2>";
 
-echo "<h3>Academic Qualifications</h3>";
-foreach (['PhD', 'Masters', 'First Class', 'Second Upper', 'Other'] as $key) {
-    echo "$key: <strong>{$dept_data[$key]}</strong><br>";
-}
-echo "Total Academic Score: <strong>{$dept_data['academic_score']}</strong><br><br>";
+// echo "<h3>Academic Qualifications</h3>";
+// foreach (['PhD', 'Masters', 'First Class', 'Second Upper', 'Other'] as $key) {
+//     echo "$key: <strong>{$dept_data[$key]}</strong><br>";
+// }
+// echo "Total Academic Score: <strong>{$dept_data['academic_score']}</strong><br><br>";
 
-echo "<h3>Research Grants</h3>";
-foreach (['Over 1B', '500M - 1B', '100M - 500M', 'Below 100M'] as $key) {
-    echo "$key Grants: <strong>{$dept_data[$key]}</strong><br>";
-}
-echo "Total Grant Score: <strong>{$dept_data['grant_score']}</strong><br>";
-echo "Total Grant Amount: <strong>" . number_format($dept_data['total_grant_amount'], 0, '.', ',') . " UGX</strong><br><br>";
+// echo "<h3>Research Grants</h3>";
+// foreach (['Over 1B', '500M - 1B', '100M - 500M', 'Below 100M'] as $key) {
+//     echo "$key Grants: <strong>{$dept_data[$key]}</strong><br>";
+// }
+// echo "Total Grant Score: <strong>{$dept_data['grant_score']}</strong><br>";
+// echo "Total Grant Amount: <strong>" . number_format($dept_data['total_grant_amount'], 0, '.', ',') . " UGX</strong><br><br>";
 
-echo "<h3>Innovations</h3>";
-foreach (['Patent', 'Utility Model', 'Copyright', 'Product', 'Trademark'] as $type) {
-    echo "$type: <strong>{$dept_data[$type]}</strong><br>";
-}
-echo "Total Innovation Score: <strong>{$dept_data['innovation_score']}</strong><br><br>";
+// echo "<h3>Innovations</h3>";
+// foreach (['Patent', 'Utility Model', 'Copyright', 'Product', 'Trademark'] as $type) {
+//     echo "$type: <strong>{$dept_data[$type]}</strong><br>";
+// }
+// echo "Total Innovation Score: <strong>{$dept_data['innovation_score']}</strong><br><br>";
 
-echo "<h3>Publications</h3>";
-foreach ([
-    'Journal Articles (First Author)',
-    'Journal Articles (Corresponding Author)',
-    'Journal Articles (Co-author)',
-    'Book with ISBN',
-    'Book Chapter'
-] as $pub_type) {
-    echo "$pub_type: <strong>{$dept_data[$pub_type]}</strong><br>";
-}
-echo "Total Publication Score: <strong>{$dept_data['publication_score']}</strong><br><br>";
+// echo "<h3>Publications</h3>";
+// foreach ([
+//     'Journal Articles (First Author)',
+//     'Journal Articles (Corresponding Author)',
+//     'Journal Articles (Co-author)',
+//     'Book with ISBN',
+//     'Book Chapter'
+// ] as $pub_type) {
+//     echo "$pub_type: <strong>{$dept_data[$pub_type]}</strong><br>";
+// }
+// echo "Total Publication Score: <strong>{$dept_data['publication_score']}</strong><br><br>";
 
-echo "<h3>Postgraduate Supervision</h3>";
-echo "PhD Supervised: <strong>{$dept_data['PhD Supervised']}</strong><br>";
-echo "Masters Supervised: <strong>{$dept_data['Masters Supervised']}</strong><br>";
-echo "Total Supervision Score: <strong>{$dept_data['supervision_score']}</strong><br><br>";
+// echo "<h3>Postgraduate Supervision</h3>";
+// echo "PhD Supervised: <strong>{$dept_data['PhD Supervised']}</strong><br>";
+// echo "Masters Supervised: <strong>{$dept_data['Masters Supervised']}</strong><br>";
+// echo "Total Supervision Score: <strong>{$dept_data['supervision_score']}</strong><br><br>";
 
-echo "<h3>Professional Memberships</h3>";
-echo "Total Memberships: <strong>{$dept_data['Professional Memberships']}</strong><br>";
-echo "Total Membership Score: <strong>{$dept_data['membership_score']}</strong><br><br>";
+// echo "<h3>Professional Memberships</h3>";
+// echo "Total Memberships: <strong>{$dept_data['Professional Memberships']}</strong><br>";
+// echo "Total Membership Score: <strong>{$dept_data['membership_score']}</strong><br><br>";
 
-echo "<h3>Community Service</h3>";
-echo "Total Community Services: <strong>{$dept_data['Community Services']}</strong><br>";
-echo "Total Community Service Score: <strong>{$dept_data['community_service_score']}</strong><br><br>";
+// echo "<h3>Community Service</h3>";
+// echo "Total Community Services: <strong>{$dept_data['Community Services']}</strong><br>";
+// echo "Total Community Service Score: <strong>{$dept_data['community_service_score']}</strong><br><br>";
 
-echo "<h3>Other Academic Activities</h3>";
-foreach (['External Examination', 'Internal Examination', 'Conference Presentation', 'Journal Editor'] as $type) {
-    echo "$type: <strong>{$dept_data[$type]}</strong><br>";
-}
-echo "Total Other Academic Activities Score: <strong>{$dept_data['other_academic_score']}</strong><br><br>";
+// echo "<h3>Other Academic Activities</h3>";
+// foreach (['External Examination', 'Internal Examination', 'Conference Presentation', 'Journal Editor'] as $type) {
+//     echo "$type: <strong>{$dept_data[$type]}</strong><br>";
+// }
+// echo "Total Other Academic Activities Score: <strong>{$dept_data['other_academic_score']}</strong><br><br>";
 
-echo "<h3>Teaching Experience</h3>";
-echo "Years of Teaching: <strong>{$dept_data['teaching_experience_years']}</strong><br>";
-echo "Total Teaching Experience Score: <strong>{$dept_data['teaching_experience_score']}</strong><br><br>";
+// echo "<h3>Teaching Experience</h3>";
+// echo "Years of Teaching: <strong>{$dept_data['teaching_experience_years']}</strong><br>";
+// echo "Total Teaching Experience Score: <strong>{$dept_data['teaching_experience_score']}</strong><br><br>";
 
-echo "<h3>Service to University</h3>";
-echo "Service Roles Held: <strong>{$dept_data['University Service Roles']}</strong><br>";
-echo "Total University Service Score: <strong>{$dept_data['university_service_score']}</strong><br>";
+// echo "<h3>Service to University</h3>";
+// echo "Service Roles Held: <strong>{$dept_data['University Service Roles']}</strong><br>";
+// echo "Total University Service Score: <strong>{$dept_data['university_service_score']}</strong><br>";
 
 
-// Calculate overall total score
-$overall_total_score = 
-    $dept_data['academic_score'] +
-    $dept_data['grant_score'] +
-    $dept_data['innovation_score'] +
-    $dept_data['publication_score'] +
-    $dept_data['supervision_score'] +
-    $dept_data['membership_score'] +
-    $dept_data['community_service_score'] +
-    $dept_data['other_academic_score'] +
-    $dept_data['teaching_experience_score'] +
-    $dept_data['university_service_score'];
+// // Calculate overall total score
+// $overall_total_score = 
+//     $dept_data['academic_score'] +
+//     $dept_data['grant_score'] +
+//     $dept_data['innovation_score'] +
+//     $dept_data['publication_score'] +
+//     $dept_data['supervision_score'] +
+//     $dept_data['membership_score'] +
+//     $dept_data['community_service_score'] +
+//     $dept_data['other_academic_score'] +
+//     $dept_data['teaching_experience_score'] +
+//     $dept_data['university_service_score'];
 
-echo "<hr>";
-echo "<h2 style='color: darkgreen;'>Overall Total Score: <strong>$overall_total_score</strong></h2>";
+// echo "<hr>";
+// echo "<h2 style='color: darkgreen;'>Overall Total Score: <strong>$overall_total_score</strong></h2>";
 
 
 ?>
