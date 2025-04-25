@@ -1,5 +1,8 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if ($_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
@@ -80,7 +83,7 @@ if ($peer_reviewed_result && $row = $peer_reviewed_result->fetch_assoc()) {
 }
 
 // Get citations count (assuming this is stored somewhere)
-$citations_query = "SELECT SUM(citation_count) as total FROM publications"; // Adjust based on your schema
+$citations_query = "SELECT SUM(publication_id) as total FROM publications"; // Adjust based on your schema
 $citations_result = $conn->query($citations_query);
 if ($citations_result && $row = $citations_result->fetch_assoc()) {
     $research_data['citations'] = $row['total'] ? $row['total'] : 0;
