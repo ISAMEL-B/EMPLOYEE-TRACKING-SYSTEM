@@ -447,7 +447,7 @@ try {
             <div class="tab-content" id="dashboardTabsContent">
                 <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                     <!-- Performance by Academic Rank (Full width) -->
-                    <div class="row mb-4">
+                    <!-- <div class="row mb-4">
                         <div class="col-12">
                             <div class="large-card">
                                 <div class="chart-container">
@@ -473,7 +473,7 @@ try {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- Other charts in original two-column layout -->
                     <div class="row">
