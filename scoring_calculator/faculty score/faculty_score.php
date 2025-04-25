@@ -63,10 +63,10 @@ function get_faculty_name($conn, $faculty_id) {
     return ($row = $result->fetch_assoc()) ? $row['faculty_name'] : 'Unknown Faculty';
 }
 
-// Usage
+// // Usage
 $faculty_id = 1;
-$faculty_data = get_faculty_performance($conn, $faculty_id);
-$faculty_name = get_faculty_name($conn, $faculty_id);
+// $faculty_data = get_faculty_performance($conn, $faculty_id);
+// $faculty_name = get_faculty_name($conn, $faculty_id);
 
 // Output
 // echo "<h2>Performance Summary for Faculty of $faculty_name</h2>";
@@ -133,3 +133,5 @@ $faculty_name = get_faculty_name($conn, $faculty_id);
 // echo "<strong>{$faculty_data['total_score']}</strong><br>";
 
 ?>
+<!-- <h2>Performance Summary for Faculty of <?php echo $faculty_name; ?></h2>
+<pre><?php// print_r($faculty_data); ?></pre> -->

@@ -21,7 +21,7 @@
     //get count of employees in a faculty
     include '../../scoring_calculator/faculty score/faculty_employees.php';
 
-    $faculty_id = $_GET['id'] ?? null;
+    $faculty_id = $_GET['faculty_id'] ?? null;
 
     if ($faculty_id) {
         $faculty_data = get_faculty_performance($conn, $faculty_id);
