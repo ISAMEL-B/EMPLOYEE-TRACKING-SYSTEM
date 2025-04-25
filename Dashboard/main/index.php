@@ -1,848 +1,1168 @@
 <?php
 session_start();
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if ($_SESSION['user_role'] !== 'hrm') {
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
 
 // Database connection
 require_once 'head/approve/config.php';
-
-// Fetch academic performance data
-$academic_data = [
-    'phds' => 0,
-    'masters' => 0,
-    'bachelors' => 0,
-    'trainings' => 0
-];
-
-// Get PhD count
-$phd_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%PhD%'";
-$phd_result = $conn->query($phd_query);
-if ($phd_result && $row = $phd_result->fetch_assoc()) {
-    $academic_data['phds'] = $row['count'];
-}
-
-// Get Masters count
-$masters_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%Master%'";
-$masters_result = $conn->query($masters_query);
-if ($masters_result && $row = $masters_result->fetch_assoc()) {
-    $academic_data['masters'] = $row['count'];
-}
-
-// Get Bachelors count
-$bachelors_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%Bachelor%'";
-$bachelors_result = $conn->query($bachelors_query);
-if ($bachelors_result && $row = $bachelors_result->fetch_assoc()) {
-    $academic_data['bachelors'] = $row['count'];
-}
-
-// Get professional trainings count (assuming this is in degrees table)
-$trainings_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%Certificate%' OR degree_name LIKE '%Training%'";
-$trainings_result = $conn->query($trainings_query);
-if ($trainings_result && $row = $trainings_result->fetch_assoc()) {
-    $academic_data['trainings'] = $row['count'];
-}
-
-// Fetch research and innovations data
-$research_data = [
-    'publications' => [
-        'google' => 0,
-        'research_gate' => 0,
-        'academia' => 0,
-        'others' => 0,
-        'total' => 0
-    ],
-    'peer_reviewed' => 0,
-    'citations' => 0,
-    'first_author' => 0,
-    'must_repository' => 0,
-    'co_authored' => 0
-];
-
-// Get publications by platform (simplified - you may need to adjust based on actual data structure)
-$publications_query = "SELECT COUNT(*) as total FROM publications";
-$publications_result = $conn->query($publications_query);
-if ($publications_result && $row = $publications_result->fetch_assoc()) {
-    $research_data['publications']['total'] = $row['total'];
-    // Distribute across platforms (adjust based on your actual data)
-    $research_data['publications']['google'] = round($row['total'] * 0.5);
-    $research_data['publications']['research_gate'] = round($row['total'] * 0.3);
-    $research_data['publications']['academia'] = round($row['total'] * 0.15);
-    $research_data['publications']['others'] = $row['total'] - ($research_data['publications']['google'] + $research_data['publications']['research_gate'] + $research_data['publications']['academia']);
-}
-
-// Get peer-reviewed publications count
-$peer_reviewed_query = "SELECT COUNT(*) as count FROM publications WHERE publication_type = 'Journal Article'";
-$peer_reviewed_result = $conn->query($peer_reviewed_query);
-if ($peer_reviewed_result && $row = $peer_reviewed_result->fetch_assoc()) {
-    $research_data['peer_reviewed'] = $row['count'];
-}
-
-// Get citations count (assuming this is stored somewhere)
-$citations_query = "SELECT SUM(publication_id) as total FROM publications"; // Adjust based on your schema
-$citations_result = $conn->query($citations_query);
-if ($citations_result && $row = $citations_result->fetch_assoc()) {
-    $research_data['citations'] = $row['total'] ? $row['total'] : 0;
-}
-
-// Get first-author publications
-$first_author_query = "SELECT COUNT(*) as count FROM publications WHERE role LIKE '%Author%'";
-$first_author_result = $conn->query($first_author_query);
-if ($first_author_result && $row = $first_author_result->fetch_assoc()) {
-    $research_data['first_author'] = $row['count'];
-}
-
-// Get co-authored publications
-$co_authored_query = "SELECT COUNT(*) as count FROM publications WHERE role LIKE '%Co-Author%'";
-$co_authored_result = $conn->query($co_authored_query);
-if ($co_authored_result && $row = $co_authored_result->fetch_assoc()) {
-    $research_data['co_authored'] = $row['count'];
-}
-
-// MUST repository count (assuming this is stored)
-$repository_query = "SELECT COUNT(*) as count FROM publications WHERE source = 'MUST Repository'"; // Adjust based on your schema
-$repository_result = $conn->query($repository_query);
-if ($repository_result && $row = $repository_result->fetch_assoc()) {
-    $research_data['must_repository'] = $row['count'] * 100; // Multiply for demonstration
-}
-
-// Fetch community service data
-$community_data = [
-    'outreach_programs' => 0,
-    'clinical_practices' => 0,
-    'student_supervisions' => 0,
-    'awareness_campaigns' => 0,
-    'embedded_projects' => 0,
-    'workshops' => 0
-];
-
-// Get community service counts
-$community_query = "SELECT COUNT(*) as total FROM communityservice";
-$community_result = $conn->query($community_query);
-if ($community_result && $row = $community_result->fetch_assoc()) {
-    $community_data['outreach_programs'] = $row['total'];
-    // Distribute across types
-    $community_data['awareness_campaigns'] = round($row['total'] * 0.5);
-    $community_data['embedded_projects'] = round($row['total'] * 0.3);
-    $community_data['workshops'] = round($row['total'] * 0.2);
-}
-
-// Get clinical practices count (assuming this is in communityservice table)
-$clinical_query = "SELECT COUNT(*) as count FROM communityservice WHERE description LIKE '%Clinical%'";
-$clinical_result = $conn->query($clinical_query);
-if ($clinical_result && $row = $clinical_result->fetch_assoc()) {
-    $community_data['clinical_practices'] = $row['count'];
-}
-
-// Get student supervisions count
-$supervision_query = "SELECT COUNT(*) as count FROM supervision";
-$supervision_result = $conn->query($supervision_query);
-if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
-    $community_data['student_supervisions'] = $row['count'];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="../components/images/favicon.ico">
-
-    <title>Dashboard</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUST Employee Performance Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
-    <!-- Custom Style-->
-    <link rel="stylesheet" href="../components/src/css/style.css">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
-    <!-- Morris Charts -->
-    <link rel="stylesheet" href="../components/src/css/morris.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
     <style>
-        /* Main content adjustments */
-        .content-wrapper {
-            margin-top: 15px;
-            /* Small margin for all devices */
+        :root {
+            --must-blue: rgb(16, 19, 111);
+            --must-green: rgb(17, 123, 21);
+            --must-yellow: rgb(251, 250, 249);
+            --must-light: #f8f9fa;
+            --must-light-green: #E5F2E9;
+            --must-light-blue: #E6F0FA;
         }
 
-        /* Mobile - full width */
-        @media (max-width: 991.98px) {
-            .content-wrapper {
-                margin-left: 0 !important;
-                margin-top: 12% !important;
-                /* Smaller margin for mobile */
-                padding-top: 0;
-            }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
         }
 
-        /* Remove extra spacing from boxes */
-        .box {
-            margin-bottom: 1rem;
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 5px solid var(--must-yellow);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        .box-header {
-            padding: 0.75rem 1.25rem;
+        .section-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-top: 4px solid var(--must-yellow);
+            background-color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        /* Info boxes adjustments */
-        .info-box {
-            margin-bottom: 1rem;
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
         }
 
-        /* Chart containers */
-        .chart {
-            margin-top: 0.5rem;
+        .section-title {
+            color: var(--must-green);
+            border-bottom: 2px solid var(--must-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* Specific section headers */
-        .box-title {
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
+        .metric-card {
+            border-left: 4px solid var(--must-blue);
+            transition: all 0.3s ease;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        /* Smaller font size for section headers on mobile */
-        @media (max-width: 767.98px) {
-            .box-title {
-                font-size: 1.25rem;
-            }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--must-yellow);
+        }
 
-            .box-header h3.box-title {
-                font-size: 1.75rem !important;
-            }
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--must-blue);
+            line-height: 1;
+        }
+
+        .metric-label {
+            color: var(--must-green);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .progress {
+            height: 25px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+        }
+
+        .badge-must {
+            background-color: var(--must-yellow);
+            color: #000;
+            font-weight: 500;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-pills .nav-link {
+            color: var(--must-blue);
+            font-weight: 500;
+            border: 1px solid #dee2e6;
+            margin-right: 5px;
+        }
+
+        .nav-pills .nav-link:hover {
+            background-color: var(--must-light-green);
+        }
+
+        .table thead {
+            background-color: var(--must-green);
+            color: white;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--must-light-green);
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            border-top: 3px solid var(--must-yellow);
+        }
+
+        .impact-high {
+            background-color: rgba(0, 104, 55, 0.1);
+            color: var(--must-green);
+            font-weight: 500;
+        }
+
+        .impact-medium {
+            background-color: rgba(255, 215, 0, 0.1);
+            color: #b38f00;
+            font-weight: 500;
+        }
+
+        .impact-low {
+            background-color: rgba(0, 91, 170, 0.1);
+            color: var(--must-blue);
+            font-weight: 500;
+        }
+
+        .bg-must-green {
+            background-color: var(--must-green);
+        }
+
+        .bg-must-blue {
+            background-color: var(--must-blue);
+        }
+
+        .bg-must-yellow {
+            background-color: var(--must-yellow);
+        }
+
+        .text-must-green {
+            color: var(--must-green);
+        }
+
+        .text-must-blue {
+            color: var(--must-blue);
+        }
+
+        .text-must-yellow {
+            color: var(--must-yellow);
+        }
+
+        .btn-must-primary {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-must-primary:hover {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 80%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .floating-action-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
     </style>
-
 </head>
 
-<body class="hold-transition light-skin sidebar-mini theme-primary fixed sidebar-collapse">
+<body>
+    <!-- Top Navigation Bar -->
+    <?php include 'bars/nav_bar.php'; ?>
 
-    <div class="wrapper">
-
-        <!--side bar  -->
-        <?php include 'bars/nav_bar.php'; ?>
-        <?php include 'bars/side_bar.php'; ?>
-
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            <div class="container-full">
-                <!-- Main content -->
-                <section class="content">
-                    <!-- ---------------------------------------------------------------------------------------------------  
-                           SECTION FOR ACADEMIC PERFORMANCE
-                       ------------------------------------------------------------------------------------------------------>
-                    <div class="row">
-                        <div class="col-lg-12 col-12">
-                            <div class="box">
-                                <div class="box-header" style="text-align : center ;">
-                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>ACADEMIC PERFORMANCE</b></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- PhD's Info Box -->
-                        <div class="col-xl-3 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info rounded"><i class="fa fa-id-card"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['phds']; ?></b></span><br><br>
-                                    <span class="info-box-text">Phd's</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Masters Degrees Info Box -->
-                        <div class="col-xl-3 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-success rounded"><i class="fas fa-thumbs-up"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['masters']; ?></b></span>
-                                    <span class="info-box-text">Masters Degrees</span><br>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Bachelor's Honors Info Box -->
-                        <div class="col-xl-3 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['bachelors']; ?></b></span>
-                                    <span class="info-box-text">Bachelor's Honors</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Professional Trainings Info Box -->
-                        <div class="col-xl-3 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-danger rounded"><i class="fa fa-id-card"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['trainings']; ?></b></span>
-                                    <span class="info-box-text">Professional Trainings</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FIRST PART OF ACADEMIC PERFORMANCE -->
-                    <div class="row">
-                        <div class="col-xl-12 col-12">
-                            <div class="box">
-                                <div class="box-header">
-                                    <h3 class="box-title"><b>ACADEMIC PERFORMANCE OVERVIEW</b></h3>
-                                </div>
-                                <div class="box-body">
-                                    <ul class="list-inline text-end">
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-info"></i>Phd's </h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-secondary"></i>Masters</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Bachelor's</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-danger"></i>Certifications</h5>
-                                        </li>
-                                    </ul>
-                                    <div id="academic-performance-chart" style="height: 245px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ---------------------------------------------------------------------------------------------------
-                   SECTION FOR RESEARCH AND INNOVATIONS
-                   ---------------------------------------------------------------------------------------------------- -->
-                    <div class="row">
-                        <div class="col-lg-12 col-12">
-                            <div class="box">
-                                <div class="box-header" style="text-align : center ;">
-                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>RESEARCH AND INNOVATIONS</b></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 col-lg-4">
-                            <div class="box">
-                                <div class="box-header with-border">
-                                    <h5 class="box-title">Publications per publishing application</h5>
-                                </div>
-                                <div class="box-body">
-                                    <div class="box-body chart-responsive">
-                                        <div class="chart" id="publications-platform-chart" style="height: 305px;"></div>
-                                    </div>
-                                    <ul class="list-inline">
-                                        <li class="flexbox mb-5 text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-danger"></span>
-                                                <span>Google</span>
-                                            </div>
-                                            <div><?= $research_data['publications']['google'] ?></div>
-                                        </li>
-                                        <li class="flexbox mb-5 text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
-                                                <span>Research Gate</span>
-                                            </div>
-                                            <div><?= $research_data['publications']['research_gate'] ?></div>
-                                        </li>
-                                        <li class="flexbox text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-primary"></span>
-                                                <span>Academia</span>
-                                            </div>
-                                            <div><?= $research_data['publications']['academia'] ?></div>
-                                        </li>
-                                        <li class="flexbox text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-success"></span>
-                                                <span>Others</span>
-                                            </div>
-                                            <div><?= $research_data['publications']['others'] ?></div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-8 col-12">
-                            <div class="box">
-                                <div class="box-header">
-                                    <h3 class="box-title"><b>PUBLICATIONS ANALYSIS</b></h3>
-                                </div>
-                                <div class="box-body">
-                                    <ul class="list-inline text-center">
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-success"></i>Peer Reviewed Publications</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Number of Citations</h5>
-                                        </li>
-                                    </ul>
-                                    <div class="chart">
-                                        <div class="chart" id="publications-analysis-chart" style="height: 233px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-primary">
-                                <div class="flexbox">
-                                    <div id="first-author-chart"></div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b><?= $research_data['first_author'] ?></b></span><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs18 ms-1" style="font-size:20px">First-Author peer-reviewed</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-success">
-                                <div class="flexbox">
-                                    <div id="repository-chart"></div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b><?= $research_data['must_repository'] ?></b></span><br><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs18 ms-1" style="font-size:20px">MUST repository</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-danger">
-                                <div class="flexbox">
-                                    <div id="co-authored-chart"></div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b><?= $research_data['co_authored'] ?></b></span><br><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs-18 ms-1" style="font-size:20px;">Co authored</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!---------------------------------------------------------------------------------------------------
-                                       SECTION FOR COMMUNITY SERVICES
-                   ---------------------------------------------------------------------------------------------------->
-                    <div class="row">
-                        <div class="col-lg-12 col-12">
-                            <div class="box">
-                                <div class="box-header" style="text-align : center ;">
-                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>COMMUNITY SERVICE</b></h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xl-4 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info rounded"><i class="fa fa-id-card"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['outreach_programs'] ?></b></span><br><br>
-                                    <span class="info-box-text">Community Outreach Programs</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-success rounded"><i class="fas fa-thumbs-up"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['clinical_practices'] ?></b></span>
-                                    <span class="info-box-text">Clinical Practices</span><br>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6 col-12">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
-                                <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['student_supervisions'] ?></b></span>
-                                    <span class="info-box-text">Supervisions of students in community placements</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12 col-lg-4">
-                            <div class="box">
-                                <div class="box-header with-border">
-                                    <h5 class="box-title">Community outreach programs</h5>
-                                </div>
-                                <div class="box-body">
-                                    <div class="box-body chart-responsive">
-                                        <div class="chart" id="community-outreach-chart" style="height: 305px;"></div>
-                                    </div>
-                                    <ul class="list-inline">
-                                        <li class="flexbox mb-5 text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
-                                                <span>Awareness campaigns</span>
-                                            </div>
-                                            <div><?= $community_data['awareness_campaigns'] ?></div>
-                                        </li>
-                                        <li class="flexbox mb-5 text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-info"></span>
-                                                <span>Embedded projects</span>
-                                            </div>
-                                            <div><?= $community_data['embedded_projects'] ?></div>
-                                        </li>
-                                        <li class="flexbox text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-danger"></span>
-                                                <span>Workshops/Trainings</span>
-                                            </div>
-                                            <div><?= $community_data['workshops'] ?></div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-8 col-12">
-                            <div class="box">
-                                <div class="box-header">
-                                    <h3 class="box-title"><b>COMMUNITY SERVICE ACTIVITIES</b></h3>
-                                </div>
-                                <div class="box-body">
-                                    <ul class="list-inline text-center">
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Supervision of Students in Community/Industrial Placements</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-success"></i>Community Outreach Programs</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-danger"></i>Clinical Practices</h5>
-                                        </li>
-                                    </ul>
-                                    <div class="chart">
-                                        <div class="chart" id="community-service-chart" style="height: 233px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <!-- /.content -->
+    <!-- Sidebar -->
+    <?php include 'bars/side_bar.php'; ?>
+    <!-- Dashboard Header -->
+    <header class="dashboard-header mt-5" style="width: 80%; margin-left: 20%;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-university me-2"></i>Mbarara University of Science and Technology</h1>
+                    <p class="mb-0 fs-5">Employee Performance Tracking Dashboard</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <p class="mb-0"><i class="fas fa-calendar-alt me-1"></i><span id="current-date"></span></p>
+                    <button class="btn btn-must-primary btn-sm mt-2"><i class="fas fa-download me-1"></i>Export Report</button>
+                </div>
             </div>
         </div>
-        <!-- /.content-wrapper -->
+    </header>
 
-        <!-- footer -->
-        <?php include 'bars/footer.php'; ?>
+    <!-- <div class="content-wrapper"> -->
+    <div class="content-wrapper mt-5" style="width: 80%; margin-left: 20%;">
+        <div class="container">
+            <!-- Quick Stats Row -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card metric-card h-100">
+                        <div class="card-body text-center">
+                            <div class="metric-value">247</div>
+                            <div class="metric-label">Total Employees</div>
+                            <small class="text-muted"><span class="text-success"><i class="fas fa-arrow-up me-1"></i>5%</span> from last year</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card metric-card h-100">
+                        <div class="card-body text-center">
+                            <div class="metric-value">83</div>
+                            <div class="metric-label">PhD Holders</div>
+                            <small class="text-muted"><span class="text-success"><i class="fas fa-arrow-up me-1"></i>12%</span> from last year</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card metric-card h-100">
+                        <div class="card-body text-center">
+                            <div class="metric-value">156</div>
+                            <div class="metric-label">Research Publications</div>
+                            <small class="text-muted"><span class="text-success"><i class="fas fa-arrow-up me-1"></i>10%</span> from last year</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card metric-card h-100">
+                        <div class="card-body text-center">
+                            <div class="metric-value">42</div>
+                            <div class="metric-label">Active Grants</div>
+                            <small class="text-muted">UGX <span class="fw-bold">3.2B</span> total value</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Performance Section -->
+            <div class="card section-card">
+                <div class="card-body">
+                    <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Academic Qualifications Distribution</h5>
+                            <div class="chart-container">
+                                <canvas id="qualificationsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-must-green"><i class="fas fa-star me-1"></i>Degree Classifications</h5>
+                            <div class="mb-3">
+                                <label>First Class Degrees <span class="badge bg-must-yellow float-end">25%</span></label>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 25%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Second Class Upper <span class="badge bg-must-yellow float-end">45%</span></label>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Second Class Lower <span class="badge bg-must-yellow float-end">20%</span></label>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 20%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label>Other Classifications <span class="badge bg-must-yellow float-end">10%</span></label>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value">83</div>
+                                            <div class="metric-label">PhD Holders</div>
+                                        </div>
+                                        <i class="fas fa-user-graduate fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>12%</span> <small>from last year</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value">112</div>
+                                            <div class="metric-label">Master's Degrees</div>
+                                        </div>
+                                        <i class="fas fa-user-tie fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>8%</span> <small>from last year</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value">52</div>
+                                            <div class="metric-label">First Class Degrees</div>
+                                        </div>
+                                        <i class="fas fa-award fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>15%</span> <small>from last year</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Research and Publications Section -->
+            <div class="card section-card">
+                <div class="card-body">
+                    <h2 class="section-title"><i class="fas fa-flask me-2 text-must-blue"></i>Research and Innovations</h2>
+
+                    <ul class="nav nav-pills mb-4" id="researchTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="publications-tab" data-bs-toggle="pill" data-bs-target="#publications" type="button" role="tab">
+                                <i class="fas fa-book me-1"></i>Publications
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="grants-tab" data-bs-toggle="pill" data-bs-target="#grants" type="button" role="tab">
+                                <i class="fas fa-money-bill-wave me-1"></i>Grants
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="supervision-tab" data-bs-toggle="pill" data-bs-target="#supervision" type="button" role="tab">
+                                <i class="fas fa-user-graduate me-1"></i>Supervision
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="innovations-tab" data-bs-toggle="pill" data-bs-target="#innovations" type="button" role="tab">
+                                <i class="fas fa-lightbulb me-1"></i>Innovations
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="researchTabsContent">
+                        <div class="tab-pane fade show active" id="publications" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Publication Types (Current Year)</h5>
+                                    <div class="chart-container">
+                                        <canvas id="publicationsChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-line me-1"></i>Publication Trends</h5>
+                                    <div class="chart-container">
+                                        <canvas id="publicationsTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">78</div>
+                                            <div class="metric-label">Journal Articles</div>
+                                            <small class="text-muted">32 first authors</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>15%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">24</div>
+                                            <div class="metric-label">Conference Papers</div>
+                                            <small class="text-muted">12 first authors</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>9%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">15</div>
+                                            <div class="metric-label">Book Chapters</div>
+                                            <small class="text-muted">5 first authors</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>7%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">8</div>
+                                            <div class="metric-label">Books with ISBN</div>
+                                            <small class="text-muted">3 single authors</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>5%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="grants" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Faculty</h5>
+                                    <div class="chart-container">
+                                        <canvas id="grantsChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-money-bill-trend-up me-1"></i>Grant Value Distribution</h5>
+                                    <div class="chart-container">
+                                        <canvas id="grantValueChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value">42</div>
+                                            <div class="metric-label">Active Grants</div>
+                                            <small>Total value: <span class="fw-bold">UGX 3.2B</span></small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>18%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value">18</div>
+                                            <div class="metric-label">International Grants</div>
+                                            <small>UGX <span class="fw-bold">2.1B</span> (66% of total)</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>22%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value">24</div>
+                                            <div class="metric-label">National Grants</div>
+                                            <small>UGX <span class="fw-bold">1.1B</span> (34% of total)</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>12%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="supervision" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-users-graduate me-1"></i>Postgraduate Supervision</h5>
+                                    <div class="chart-container">
+                                        <canvas id="supervisionChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-tasks me-1"></i>Completion Rates</h5>
+                                    <div class="chart-container">
+                                        <canvas id="completionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value">56</div>
+                                            <div class="metric-label">Active PhD Supervisions</div>
+                                            <small>Average: <span class="fw-bold">2.3</span> per faculty</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>10%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value">124</div>
+                                            <div class="metric-label">Active Masters Supervisions</div>
+                                            <small>Average: <span class="fw-bold">5.1</span> per faculty</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>8%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value">82%</div>
+                                            <div class="metric-label">Completion Rate</div>
+                                            <small><span class="fw-bold">5%</span> above national average</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>3%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="innovations" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Innovation Types</h5>
+                                    <div class="chart-container">
+                                        <canvas id="innovationsChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Innovation Commercialization</h5>
+                                    <div class="chart-container">
+                                        <canvas id="commercializationChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">7</div>
+                                            <div class="metric-label">Patents</div>
+                                            <small>3 pending approval</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>2 new</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">12</div>
+                                            <div class="metric-label">Copyrights</div>
+                                            <small>5 software, 7 literary</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>4 new</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">9</div>
+                                            <div class="metric-label">Trademarks</div>
+                                            <small>4 registered</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>2 new</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">15</div>
+                                            <div class="metric-label">Products</div>
+                                            <small>3 commercialized</small>
+                                            <div class="mt-2">
+                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>5 new</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Service Section -->
+            <div class="card section-card">
+                <div class="card-body">
+                    <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Community Service Participation</h5>
+                            <div class="chart-container">
+                                <canvas id="communityServiceChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Service Types</h5>
+                            <div class="chart-container">
+                                <canvas id="serviceTypesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value">187</div>
+                                            <div class="metric-label">Employees Engaged</div>
+                                        </div>
+                                        <i class="fas fa-users fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>22%</span> <small>from last year</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value">64</div>
+                                            <div class="metric-label">Community Projects</div>
+                                        </div>
+                                        <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>18%</span> <small>from last year</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value">2,450</div>
+                                            <div class="metric-label">Hours Contributed</div>
+                                        </div>
+                                        <i class="fas fa-clock fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>30%</span> <small>from last year</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5 class="text-must-green"><i class="fas fa-trophy me-1"></i>Top Community Service Initiatives</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Initiative</th>
+                                        <th>Lead Department</th>
+                                        <th>Participants</th>
+                                        <th>Impact Level</th>
+                                        <th>Duration</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Health Camp - Western Region</td>
+                                        <td>Medicine</td>
+                                        <td>28</td>
+                                        <td><span class="badge impact-high">High Impact</span></td>
+                                        <td>3 months</td>
+                                    </tr>
+                                    <tr>
+                                        <td>STEM Education Outreach</td>
+                                        <td>Science & Education</td>
+                                        <td>35</td>
+                                        <td><span class="badge impact-high">High Impact</span></td>
+                                        <td>Ongoing</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Agricultural Training</td>
+                                        <td>Agriculture</td>
+                                        <td>22</td>
+                                        <td><span class="badge impact-medium">Medium Impact</span></td>
+                                        <td>6 weeks</td>
+                                    </tr>
+                                    <tr>
+                                        <td>ICT Literacy Program</td>
+                                        <td>Computing</td>
+                                        <td>18</td>
+                                        <td><span class="badge impact-medium">Medium Impact</span></td>
+                                        <td>2 months</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Water Sanitation Project</td>
+                                        <td>Engineering</td>
+                                        <td>15</td>
+                                        <td><span class="badge impact-high">High Impact</span></td>
+                                        <td>4 months</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- ./wrapper -->
+    <footer class="py-4 mt-5">
+        <div class="container text-center">
+            <img src="https://via.placeholder.com/150x50?text=MUST+Logo" alt="MUST Logo" class="mb-3">
+            <p class="mb-1">© 2023 Mbarara University of Science and Technology</p>
+            <p class="mb-0">Human Resource Management System | <small>Data updated hourly | For official use only</small></p>
+        </div>
+    </footer>
 
-    <!-- Page Content overlay -->
-    <?php include 'bars/chatbot_overlay.php'; ?>
+    <!-- Floating Action Button -->
+    <div class="floating-action-btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Quick Actions">
+        <i class="fas fa-bolt"></i>
+    </div>
 
-    <!-- Vendor JS -->
-    <script src="../components/src/js/vendors.min.js"></script>
-    <!-- for chat bot popups -->
-    <script src="../components/src/js/pages/chat-popup.js"></script>
-    <!-- Morris Charts -->
-    <script src="../components/src/js/raphael.min.js"></script>
-    <script src="../components/src/js/morris.min.js"></script>
-
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom JS -->
     <script>
-        // Pass PHP data to JavaScript for charts
-        var academicData = {
-            phds: <?= $academic_data['phds'] ?>,
-            masters: <?= $academic_data['masters'] ?>,
-            bachelors: <?= $academic_data['bachelors'] ?>,
-            trainings: <?= $academic_data['trainings'] ?>
-        };
+        // Set current date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
 
-        var researchData = {
-            publications: {
-                google: <?= $research_data['publications']['google'] ?>,
-                research_gate: <?= $research_data['publications']['research_gate'] ?>,
-                academia: <?= $research_data['publications']['academia'] ?>,
-                others: <?= $research_data['publications']['others'] ?>
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Academic Qualifications Chart
+        const qualificationsCtx = document.getElementById('qualificationsChart').getContext('2d');
+        const qualificationsChart = new Chart(qualificationsCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['PhD', 'Master\'s', 'Bachelor\'s', 'Diploma', 'Other'],
+                datasets: [{
+                    data: [83, 112, 45, 5, 2],
+                    backgroundColor: [
+                        '#006837', // MUST Green
+                        '#005BAA', // MUST Blue
+                        '#FFD700', // MUST Yellow
+                        '#E5F2E9', // Light Green
+                        '#E6F0FA' // Light Blue
+                    ],
+                    borderWidth: 1
+                }]
             },
-            peer_reviewed: <?= $research_data['peer_reviewed'] ?>,
-            citations: <?= $research_data['citations'] ?>,
-            first_author: <?= $research_data['first_author'] ?>,
-            must_repository: <?= $research_data['must_repository'] ?>,
-            co_authored: <?= $research_data['co_authored'] ?>
-        };
-
-        var communityData = {
-            outreach_programs: <?= $community_data['outreach_programs'] ?>,
-            clinical_practices: <?= $community_data['clinical_practices'] ?>,
-            student_supervisions: <?= $community_data['student_supervisions'] ?>,
-            awareness_campaigns: <?= $community_data['awareness_campaigns'] ?>,
-            embedded_projects: <?= $community_data['embedded_projects'] ?>,
-            workshops: <?= $community_data['workshops'] ?>
-        };
-
-        // Initialize charts when the page loads
-        $(document).ready(function() {
-            // Academic Performance Chart
-            Morris.Area({
-                element: 'academic-performance-chart',
-                data: [{
-                        year: '2020',
-                        phds: academicData.phds * 0.2,
-                        masters: academicData.masters * 0.2,
-                        bachelors: academicData.bachelors * 0.2,
-                        trainings: academicData.trainings * 0.2
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
                     },
-                    {
-                        year: '2021',
-                        phds: academicData.phds * 0.5,
-                        masters: academicData.masters * 0.5,
-                        bachelors: academicData.bachelors * 0.5,
-                        trainings: academicData.trainings * 0.5
-                    },
-                    {
-                        year: '2022',
-                        phds: academicData.phds * 0.8,
-                        masters: academicData.masters * 0.8,
-                        bachelors: academicData.bachelors * 0.8,
-                        trainings: academicData.trainings * 0.8
-                    },
-                    {
-                        year: '2023',
-                        phds: academicData.phds,
-                        masters: academicData.masters,
-                        bachelors: academicData.bachelors,
-                        trainings: academicData.trainings
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
                     }
-                ],
-                xkey: 'year',
-                ykeys: ['phds', 'masters', 'bachelors', 'trainings'],
-                labels: ['PhDs', 'Masters', 'Bachelors', 'Trainings'],
-                lineColors: ['#17a2b8', '#6c757d', '#007bff', '#dc3545'],
-                hideHover: 'auto',
-                resize: true
-            });
+                }
+            }
+        });
 
-            // Publications by Platform Chart
-            Morris.Donut({
-                element: 'publications-platform-chart',
-                data: [{
-                        label: "Google",
-                        value: researchData.publications.google
+        // Publications Chart
+        const publicationsCtx = document.getElementById('publicationsChart').getContext('2d');
+        const publicationsChart = new Chart(publicationsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Journal Articles', 'Conference Papers', 'Book Chapters', 'Books'],
+                datasets: [{
+                    label: 'First Author',
+                    data: [32, 12, 5, 3],
+                    backgroundColor: '#003366',
+                }, {
+                    label: 'Co-Author',
+                    data: [46, 12, 10, 5],
+                    backgroundColor: '#6699CC',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
                     },
-                    {
-                        label: "Research Gate",
-                        value: researchData.publications.research_gate
-                    },
-                    {
-                        label: "Academia",
-                        value: researchData.publications.academia
-                    },
-                    {
-                        label: "Others",
-                        value: researchData.publications.others
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
                     }
-                ],
-                colors: ['#dc3545', '#ffc107', '#007bff', '#28a745'],
-                resize: true
-            });
+                }
+            }
+        });
 
-            // Publications Analysis Chart
-            Morris.Bar({
-                element: 'publications-analysis-chart',
-                data: [{
-                        y: 'Peer Reviewed',
-                        a: researchData.peer_reviewed
-                    },
-                    {
-                        y: 'Citations',
-                        a: researchData.citations
+        // Publications Trend Chart
+        const trendCtx = document.getElementById('publicationsTrendChart').getContext('2d');
+        const trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                datasets: [{
+                    label: 'Total Publications',
+                    data: [98, 112, 105, 127, 142, 156],
+                    borderColor: '#003366',
+                    backgroundColor: 'rgba(0, 51, 102, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
-                ],
-                xkey: 'y',
-                ykeys: ['a'],
-                labels: ['Count'],
-                barColors: ['#28a745', '#007bff'],
-                hideHover: 'auto',
-                resize: true
-            });
+                }
+            }
+        });
 
-            // First Author Chart
-            Morris.Line({
-                element: 'first-author-chart',
-                data: [{
-                        y: '2020',
-                        value: researchData.first_author * 0.2
-                    },
-                    {
-                        y: '2021',
-                        value: researchData.first_author * 0.5
-                    },
-                    {
-                        y: '2022',
-                        value: researchData.first_author * 0.8
-                    },
-                    {
-                        y: '2023',
-                        value: researchData.first_author
+        // Grants Chart
+        const grantsCtx = document.getElementById('grantsChart').getContext('2d');
+        const grantsChart = new Chart(grantsCtx, {
+            type: 'polarArea',
+            data: {
+                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
+                datasets: [{
+                    data: [18, 12, 8, 6, 5, 3],
+                    backgroundColor: [
+                        '#003366',
+                        '#6699CC',
+                        '#FF9900',
+                        '#CCCCCC',
+                        '#999999',
+                        '#666666'
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
                     }
-                ],
-                xkey: 'y',
-                ykeys: ['value'],
-                labels: ['First Author'],
-                lineColors: ['#ffffff'],
-                gridTextColor: '#ffffff',
-                grid: false,
-                hideHover: 'auto',
-                resize: true
-            });
+                }
+            }
+        });
 
-            // Repository Chart
-            Morris.Bar({
-                element: 'repository-chart',
-                data: [{
-                        y: '2020',
-                        value: researchData.must_repository * 0.2
-                    },
-                    {
-                        y: '2021',
-                        value: researchData.must_repository * 0.5
-                    },
-                    {
-                        y: '2022',
-                        value: researchData.must_repository * 0.8
-                    },
-                    {
-                        y: '2023',
-                        value: researchData.must_repository
+        // Grant Value Chart
+        const grantValueCtx = document.getElementById('grantValueChart').getContext('2d');
+        const grantValueChart = new Chart(grantValueCtx, {
+            type: 'pie',
+            data: {
+                labels: ['International', 'National', 'Local'],
+                datasets: [{
+                    data: [2100, 1100, 200],
+                    backgroundColor: [
+                        '#003366',
+                        '#6699CC',
+                        '#FF9900'
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: UGX ${value}M (${percentage}%)`;
+                            }
+                        }
                     }
-                ],
-                xkey: 'y',
-                ykeys: ['value'],
-                labels: ['Repository'],
-                barColors: ['#ffffff'],
-                gridTextColor: '#ffffff',
-                grid: false,
-                hideHover: 'auto',
-                resize: true
-            });
+                }
+            }
+        });
 
-            // Co-Authored Chart
-            Morris.Line({
-                element: 'co-authored-chart',
-                data: [{
-                        y: '2020',
-                        value: researchData.co_authored * 0.2
+        // Supervision Chart
+        const supervisionCtx = document.getElementById('supervisionChart').getContext('2d');
+        const supervisionChart = new Chart(supervisionCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
+                datasets: [{
+                    label: 'PhD',
+                    data: [18, 12, 8, 6, 5, 7],
+                    backgroundColor: '#003366',
+                }, {
+                    label: 'Masters',
+                    data: [35, 28, 22, 15, 12, 12],
+                    backgroundColor: '#6699CC',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: false,
                     },
-                    {
-                        y: '2021',
-                        value: researchData.co_authored * 0.5
-                    },
-                    {
-                        y: '2022',
-                        value: researchData.co_authored * 0.8
-                    },
-                    {
-                        y: '2023',
-                        value: researchData.co_authored
+                    y: {
+                        stacked: false,
+                        beginAtZero: true
                     }
-                ],
-                xkey: 'y',
-                ykeys: ['value'],
-                labels: ['Co-Authored'],
-                lineColors: ['#ffffff'],
-                gridTextColor: '#ffffff',
-                grid: false,
-                hideHover: 'auto',
-                resize: true
-            });
+                }
+            }
+        });
 
-            // Community Outreach Chart
-            Morris.Donut({
-                element: 'community-outreach-chart',
-                data: [{
-                        label: "Awareness Campaigns",
-                        value: communityData.awareness_campaigns
-                    },
-                    {
-                        label: "Embedded Projects",
-                        value: communityData.embedded_projects
-                    },
-                    {
-                        label: "Workshops/Trainings",
-                        value: communityData.workshops
+        // Completion Chart
+        const completionCtx = document.getElementById('completionChart').getContext('2d');
+        const completionChart = new Chart(completionCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Timeliness', 'Examination', 'Publication', 'Funding', 'Resources', 'Support'],
+                datasets: [{
+                    label: 'PhD Completion',
+                    data: [75, 82, 68, 70, 78, 85],
+                    backgroundColor: 'rgba(0, 51, 102, 0.2)',
+                    borderColor: '#003366',
+                    pointBackgroundColor: '#003366',
+                    pointBorderColor: '#fff',
+                }, {
+                    label: 'Masters Completion',
+                    data: [85, 88, 75, 80, 82, 90],
+                    backgroundColor: 'rgba(102, 153, 204, 0.2)',
+                    borderColor: '#6699CC',
+                    pointBackgroundColor: '#6699CC',
+                    pointBorderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        angleLines: {
+                            display: true
+                        },
+                        suggestedMin: 50,
+                        suggestedMax: 100
                     }
-                ],
-                colors: ['#ffc107', '#17a2b8', '#dc3545'],
-                resize: true
-            });
+                }
+            }
+        });
 
-            // Community Service Chart
-            Morris.Bar({
-                element: 'community-service-chart',
-                data: [{
-                        y: 'Supervisions',
-                        a: communityData.student_supervisions
-                    },
-                    {
-                        y: 'Outreach',
-                        a: communityData.outreach_programs
-                    },
-                    {
-                        y: 'Clinical',
-                        a: communityData.clinical_practices
+        // Innovations Chart
+        const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
+        const innovationsChart = new Chart(innovationsCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Patents', 'Copyrights', 'Trademarks', 'Products'],
+                datasets: [{
+                    data: [7, 12, 9, 15],
+                    backgroundColor: [
+                        '#003366',
+                        '#6699CC',
+                        '#FF9900',
+                        '#CCCCCC'
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
                     }
-                ],
-                xkey: 'y',
-                ykeys: ['a'],
-                labels: ['Count'],
-                barColors: ['#007bff', '#28a745', '#dc3545'],
-                hideHover: 'auto',
-                resize: true
-            });
+                }
+            }
+        });
+
+        // Commercialization Chart
+        const commercializationCtx = document.getElementById('commercializationChart').getContext('2d');
+        const commercializationChart = new Chart(commercializationCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Patents', 'Copyrights', 'Trademarks', 'Products'],
+                datasets: [{
+                    label: 'Commercialized',
+                    data: [2, 4, 4, 3],
+                    backgroundColor: '#003366',
+                }, {
+                    label: 'Not Commercialized',
+                    data: [5, 8, 5, 12],
+                    backgroundColor: '#CCCCCC',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Community Service Chart
+        const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
+        const communityChart = new Chart(communityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
+                datasets: [{
+                    label: 'Participants',
+                    data: [45, 38, 32, 28, 22, 22],
+                    backgroundColor: '#003366',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Service Types Chart
+        const serviceTypesCtx = document.getElementById('serviceTypesChart').getContext('2d');
+        const serviceTypesChart = new Chart(serviceTypesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Health', 'Education', 'Agriculture', 'Technology', 'Other'],
+                datasets: [{
+                    data: [45, 35, 25, 15, 10],
+                    backgroundColor: [
+                        '#003366',
+                        '#6699CC',
+                        '#FF9900',
+                        '#CCCCCC',
+                        '#999999'
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
         });
     </script>
-    <script src="../components/src/js/pages/chat-popup.js"></script>
-    <script src="../components/assets/icons/feather-icons/feather.min.js"></script>
-
-
-    <script src="../components/assets/vendor_components/raphael/raphael.min.js"></script>
-    <script src="../components/assets/vendor_components/morris.js/morris.min.js"></script>
-    <script src="../components/assets/vendor_components/apexcharts-bundle/dist/apexcharts.js"></script>
-    <script src="../components/assets/vendor_plugins/weather-icons/WeatherIcon.js"></script>
-    <script src="../components/assets/vendor_components/moment/min/moment.min.js"></script>
-    <script src="../components/assets/vendor_components/bootstrap-daterangepicker/daterangepicker.js"></script>
-    <script src="../components/assets/vendor_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.js"></script>
-    <script src="../components/assets/vendor_plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.js"></script>
-    <script src="../components/assets/vendor_components/jquery.peity/jquery.peity.js"></script>
-    <script src="../components/src/js/demo.js"></script>
-    <script src="../components/src/js/template.js"></script>
-    <script src="js/stat-cards.js"></script>
-    <script src="../js/chart.js"></script>
 </body>
 
 </html>
