@@ -413,10 +413,10 @@ require_once 'head/approve/config.php';
 
                     <div class="tab-content" id="researchTabsContent">
                         <div class="tab-pane fade show active" id="publications" role="tabpanel">
-                            <div class="row">
+                            <div class="row ">
                                 <div class="col-md-6">
-                                    <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Publication Types (Current Year)</h5>
-                                    <div class="chart-container">
+                                    <h5 class="text-must-green "><i class="fas fa-chart-bar me-1"></i>Publication Types (Current Year)</h5>
+                                    <div class="chart-container ">
                                         <canvas id="publicationsChart"></canvas>
                                     </div>
                                 </div>
@@ -434,10 +434,6 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">78</div>
                                             <div class="metric-label">Journal Articles</div>
-                                            <small class="text-muted">32 first authors</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>15%</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -446,10 +442,6 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">24</div>
                                             <div class="metric-label">Conference Papers</div>
-                                            <small class="text-muted">12 first authors</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>9%</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -458,10 +450,6 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">15</div>
                                             <div class="metric-label">Book Chapters</div>
-                                            <small class="text-muted">5 first authors</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>7%</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -470,10 +458,6 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">8</div>
                                             <div class="metric-label">Books with ISBN</div>
-                                            <small class="text-muted">3 single authors</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>5%</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -490,45 +474,6 @@ require_once 'head/approve/config.php';
                                 </div>
                                 
                             </div>
-
-                            <!-- <div class="row mt-4">
-                                <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="metric-value">42</div>
-                                            <div class="metric-label">Active Grants</div>
-                                            <small>Total value: <span class="fw-bold">UGX 3.2B</span></small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>18%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="metric-value">18</div>
-                                            <div class="metric-label">International Grants</div>
-                                            <small>UGX <span class="fw-bold">2.1B</span> (66% of total)</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>22%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="metric-value">24</div>
-                                            <div class="metric-label">National Grants</div>
-                                            <small>UGX <span class="fw-bold">1.1B</span> (34% of total)</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>12%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
                         </div>
 
                         <div class="tab-pane fade" id="supervision" role="tabpanel">
@@ -625,18 +570,18 @@ require_once 'head/approve/config.php';
                     <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Community Service Participation</h5>
                             <div class="chart-container">
                                 <canvas id="communityServiceChart"></canvas>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                             <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Service Types</h5>
                             <div class="chart-container">
                                 <canvas id="serviceTypesChart"></canvas>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row mt-4">
@@ -650,9 +595,7 @@ require_once 'head/approve/config.php';
                                         </div>
                                         <i class="fas fa-users fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>22%</span> <small>from last year</small>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -666,9 +609,7 @@ require_once 'head/approve/config.php';
                                         </div>
                                         <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>18%</span> <small>from last year</small>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -678,71 +619,16 @@ require_once 'head/approve/config.php';
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <div class="metric-value">2,450</div>
-                                            <div class="metric-label">Hours Contributed</div>
+                                            <div class="metric-label">Total Beneficiaries</div>
                                         </div>
                                         <i class="fas fa-clock fa-3x text-muted opacity-25"></i>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>30%</span> <small>from last year</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <h5 class="text-must-green"><i class="fas fa-trophy me-1"></i>Top Community Service Initiatives</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Initiative</th>
-                                        <th>Lead Department</th>
-                                        <th>Participants</th>
-                                        <th>Impact Level</th>
-                                        <th>Duration</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Health Camp - Western Region</td>
-                                        <td>Medicine</td>
-                                        <td>28</td>
-                                        <td><span class="badge impact-high">High Impact</span></td>
-                                        <td>3 months</td>
-                                    </tr>
-                                    <tr>
-                                        <td>STEM Education Outreach</td>
-                                        <td>Science & Education</td>
-                                        <td>35</td>
-                                        <td><span class="badge impact-high">High Impact</span></td>
-                                        <td>Ongoing</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Agricultural Training</td>
-                                        <td>Agriculture</td>
-                                        <td>22</td>
-                                        <td><span class="badge impact-medium">Medium Impact</span></td>
-                                        <td>6 weeks</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ICT Literacy Program</td>
-                                        <td>Computing</td>
-                                        <td>18</td>
-                                        <td><span class="badge impact-medium">Medium Impact</span></td>
-                                        <td>2 months</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Water Sanitation Project</td>
-                                        <td>Engineering</td>
-                                        <td>15</td>
-                                        <td><span class="badge impact-high">High Impact</span></td>
-                                        <td>4 months</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -947,10 +833,22 @@ require_once 'head/approve/config.php';
                     label: 'PhD',
                     data: [18, 12, 8, 6, 5, 7],
                     backgroundColor: '#003366',
+                    borderRadius: {
+        topLeft: 5,
+        topRight: 5,
+        bottomLeft: 0,
+        bottomRight: 0
+    }
                 }, {
                     label: 'Masters',
                     data: [35, 28, 22, 15, 12, 12],
                     backgroundColor: '#6699CC',
+                    borderRadius: {
+        topLeft: 5,
+        topRight: 5,
+        bottomLeft: 0,
+        bottomRight: 0
+    }
                 }]
             },
             options: {
@@ -983,6 +881,12 @@ require_once 'head/approve/config.php';
                         '#FF9900',
                         '#CCCCCC'
                     ],
+                    borderRadius: {
+                        topLeft: 5,
+                        topRight: 5,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    },
                 }]
             },
             options: {
@@ -999,52 +903,59 @@ require_once 'head/approve/config.php';
 
         // Community Service Chart
         const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
-        const communityChart = new Chart(communityCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
-                datasets: [{
-                    label: 'Participants',
-                    data: [45, 38, 32, 28, 22, 22],
-                    backgroundColor: '#003366',
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+const communityChart = new Chart(communityCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
+        datasets: [{
+            label: 'Participants',
+            data: [45, 38, 32, 28, 22, 22],
+            backgroundColor: '#003366',
+            borderRadius: {
+        topLeft: 5,
+        topRight: 5,
+        bottomLeft: 0,
+        bottomRight: 0
+    }, // This will round all corners
+            borderSkipped: false, // Important for applying borderRadius to all sides
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
             }
-        });
+        }
+    }
+});
 
         // Service Types Chart
-        const serviceTypesCtx = document.getElementById('serviceTypesChart').getContext('2d');
-        const serviceTypesChart = new Chart(serviceTypesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Health', 'Education', 'Agriculture', 'Technology', 'Other'],
-                datasets: [{
-                    data: [45, 35, 25, 15, 10],
-                    backgroundColor: [
-                        '#003366',
-                        '#6699CC',
-                        '#FF9900',
-                        '#CCCCCC',
-                        '#999999'
-                    ],
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    }
-                }
-            }
-        });
+        // const serviceTypesCtx = document.getElementById('serviceTypesChart').getContext('2d');
+        // const serviceTypesChart = new Chart(serviceTypesCtx, {
+        //     type: 'doughnut',
+        //     data: {
+        //         labels: ['Health', 'Education', 'Agriculture', 'Technology', 'Other'],
+        //         datasets: [{
+        //             data: [45, 35, 25, 15, 10],
+        //             backgroundColor: [
+        //                 '#003366',
+        //                 '#6699CC',
+        //                 '#FF9900',
+        //                 '#CCCCCC',
+        //                 '#999999'
+        //             ],
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         plugins: {
+        //             legend: {
+        //                 position: 'right',
+        //             }
+        //         }
+        //     }
+        // });
     </script>
 </body>
 
