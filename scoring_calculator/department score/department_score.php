@@ -166,6 +166,19 @@ function get_department_performance($conn, $department_id) {
         $department_data['university_service_score'] += $service_details['score'] ?? 0;
     }
 
+    // Compute total score from component scores
+    $department_data['total_score'] =
+        $department_data['academic_score'] +
+        $department_data['grant_score'] +
+        $department_data['innovation_score'] +
+        $department_data['publication_score'] +
+        $department_data['supervision_score'] +
+        $department_data['membership_score'] +
+        $department_data['community_service_score'] +
+        $department_data['other_academic_score'] +
+        $department_data['teaching_experience_score'] +
+        $department_data['university_service_score'];
+
 
 
 return $department_data;
@@ -199,9 +212,11 @@ function get_department_staff_count($conn, $department_id) {
 
 
 // Usage
-// $department_id = 2;
+// $department_id = 1;
 // $dept_data = get_department_performance($conn, $department_id);
 // $department_name = get_department_name($conn, $department_id);
+
+
 
 // echo $dept_data['total_publications'] . "<br>";
 // // Output
@@ -284,3 +299,4 @@ function get_department_staff_count($conn, $department_id) {
 
 
 ?>
+<!-- <pre><?//php print_r($dept_data); ?></pre> -->
