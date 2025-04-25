@@ -101,12 +101,14 @@ require_once 'head/approve/config.php';
 
         .chart-container {
             position: relative;
-            height: 300px;
             margin-bottom: 20px;
             background-color: white;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            
+            height: 400px;
+            width: 100%;
         }
 
         .progress {
@@ -234,6 +236,14 @@ require_once 'head/approve/config.php';
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
+        .large-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            height: auto;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -269,7 +279,6 @@ require_once 'head/approve/config.php';
                         <div class="card-body text-center">
                             <div class="metric-value">247</div>
                             <div class="metric-label">Total Employees</div>
-                            <small class="text-muted"><span class="text-success"><i class="fas fa-arrow-up me-1"></i>5%</span> from last year</small>
                         </div>
                     </div>
                 </div>
@@ -278,7 +287,6 @@ require_once 'head/approve/config.php';
                         <div class="card-body text-center">
                             <div class="metric-value">83</div>
                             <div class="metric-label">PhD Holders</div>
-                            <small class="text-muted"><span class="text-success"><i class="fas fa-arrow-up me-1"></i>12%</span> from last year</small>
                         </div>
                     </div>
                 </div>
@@ -287,7 +295,6 @@ require_once 'head/approve/config.php';
                         <div class="card-body text-center">
                             <div class="metric-value">156</div>
                             <div class="metric-label">Research Publications</div>
-                            <small class="text-muted"><span class="text-success"><i class="fas fa-arrow-up me-1"></i>10%</span> from last year</small>
                         </div>
                     </div>
                 </div>
@@ -296,7 +303,6 @@ require_once 'head/approve/config.php';
                         <div class="card-body text-center">
                             <div class="metric-value">42</div>
                             <div class="metric-label">Active Grants</div>
-                            <small class="text-muted">UGX <span class="fw-bold">3.2B</span> total value</small>
                         </div>
                     </div>
                 </div>
@@ -307,40 +313,27 @@ require_once 'head/approve/config.php';
                 <div class="card-body">
                     <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
 
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-6">
                             <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Academic Qualifications Distribution</h5>
                             <div class="chart-container">
                                 <canvas id="qualificationsChart"></canvas>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <h5 class="text-must-green"><i class="fas fa-star me-1"></i>Degree Classifications</h5>
-                            <div class="mb-3">
-                                <label>First Class Degrees <span class="badge bg-must-yellow float-end">25%</span></label>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: 25%"></div>
+                        
+                    </div> -->
+                    <div class="large-card">
+                        <div class="large-card">
+                            <div class="large-card">
+                                <div class="section-title">
+                                    <h2>Faculty Overview</h2>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Second Class Upper <span class="badge bg-must-yellow float-end">45%</span></label>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: 45%"></div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Second Class Lower <span class="badge bg-must-yellow float-end">20%</span></label>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: 20%"></div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Other Classifications <span class="badge bg-must-yellow float-end">10%</span></label>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: 10%"></div>
+                                <div class="chart-container">
+                                    <canvas id="qualificationsChart"></canvas>
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
 
                     <div class="row mt-4">
@@ -354,9 +347,7 @@ require_once 'head/approve/config.php';
                                         </div>
                                         <i class="fas fa-user-graduate fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>12%</span> <small>from last year</small>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -370,9 +361,7 @@ require_once 'head/approve/config.php';
                                         </div>
                                         <i class="fas fa-user-tie fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>8%</span> <small>from last year</small>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -386,9 +375,7 @@ require_once 'head/approve/config.php';
                                         </div>
                                         <i class="fas fa-award fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>15%</span> <small>from last year</small>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -495,21 +482,16 @@ require_once 'head/approve/config.php';
 
                         <div class="tab-pane fade" id="grants" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Faculty</h5>
                                     <div class="chart-container">
                                         <canvas id="grantsChart"></canvas>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <h5 class="text-must-green"><i class="fas fa-money-bill-trend-up me-1"></i>Grant Value Distribution</h5>
-                                    <div class="chart-container">
-                                        <canvas id="grantValueChart"></canvas>
-                                    </div>
-                                </div>
+                                
                             </div>
 
-                            <div class="row mt-4">
+                            <!-- <div class="row mt-4">
                                 <div class="col-md-4">
                                     <div class="card metric-card">
                                         <div class="card-body">
@@ -546,77 +528,53 @@ require_once 'head/approve/config.php';
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                         <div class="tab-pane fade" id="supervision" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <h5 class="text-must-green"><i class="fas fa-users-graduate me-1"></i>Postgraduate Supervision</h5>
                                     <div class="chart-container">
                                         <canvas id="supervisionChart"></canvas>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <h5 class="text-must-green"><i class="fas fa-tasks me-1"></i>Completion Rates</h5>
-                                    <div class="chart-container">
-                                        <canvas id="completionChart"></canvas>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="row mt-4">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="card metric-card">
                                         <div class="card-body">
                                             <div class="metric-value">56</div>
-                                            <div class="metric-label">Active PhD Supervisions</div>
-                                            <small>Average: <span class="fw-bold">2.3</span> per faculty</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>10%</span>
-                                            </div>
+                                            <div class="metric-label"> PhD Supervisions</div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="card metric-card">
                                         <div class="card-body">
                                             <div class="metric-value">124</div>
-                                            <div class="metric-label">Active Masters Supervisions</div>
-                                            <small>Average: <span class="fw-bold">5.1</span> per faculty</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>8%</span>
-                                            </div>
+                                            <div class="metric-label"> Masters Supervisions</div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <!-- <div class="col-md-4">
                                     <div class="card metric-card">
                                         <div class="card-body">
                                             <div class="metric-value">82%</div>
                                             <div class="metric-label">Completion Rate</div>
-                                            <small><span class="fw-bold">5%</span> above national average</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>3%</span>
-                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 
                         <div class="tab-pane fade" id="innovations" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Innovation Types</h5>
                                     <div class="chart-container">
                                         <canvas id="innovationsChart"></canvas>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Innovation Commercialization</h5>
-                                    <div class="chart-container">
-                                        <canvas id="commercializationChart"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -626,11 +584,7 @@ require_once 'head/approve/config.php';
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
                                             <div class="metric-value">7</div>
-                                            <div class="metric-label">Patents</div>
-                                            <small>3 pending approval</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>2 new</span>
-                                            </div>
+                                            <div class="metric-label">Copyrights</div>
                                         </div>
                                     </div>
                                 </div>
@@ -639,10 +593,6 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">12</div>
                                             <div class="metric-label">Copyrights</div>
-                                            <small>5 software, 7 literary</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>4 new</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -651,10 +601,6 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">9</div>
                                             <div class="metric-label">Trademarks</div>
-                                            <small>4 registered</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>2 new</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -663,13 +609,10 @@ require_once 'head/approve/config.php';
                                         <div class="card-body text-center">
                                             <div class="metric-value">15</div>
                                             <div class="metric-label">Products</div>
-                                            <small>3 commercialized</small>
-                                            <div class="mt-2">
-                                                <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>5 new</span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -840,17 +783,16 @@ require_once 'head/approve/config.php';
         // Academic Qualifications Chart
         const qualificationsCtx = document.getElementById('qualificationsChart').getContext('2d');
         const qualificationsChart = new Chart(qualificationsCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
-                labels: ['PhD', 'Master\'s', 'Bachelor\'s', 'Diploma', 'Other'],
+                labels: ['PhD', 'Master\'s', 'First Class', 'Second Class'],
                 datasets: [{
-                    data: [83, 112, 45, 5, 2],
+                    data: [83, 112, 45, 5],
                     backgroundColor: [
                         '#006837', // MUST Green
                         '#005BAA', // MUST Blue
                         '#FFD700', // MUST Yellow
                         '#E5F2E9', // Light Green
-                        '#E6F0FA' // Light Blue
                     ],
                     borderWidth: 1
                 }]
@@ -881,14 +823,14 @@ require_once 'head/approve/config.php';
         const publicationsChart = new Chart(publicationsCtx, {
             type: 'bar',
             data: {
-                labels: ['Journal Articles', 'Conference Papers', 'Book Chapters', 'Books'],
+                labels: ['Journal Articles', 'Conference Papers', 'Books'],
                 datasets: [{
                     label: 'First Author',
-                    data: [32, 12, 5, 3],
+                    data: [32, 12, 5],
                     backgroundColor: '#003366',
                 }, {
                     label: 'Co-Author',
-                    data: [46, 12, 10, 5],
+                    data: [46, 12, 10],
                     backgroundColor: '#6699CC',
                 }]
             },
@@ -897,10 +839,25 @@ require_once 'head/approve/config.php';
                 scales: {
                     x: {
                         stacked: true,
+                        title: {
+                            display: true,
+                            text: 'Publication Type',  // X-axis label
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            }
+                        }
                     },
                     y: {
                         stacked: true,
-                        beginAtZero: true
+                        title: {
+                            display: true,
+                            text: 'Number',  // X-axis label
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            }
+                        }
                     }
                 }
             }
@@ -911,10 +868,10 @@ require_once 'head/approve/config.php';
         const trendChart = new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                labels: ['2021', '2022', '2023', '2024', '2025'],
                 datasets: [{
                     label: 'Total Publications',
-                    data: [98, 112, 105, 127, 142, 156],
+                    data: [112, 105, 127, 142, 156],
                     borderColor: '#003366',
                     backgroundColor: 'rgba(0, 51, 102, 0.1)',
                     fill: true,
@@ -924,8 +881,27 @@ require_once 'head/approve/config.php';
             options: {
                 responsive: true,
                 scales: {
+                    x:{
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'Years',  // X-axis label
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            }
+                        }
+                    },
                     y: {
-                        beginAtZero: true
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'Number',  // X-axis label
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            }
+                        }
                     }
                 }
             }
@@ -959,38 +935,7 @@ require_once 'head/approve/config.php';
             }
         });
 
-        // Grant Value Chart
-        const grantValueCtx = document.getElementById('grantValueChart').getContext('2d');
-        const grantValueChart = new Chart(grantValueCtx, {
-            type: 'pie',
-            data: {
-                labels: ['International', 'National', 'Local'],
-                datasets: [{
-                    data: [2100, 1100, 200],
-                    backgroundColor: [
-                        '#003366',
-                        '#6699CC',
-                        '#FF9900'
-                    ],
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.raw || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return `${label}: UGX ${value}M (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        
 
         // Supervision Chart
         const supervisionCtx = document.getElementById('supervisionChart').getContext('2d');
@@ -1022,46 +967,12 @@ require_once 'head/approve/config.php';
             }
         });
 
-        // Completion Chart
-        const completionCtx = document.getElementById('completionChart').getContext('2d');
-        const completionChart = new Chart(completionCtx, {
-            type: 'radar',
-            data: {
-                labels: ['Timeliness', 'Examination', 'Publication', 'Funding', 'Resources', 'Support'],
-                datasets: [{
-                    label: 'PhD Completion',
-                    data: [75, 82, 68, 70, 78, 85],
-                    backgroundColor: 'rgba(0, 51, 102, 0.2)',
-                    borderColor: '#003366',
-                    pointBackgroundColor: '#003366',
-                    pointBorderColor: '#fff',
-                }, {
-                    label: 'Masters Completion',
-                    data: [85, 88, 75, 80, 82, 90],
-                    backgroundColor: 'rgba(102, 153, 204, 0.2)',
-                    borderColor: '#6699CC',
-                    pointBackgroundColor: '#6699CC',
-                    pointBorderColor: '#fff',
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 50,
-                        suggestedMax: 100
-                    }
-                }
-            }
-        });
+        
 
         // Innovations Chart
         const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
         const innovationsChart = new Chart(innovationsCtx, {
-            type: 'pie',
+            type: 'bar',
             data: {
                 labels: ['Patents', 'Copyrights', 'Trademarks', 'Products'],
                 datasets: [{
@@ -1084,35 +995,7 @@ require_once 'head/approve/config.php';
             }
         });
 
-        // Commercialization Chart
-        const commercializationCtx = document.getElementById('commercializationChart').getContext('2d');
-        const commercializationChart = new Chart(commercializationCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Patents', 'Copyrights', 'Trademarks', 'Products'],
-                datasets: [{
-                    label: 'Commercialized',
-                    data: [2, 4, 4, 3],
-                    backgroundColor: '#003366',
-                }, {
-                    label: 'Not Commercialized',
-                    data: [5, 8, 5, 12],
-                    backgroundColor: '#CCCCCC',
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        stacked: true,
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+        
 
         // Community Service Chart
         const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
