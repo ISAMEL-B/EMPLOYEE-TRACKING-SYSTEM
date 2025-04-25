@@ -134,19 +134,26 @@ $year2025Data = [
           resize: true // Makes it responsive
       });
   
-  //donut chart to show applications wehre the publications are hosted
-  var donut = new Morris.Donut({
-      element: 'daily-inquery',
-      resize: true,
-      colors: ["#dc3545", "#ffc107", "#0d6efd", "#198754"],
-      data: [
-        {label: "Google", value: 300},
-        {label: "Research Gate", value: 55},
-        {label: "Academia", value: 100},
-        {label: "Others", value: 10},
-      ],
-      hideHover: 'auto'
-    });
+        // Dynamic Donut Chart for Publication Types
+        var donut = new Morris.Donut({
+            element: 'daily-inquery',
+            resize: true,
+            colors: ["#dc3545", "#ffc107", "#0d6efd", "#198754", "#20c997"],
+            data: [
+                {label: "First Author", value: <?= $journal ?? 0 ?>},
+                {label: "Corresponding Author", value: <?= $articles ?? 0 ?>},
+                {label: "Co-author", value: <?= $co_author ?? 0 ?>},
+                {label: "Book with ISBN", value: <?= $book ?? 0 ?>},
+                {label: "Book Chapter", value: <?= $book_chapter ?? 0 ?>}
+            ],
+            hideHover: 'auto',
+            formatter: function (value) { 
+                return value + ' publications'; 
+            },
+            redraw: true,
+            parseTime: false,
+            gridTextSize: 10
+        });
 
   // WeatherIcon	
       WeatherIcon.add('icon1'	, WeatherIcon.SLEET , {stroke:false , shadow:false , animated:true } );	
@@ -235,11 +242,12 @@ $year2025Data = [
       
       
   
-}); // End of use strict
+}); // End of use script
 
 
       
 	</script>
+</body>
 </body>
 </html>
 

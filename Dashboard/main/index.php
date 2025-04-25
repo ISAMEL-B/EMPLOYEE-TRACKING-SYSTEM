@@ -19,13 +19,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
 include '../../scoring_calculator/university score/university_score.php';
 
 
-// echo $university_data['PhD'] . ' space'; 
-// echo $university_data['First Class']. ' space';
-// echo $university_data['Masters']. ' space';
-// echo $university_data['academic_score']. ' space';
-// echo 'thsi is the world';
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,6 +37,7 @@ include '../../scoring_calculator/university score/university_score.php';
     <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
     <!-- Style-->
     <link rel="stylesheet" href="../components/src/css/style.css">
+    <link rel="stylesheet" href="css/stat-cards.css">';
 
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
 
@@ -91,6 +85,18 @@ include '../../scoring_calculator/university score/university_score.php';
                     $masters = $university_data['Masters']; // Dynamic value for Masters Degrees
                     $bachelors_first_class = $university_data['First Class']; // Dynamic value for Bachelor's Honors
                     $trainings = $university_data['Other']; // Dynamic value for Professional Trainings
+                    $patents = $university_data['Patent']; // Dynamic value for Patents
+                    $publications = $university_data['Journal Articles (First Author)'] + $university_data['Journal Articles (Corresponding Author)'] + $university_data['Journal Articles (Co-author)'] + $university_data['Book with ISBN'] + $university_data['Book Chapter'];// Dynamic value for publications
+                    $journal = $university_data['Journal Articles (First Author)']; // Dynamic value for Journal Articles for First Author      
+                    $articles = $university_data['Journal Articles (Corresponding Author)']; // Dynamic value for Journal Articles for Corresponding Author
+                    $co_author = $university_data['Journal Articles (Co-author)']; // Dynamic value for Journal Articles for Co-author
+                    $book = $university_data['Book with ISBN']; // Dynamic value for Book with ISBN
+                    $book_chapter = $university_data['Book Chapter']; // Dynamic value for Book Chapter
+                    
+                    $grants = $university_data['total_grant_amount']; // Dynamic value for Grants
+
+
+
                     ?>
 
                     <div class="row">
@@ -99,7 +105,7 @@ include '../../scoring_calculator/university score/university_score.php';
                             <div class="info-box">
                                 <span class="info-box-icon bg-info rounded"><i class="fa fa-id-card"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $phds; ?></b></span><br><br>
+                                    <span class="info-box-number" style="font-size:40px"><?php echo $phds ?></b></span><br><br>
                                     <span class="info-box-text">Phd's</span>
                                 </div>
                             </div>
@@ -110,7 +116,7 @@ include '../../scoring_calculator/university score/university_score.php';
                             <div class="info-box">
                                 <span class="info-box-icon bg-success rounded"><i class="fas fa-thumbs-up"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $masters; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><?= $masters ?></span>
                                     <span class="info-box-text">Masters Degrees</span><br>
                                 </div>
                             </div>
@@ -121,7 +127,7 @@ include '../../scoring_calculator/university score/university_score.php';
                             <div class="info-box">
                                 <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $bachelors_first_class; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><?= $bachelors_first_class ?></span>
                                     <span class="info-box-text">Bachelor's Honors</span>
                                 </div>
                             </div>
@@ -132,7 +138,7 @@ include '../../scoring_calculator/university score/university_score.php';
                             <div class="info-box">
                                 <span class="info-box-icon bg-danger rounded"><i class="fa fa-id-card"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $trainings; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><?= $trainings ?></span>
                                     <span class="info-box-text">Professional Trainings</span>
                                 </div>
                             </div>
@@ -157,13 +163,10 @@ include '../../scoring_calculator/university score/university_score.php';
                                             <h5><i class="fa fa-circle me-5 text--bs-indigo"></i>Masters</h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First clas</h5>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First class</h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First clas</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-danger"></i>Certifications</h5>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First class</h5>
                                         </li>
                                     </ul>
                                     <div id="morris-area-chart3" style="height: 245px;"></div>
@@ -174,137 +177,101 @@ include '../../scoring_calculator/university score/university_score.php';
 
                     <!-- ---------------------------------------------------------------------------------------------------
 
-                   SECTION FOR RESEARCH AND INNOVATIONS
+                                    SECTION FOR RESEARCH AND INNOVATIONS
 
-                   ---------------------------------------------------------------------------------------------------- -->
+                    ---------------------------------------------------------------------------------------------------- -->
 
                     <div class="row">
                         <div class="col-lg-12 col-12">
                             <div class="box">
-                                <div class="box-header" style="text-align : center ;">
-                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>RESEARCH AND INNOVATIONS</b></h3>
+                                <div class="box-header" style="text-align: center;">
+                                    <h3 class="box-title" style="font-size: 40px;"><b>RESEARCH AND INNOVATIONS</b></h3>
                                 </div>
-
                             </div>
                         </div>
-
                     </div>
 
                     <div class="row">
                         <div class="col-12 col-lg-4">
                             <div class="box">
                                 <div class="box-header with-border">
-                                    <h5 class="box-title">Publications per publishing application</h5>
-                                </div>
-                                <div class="box-body">
-                                    <div class="box-body chart-responsive">
-                                        <div class="chart" id="daily-inquery" style="height: 305px;"></div>
+                                    <h5 class="box-title">Publications by type</h5>
+                                </div>                                
+                                <div class="box-body" style="padding: 15px;">
+                                    <div class="box-body chart-responsive" style="height: 180px;">
+                                        <div class="chart" id="daily-inquery" style="height: 180px;"></div>
                                     </div>
-
-                                    <ul class="list-inline">
-                                        <li class="flexbox mb-5 text-fade">
+                                    <ul class="list-inline" style="margin-bottom: 0;">
+                                        <li class="flexbox mb-3 text-fade"> <!-- Reduced from mb-5 to mb-3 -->
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-danger"></span>
-                                                <span>Google</span>
+                                                <span>First Author</span>
                                             </div>
-                                            <div>300</div>
+                                            <div><?= $journal ?></div>
                                         </li>
-                                        <li class="flexbox mb-5 text-fade">
+                                        <li class="flexbox mb-3 text-fade">
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
-                                                <span>Research Gate</span>
+                                                <span>Corresponding Author</span>
                                             </div>
-                                            <div>55</div>
+                                            <div><?= $articles ?></div>
                                         </li>
-                                        <li class="flexbox text-fade">
+                                        <li class="flexbox mb-3 text-fade"> <!-- Added mb-3 for consistency -->
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-primary"></span>
-                                                <span>Academia</span>
+                                                <span>Co-author</span>
                                             </div>
-                                            <div>100</div>
+                                            <div><?= $co_author ?></div>
                                         </li>
-                                        <li class="flexbox text-fade">
+                                        <li class="flexbox mb-3 text-fade">
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-success"></span>
-                                                <span>Others</span>
+                                                <span>Book with ISBN</span>
                                             </div>
-                                            <div>10</div>
+                                            <div><?= $book ?></div>
                                         </li>
-                                        <li class="flexbox text-fade">
+                                        <li class="flexbox text-fade"> <!-- Last item doesn't need margin-bottom -->
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-info"></span>
+                                                <span>Book Chapter</span>
+                                            </div>
+                                            <div><?= $book_chapter ?></div>
                                         </li>
                                     </ul>
                                 </div>
-                            </div>
+                            </div>    
                         </div>
-
 
                         <div class="col-lg-8 col-12">
-                            <div class="box">
-                                <div class="box-header">
-                                    <h3 class="box-title"><b>PUBLICATIONS</b></h3>
+                            <!-- Stat Cards Container -->
+                            <div class="stat-cards-container">
+                                <!-- Publications Card -->
+                                <div class="stat-card">
+                                    <h3>Publications</h3>
+                                    <p class="stat-number"><b><?= $publications ?></b></p>
+                                    <p class="stat-change positive">
+                                        +23% from last year
+                                    </p>
                                 </div>
-                                <div class="box-body">
-                                    <ul class="list-inline text-center">
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-success"></i>Peer Reviewed Publications</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Number of Citations</h5>
-                                        </li>
-                                    </ul>
-                                    <div class="chart">
-                                        <div class="chart" id="revenue-chart" style="height: 233px;"></div>
-                                    </div>
+                                
+                                <!-- Grants Card -->                        
+                                <div class="stat-card grants">
+                                    <h3>Grants</h3>
+                                    <p class="stat-number"><b><?= $grants ?></b></p>
+                                    <p class="stat-change positive">
+                                        +15% from last year
+                                    </p>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-primary">
-                                <div class="flexbox">
-                                    <div id="linechart">1,4,3,7,6,4,8,9,6,8,12</div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b>113</b></span><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs18 ms-1" style="font-size:20px">First-Author peer-reviewed</span>
-                                        </span>
-                                    </div>
+                                
+                                <!-- Patents Card -->
+                                <div class="stat-card patents">     
+                                    <h3>Patents</h3>
+                                    <p class="stat-number"><b><?= $patents ?></b></p>
+                                    <p class="stat-change positive">
+                                        +10% from last year
+                                    </p>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-success">
-                                <div class="flexbox">
-                                    <div id="barchart">1,3,5</div>
-                                    <div class="text-end">
-
-
-                                        <span style="font-size:40px;"><b>34578</b></span><br><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs18 ms-1" style="font-size:20px">MUST repository</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-danger">
-                                <div class="flexbox">
-                                    <div id="discretechart">1,4,3,7,6,4,8,9,6,8,12</div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b>234</b></span><br><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs-18 ms-1" style="font-size:20px;">Co authored</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            </div>                           
                         </div>
                     </div>
 
@@ -469,6 +436,8 @@ include '../../scoring_calculator/university score/university_score.php';
     <script src="../components/assets/vendor_components/jquery.peity/jquery.peity.js"></script>
     <script src="../components/src/js/demo.js"></script>
     <script src="../components/src/js/template.js"></script>
+    <script src="js/stat-cards.js"></script>
+    <script src="../js/chart.js"></script>
     <!-- <script src="../components/src/js/pages/dashboard.php"></script> -->
     <?php
     include '../components/src/js/pages/dashboarddd.php';
