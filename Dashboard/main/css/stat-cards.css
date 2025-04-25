@@ -1,0 +1,105 @@
+/* Stat Cards Container */
+.stat-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between cards */
+    justify-content: flex-start; /* Or use 'space-between' for equal spacing */
+}
+
+/* Individual Stat Card */
+.stat-card {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border-radius: 12px;
+    padding: 25px;
+    width: 300px; /* Fixed width */
+    min-height: 220px; /* Minimum height */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.2);
+    flex: 0 0 auto; /* Don't grow or shrink */
+}
+
+/* Different color variations */
+.stat-card.grants {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.stat-card.patents {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+/* Rest of your existing stat card styles... */
+/* (Keep all the other styles from previous .stat-card definitions) */
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.stat-card h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.stat-number {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-change {
+    margin: 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-change span {
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 3px 8px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.stat-change svg {
+    width: 12px;
+    height: 12px;
+    margin-right: 3px;
+}
+@media (max-width: 768px) {
+    .stat-card {
+        width: 100%; /* Full width on mobile */
+        min-height: 180px; /* Slightly shorter on mobile */
+    }
+    
+    .stat-cards-container {
+        gap: 15px; /* Smaller gap on mobile */
+    }
+}
+/* Compact list items */
+.list-inline .flexbox {
+    padding: 4px 0; /* Reduced vertical padding */
+}
+
+/* Smaller badges */
+.badge-dot.badge-lg {
+    width: 10px;
+    height: 10px;
+}
+
+/* Compact box header */
+.box-header.with-border {
+    padding: 8px 15px;
+}
+.box-title {
+    font-size: 14px;
+}
