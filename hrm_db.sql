@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Apr 14, 2025 at 12:27 AM
+-- Host: 127.0.0.1
+-- Generation Time: Apr 25, 2025 at 05:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -52,18 +52,24 @@ INSERT INTO `academicactivities` (`activity_id`, `staff_id`, `activity_type`) VA
 CREATE TABLE `communityservice` (
   `community_service_id` int(11) NOT NULL,
   `staff_id` int(11) DEFAULT NULL,
-  `description` text DEFAULT NULL
+  `description` text DEFAULT NULL,
+  `beneficiaries` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `communityservice`
 --
 
-INSERT INTO `communityservice` (`community_service_id`, `staff_id`, `description`) VALUES
-(1, 1, 'Volunteer Teaching'),
-(2, 2, 'Community Cleanup'),
-(3, 3, 'Technical Workshop'),
-(4, 4, 'Health Awareness Campaign');
+INSERT INTO `communityservice` (`community_service_id`, `staff_id`, `description`, `beneficiaries`) VALUES
+(1, 1, 'Volunteer Teaching', NULL),
+(2, 2, 'Community Cleanup', NULL),
+(3, 3, 'Technical Workshop', NULL),
+(4, 4, 'Health Awareness Campaign', NULL),
+(5, 2, 'rerererer', NULL),
+(6, 1, 'Volunteer Teaching', '4'),
+(7, 2, 'Community Cleanup', '6'),
+(8, 3, 'Technical Workshop', '10'),
+(9, 4, 'Health Awareness Campaign', '5');
 
 -- --------------------------------------------------------
 
@@ -75,7 +81,6 @@ CREATE TABLE `criteria` (
   `id` int(11) NOT NULL,
   `category` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `display_name` varchar(255) NOT NULL,
   `points` float DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -85,46 +90,45 @@ CREATE TABLE `criteria` (
 -- Dumping data for table `criteria`
 --
 
-INSERT INTO `criteria` (`id`, `category`, `name`, `display_name`, `points`, `created_at`, `updated_at`) VALUES
-(2, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Masters', 'Masters', 12, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(3, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Bachelor\'s (First Class)', 'Bachelor&#039;s (First Class)', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(4, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Bachelor\'s (Second Upper)', 'Bachelor&#039;s (Second Upper)', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(5, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Other Qualifications', 'Other Qualifications', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(6, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Peer-reviewed Journal (First author)', 'Peer-reviewed Journal (First author)', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(7, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Peer-reviewed Journal (Corresponding author)', 'Peer-reviewed Journal (Corresponding author)', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(8, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Peer-reviewed Journal (Co-author)', 'Peer-reviewed Journal (Co-author)', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(9, 'Academic and Professional Qualifications (Non-clinical Scholars)', '1 point per year', '1 point per year', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(10, 'Academic and Professional Qualifications (Clinical Scholars)', 'PhD or being on PhD track', 'PhD or being on PhD track', 8, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(11, 'Academic and Professional Qualifications (Clinical Scholars)', 'Bachelor\'s degree (First class)', 'Bachelor&#039;s degree (First class)', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(12, 'Academic and Professional Qualifications (Clinical Scholars)', 'Bachelor\'s degree (Second upper)', 'Bachelor&#039;s degree (Second upper)', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(13, 'Academic and Professional Qualifications (Clinical Scholars)', 'Other academic and professional qualifications', 'Other academic and professional qualifications', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(14, 'Research Grants and Collaborations', 'More than UGX 1,000,000,000', 'More than UGX 1,000,000,000', 12, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(15, 'Research Grants and Collaborations', 'UGX 500,000,000 - 1,000,000,000', 'UGX 500,000,000 - 1,000,000,000', 8, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(16, 'Research Grants and Collaborations', 'UGX 100,000,000 - 500,000,000', 'UGX 100,000,000 - 500,000,000', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(17, 'Research Grants and Collaborations', 'Less than UGX 100,000,000', 'Less than UGX 100,000,000', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(18, 'Supervision of Students', 'PhD Candidates (max 10)', 'PhD Candidates (max 10)', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(19, 'Supervision of Students', 'Masters Candidates (max 5)', 'Masters Candidates (max 5)', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(20, 'Teaching Courses', 'More than 6 Courses', 'More than 6 Courses', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(21, 'Teaching Courses', '4 - 6 Courses', '4 - 6 Courses', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(22, 'Teaching Courses', 'Less than 4 Courses', 'Less than 4 Courses', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(23, 'Intellectual Property', 'Patent', 'Patent', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(24, 'Intellectual Property', 'Utility Model', 'Utility Model', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(25, 'Intellectual Property', 'Copyright', 'Copyright', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(26, 'Intellectual Property', 'Product', 'Product', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(27, 'Intellectual Property', 'Trademark', 'Trademark', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(28, 'Administrative Roles', 'Dean / Director', 'Dean / Director', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(29, 'Administrative Roles', 'Deputy Dean/Director', 'Deputy Dean/Director', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(30, 'Administrative Roles', 'Head of Department', 'Head of Department', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(31, 'Administrative Roles', 'Other', 'Other', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(32, 'International Collaboration', 'Collaborations with international organizations', 'Collaborations with international organizations', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(33, 'International Collaboration', 'Exchange programs with international institutions', 'Exchange programs with international institutions', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(34, 'International Collaboration', 'Joint research initiatives', 'Joint research initiatives', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(35, 'Teaching Assistants', 'Teaching experience (max 3 years)', 'Teaching experience (max 3 years)', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(36, 'Teaching Assistants', 'Research contributions', 'Research contributions', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(37, 'Teaching Assistants', 'Participation in workshops or seminars', 'Participation in workshops or seminars', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(38, 'Overall', 'Overall', 'Overall', 120, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
-(39, 'General', 'crit_6512bd43d9caa6e02c990b0a82652dca', 'crit_6512bd43d9caa6e02c990b0a82652dca', 12, '2025-04-06 20:06:32', '2025-04-10 02:45:29'),
-(40, 'General', 'crit_4295ed0c9cbd0dc7e7476c91e7be83c0', 'PhD', 9, '2025-04-10 02:45:29', '2025-04-10 02:45:29');
+INSERT INTO `criteria` (`id`, `category`, `name`, `points`, `created_at`, `updated_at`) VALUES
+(2, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Masters', 12, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(3, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Bachelor\'s (First Class)', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(4, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Bachelor\'s (Second Upper)', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(5, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Other Qualifications', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(6, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Peer-reviewed Journal (First author)', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(7, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Peer-reviewed Journal (Corresponding author)', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(8, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Peer-reviewed Journal (Co-author)', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(9, 'Academic and Professional Qualifications (Non-clinical Scholars)', '1 point per year', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(10, 'Academic and Professional Qualifications (Clinical Scholars)', 'PhD or being on PhD track', 12, '2025-04-06 20:04:55', '2025-04-14 12:48:13'),
+(11, 'Academic and Professional Qualifications (Clinical Scholars)', 'Bachelor\'s degree (First class)', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(12, 'Academic and Professional Qualifications (Clinical Scholars)', 'Bachelor\'s degree (Second upper)', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(13, 'Academic and Professional Qualifications (Clinical Scholars)', 'Other academic and professional qualifications', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(14, 'Research Grants and Collaborations', 'More than UGX 1,000,000,000', 12, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(15, 'Research Grants and Collaborations', 'UGX 500,000,000 - 1,000,000,000', 8, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(16, 'Research Grants and Collaborations', 'UGX 100,000,000 - 500,000,000', 6, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(17, 'Research Grants and Collaborations', 'Less than UGX 100,000,000', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(18, 'Supervision of Students', 'PhD Candidates (max 10)', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(19, 'Supervision of Students', 'Masters Candidates (max 5)', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(20, 'Teaching Courses', 'More than 6 Courses', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(21, 'Teaching Courses', '4 - 6 Courses', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(22, 'Teaching Courses', 'Less than 4 Courses', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(23, 'Intellectual Property', 'Patent', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(24, 'Intellectual Property', 'Utility Model', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(25, 'Intellectual Property', 'Copyright', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(26, 'Intellectual Property', 'Product', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(27, 'Intellectual Property', 'Trademark', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(28, 'Administrative Roles', 'Dean / Director', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(29, 'Administrative Roles', 'Deputy Dean/Director', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(30, 'Administrative Roles', 'Head of Department', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(31, 'Administrative Roles', 'Other', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(32, 'International Collaboration', 'Collaborations with international organizations', 5, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(33, 'International Collaboration', 'Exchange programs with international institutions', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(34, 'International Collaboration', 'Joint research initiatives', 2, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(35, 'Teaching Assistants', 'Teaching experience (max 3 years)', 4, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(36, 'Teaching Assistants', 'Research contributions', 3, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(37, 'Teaching Assistants', 'Participation in workshops or seminars', 1, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(38, 'Overall', 'Overall', 120, '2025-04-06 20:04:55', '2025-04-10 02:45:29'),
+(41, 'Academic and Professional Qualifications (Clinical Scholars)', 'masters', 6, '2025-04-14 12:58:08', '2025-04-14 12:58:08');
 
 -- --------------------------------------------------------
 
@@ -136,7 +140,7 @@ CREATE TABLE `csv_approvals` (
   `id` int(11) NOT NULL,
   `table_name` varchar(50) NOT NULL,
   `file_path` varchar(255) NOT NULL,
-  `submitted_by` int(11) NOT NULL,
+  `submitted_by` int(11) DEFAULT NULL,
   `submitted_at` datetime DEFAULT current_timestamp(),
   `record_count` int(11) NOT NULL,
   `status` enum('pending','approved','rejected') DEFAULT 'pending',
@@ -150,10 +154,10 @@ CREATE TABLE `csv_approvals` (
 --
 
 INSERT INTO `csv_approvals` (`id`, `table_name`, `file_path`, `submitted_by`, `submitted_at`, `record_count`, `status`, `reviewed_by`, `reviewed_at`, `rejection_reason`) VALUES
-(33, 'staff', '/uploads/staff_20230501.csv', 1, '2023-05-01 09:15:22', 12, 'approved', 2, '2025-04-10 04:07:31', NULL),
-(34, 'publications', '/uploads/publications_20230502.csv', 2, '2023-05-02 14:30:45', 8, 'approved', 2, '2025-04-09 23:00:02', NULL),
+(33, 'staff', '/uploads/staff_20230501.csv', 1, '2023-05-01 09:15:22', 12, 'pending', 2, '2025-04-10 04:07:31', NULL),
+(34, 'publications', '/uploads/publications_20230502.csv', 2, '2023-05-02 14:30:45', 8, 'pending', 2, '2025-04-09 23:00:02', NULL),
 (35, 'grants', '/uploads/grants_20230503.csv', 3, '2023-05-03 11:20:33', 5, 'pending', NULL, NULL, NULL),
-(36, 'departments', '/uploads/departments_20230504.csv', 1, '2023-05-04 16:45:12', 3, 'approved', 2, '2025-04-13 21:08:45', NULL),
+(36, 'departments', '/uploads/departments_20230504.csv', 1, '2023-05-04 16:45:12', 3, 'approved', 2, '2025-04-19 18:34:54', NULL),
 (37, 'staff', '/uploads/staff_20230505.csv', 2, '2023-05-05 10:05:18', 7, 'rejected', 2, '2025-04-10 04:48:06', 'dddf'),
 (38, 'publications', '/uploads/publications_20230506.csv', 3, '2023-05-06 13:25:09', 6, 'approved', 2, '2025-04-10 04:10:41', NULL),
 (39, 'grants', '/uploads/grants_20230507.csv', 1, '2023-05-07 15:40:27', 4, 'approved', 2, '2025-04-10 04:09:12', NULL),
@@ -179,13 +183,10 @@ CREATE TABLE `degrees` (
 --
 
 INSERT INTO `degrees` (`degree_id`, `staff_id`, `degree_name`, `degree_classification`) VALUES
+(1, 1, 'Bachelor of Science in Software Engineering', 'First Class'),
 (2, 2, 'Bachelor of Science in Information Technology', 'Second Class Upper'),
-(3, 3, 'Bachelor of Science in Computer Science', 'first class'),
-(4, 4, 'Bachelor of Engineering in Telecommunication', 'masters'),
-(5, 2, 'phd', 'phd'),
-(6, 2, 'masters', 'masters'),
-(7, 3, 'masters in sis', 'masters'),
-(8, 2, 'cisco packet tracer', 'certificate');
+(3, 3, 'Bachelor of Science in Computer Science', 'Second Class Lower'),
+(4, 4, 'Bachelor of Engineering in Telecommunication', 'First Class');
 
 -- --------------------------------------------------------
 
@@ -222,7 +223,8 @@ INSERT INTO `departments` (`department_id`, `faculty_id`, `department_name`) VAL
 (16, 6, 'Gender and Women Studies'),
 (17, 1, 'Software Engineering'),
 (18, 2, 'Biology'),
-(19, 2, 'Chemistry');
+(19, 2, 'Physics'),
+(20, 2, 'Chemistry');
 
 -- --------------------------------------------------------
 
@@ -267,7 +269,11 @@ INSERT INTO `grants` (`grant_id`, `staff_id`, `grant_amount`) VALUES
 (1, 1, 1500000000.00),
 (2, 2, 700000000.00),
 (3, 3, 400000000.00),
-(4, 4, 80000000.00);
+(4, 4, 80000000.00),
+(5, 2, 200000000000.00),
+(6, 2, 800000000.00),
+(7, 3, 450000000.00),
+(8, 4, 50000000.00);
 
 -- --------------------------------------------------------
 
@@ -288,7 +294,26 @@ CREATE TABLE `innovations` (
 INSERT INTO `innovations` (`innovation_id`, `staff_id`, `innovation_type`) VALUES
 (1, 1, 'Patent'),
 (2, 2, 'Utility Model'),
-(3, 3, 'Copyrigh');
+(3, 3, 'Copyright');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_change_log`
+--
+
+CREATE TABLE `password_change_log` (
+  `password_change_lid` int(10) NOT NULL,
+  `staff_email` varchar(45) DEFAULT NULL,
+  `change_date` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `password_change_log`
+--
+
+INSERT INTO `password_change_log` (`password_change_lid`, `staff_email`, `change_date`) VALUES
+(1, 'byaruhangaisamelk@gmail.com', '2025-04-24 20:40:32');
 
 -- --------------------------------------------------------
 
@@ -317,10 +342,7 @@ INSERT INTO `performance_metrics` (`id`, `staff_id`, `department_id`, `metric_na
 (21, 2, 2, 'Research Publications', 5.00, 10.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'Q1 research output'),
 (22, 4, 4, 'Student Supervisions', 3.00, 5.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'Fewer due to leave'),
 (23, 5, 5, 'Community Engagements', 2.00, 3.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'Attended rural health workshop'),
-(24, 6, 6, 'Projects Completed', 4.00, 4.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'All deliverables met'),
-(25, 7, 1, 'Training Sessions', 6.00, 5.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'Overachieved goal'),
 (26, 8, 2, 'Grants Acquired', 1.00, 2.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', '1 grant approved'),
-(27, 9, 3, 'Conference Presentations', 2.00, 3.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'Presented at MUST Symposium'),
 (28, 10, 4, 'Workshops Conducted', 1.00, 2.00, '2025-01-01', '2025-06-30', '2025-04-10 04:08:02', 'Limited by funding');
 
 -- --------------------------------------------------------
@@ -433,23 +455,43 @@ CREATE TABLE `staff` (
   `role_id` int(11) DEFAULT NULL,
   `department_id` int(11) DEFAULT NULL,
   `years_of_experience` int(11) DEFAULT NULL,
-  `performance_score` int(11) DEFAULT NULL
+  `performance_score` int(11) DEFAULT NULL,
+  `employee_id` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  `system_role` varchar(30) DEFAULT NULL,
+  `phone_number` varchar(50) DEFAULT NULL,
+  `personal_email` varchar(50) DEFAULT NULL,
+  `date_created` datetime DEFAULT current_timestamp(),
+  `photo_path` varchar(255) DEFAULT NULL,
+  `reset_code` varchar(10) DEFAULT NULL,
+  `reset_code_expiry` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `staff`
 --
 
-INSERT INTO `staff` (`staff_id`, `first_name`, `last_name`, `scholar_type`, `role_id`, `department_id`, `years_of_experience`, `performance_score`) VALUES
-(2, 'Akanyoreka', 'Smith', 'Non Clinical', 2, 2, 5, 90),
-(3, 'Michael', 'Johnson', 'Clinical', 4, 8, 3, 80),
-(4, 'Emily', 'Davidson', 'Non Clinical', 4, 4, 15, 88),
-(5, 'David', 'Wilson', 'Clinical', 5, 5, 8, 75),
-(6, 'Sarah', 'Connor', 'Non Clinical', 6, 6, 2, 70),
-(7, 'Robert', 'Brown', 'Clinical', 4, 1, 6, 82),
-(8, 'Alice', 'Williams', 'Non Clinical', 2, 2, 10, 0),
-(9, 'James', 'Anderson', 'Clinical', 1, 3, 11, 86),
-(10, 'Linda', 'Taylor', 'Non Clinical', 3, 4, 7, 78);
+INSERT INTO `staff` (`staff_id`, `first_name`, `last_name`, `scholar_type`, `role_id`, `department_id`, `years_of_experience`, `performance_score`, `employee_id`, `email`, `password`, `system_role`, `phone_number`, `personal_email`, `date_created`, `photo_path`, `reset_code`, `reset_code_expiry`) VALUES
+(1, 'Byaruhanga', 'Isamel', NULL, NULL, NULL, NULL, NULL, NULL, 'bi@must.ac.ug', NULL, 'is', '0757003628', 'godigitaltech001@gmail.com', '2025-04-19 18:10:59', NULL, '', NULL),
+(2, 'Akanyoreka', 'Smith', 'Non Clinical', 1, 17, 19, 150, 'hrm001', 'hrm@must.ac.ug', '$2y$10$YRSx0Jncqg2/OmBJp9nxK.toljVv7fRyhyrtdcIalVuLwG10MhadG', 'hrm', '0757003628', 'byaruhangaisamelk@gmail.com', '2025-04-19 17:36:42', 'uploads/profile_pictures/user_2_1744703588.png', NULL, NULL),
+(3, 'Michael', 'Johnson', 'Clinical', 4, 8, 3, 80, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(4, 'Emily', 'Davidson', 'Non Clinical', 4, 4, 15, 88, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(5, 'David', 'Wilson', 'Clinical', 5, 5, 8, 75, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(8, 'Alice', 'Williams', 'Non Clinical', 2, 2, 10, 89, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(10, 'Linda', 'Taylor', 'Non Clinical', 3, 4, 7, 78, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(12, 'Mugabi', 'Praise', 'Researcher', 3, 2, 3, 78, NULL, NULL, NULL, NULL, '0757094854', 'praise@gmail.com', '2025-04-19 17:36:42', 'uploads/profile_photos/staff_12_1745447777.png', '', NULL),
+(14, 'Maria', 'Nabwire', 'Lecturer', 2, 3, 7, 92, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(15, 'Peter', 'Okello', 'Senior Lecturer', 1, 2, 10, 95, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(16, 'Sarah', 'Kamani', 'Assistant Lecturer', 4, 4, 1, 60, NULL, NULL, NULL, NULL, '0773494188', 'godigitaltech001@gmail.com', '2025-04-19 17:36:42', NULL, '', NULL),
+(17, 'David', 'Tumusiime', 'Lecturer', 2, 3, 6, 88, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(18, 'Grace', 'Achan', 'Research Fellow', 3, 1, 4, 73, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(19, 'Michael', 'Mwangi', 'Senior Researcher', 5, 2, 9, 90, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(20, 'Linda', 'Namatovu', 'Lecturer', 2, 4, 5, 82, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-19 17:36:42', NULL, '', NULL),
+(22, 'Akanjuna', 'Joel', NULL, NULL, NULL, NULL, NULL, 'hod', 'hod@must.ac.ug', '$2y$10$LvQjNY/K5.tVzRjJGPgLRO5dg9sflPAgg.wmucPr1101NsdE66S5W', 'hod', '0773494188', 'akaj@gmail.com', '2025-04-19 20:50:26', NULL, '', NULL),
+(23, 'Akambamu', 'Mathias', NULL, NULL, NULL, NULL, NULL, 'dean001', 'dean@must.ac.ug', '$2y$10$7ewntoj01aZVfDps4QND9uZrxSlTMQRP0hkIY4gCm5/65XXUYI/Km', 'dean', '0764920075', 'byaruhangangaisamelk@gmail.com', '2025-04-19 20:50:57', NULL, '', NULL),
+(24, 'Mugabi', 'Praise', NULL, NULL, NULL, NULL, NULL, 'ar001', 'ar@must.ac.ug', '$2y$10$00k6I66SihJLeJwtTR5or.e3oQJDbOp6x4PjXa4ujQ6c5YH4/yCyu', 'ar', '0764920075', 'praise@gmail.com', '2025-04-19 20:51:22', NULL, '', NULL),
+(25, 'Mukama', 'Martin', NULL, NULL, NULL, NULL, NULL, 'std001', 'staff@must.ac.ug', '$2y$10$n4yOdyNYulunzvrg2GP1ie8PW4bhalLGhd9nQdHWLMweJdb5XBRYa', 'staff', '0764920075', 'byaruhangangaisamelk@gmail.com', '2025-04-19 20:56:52', NULL, '', NULL);
 
 -- --------------------------------------------------------
 
@@ -476,10 +518,10 @@ INSERT INTO `supervision` (`supervision_id`, `staff_id`, `student_level`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Table structure for table `users1`
 --
 
-CREATE TABLE `users` (
+CREATE TABLE `users1` (
   `user_id` int(11) NOT NULL,
   `staff_id` int(10) DEFAULT NULL,
   `employee_id` varchar(100) DEFAULT NULL,
@@ -491,19 +533,22 @@ CREATE TABLE `users` (
   `phone_number` varchar(50) DEFAULT NULL,
   `personal_email` varchar(50) DEFAULT NULL,
   `date_created` datetime DEFAULT current_timestamp(),
-  `photo_path` varchar(255) DEFAULT NULL
+  `photo_path` varchar(255) DEFAULT NULL,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `reset_token_expiry` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `users`
+-- Dumping data for table `users1`
 --
 
-INSERT INTO `users` (`user_id`, `staff_id`, `employee_id`, `email`, `password`, `role`, `first_name`, `last_name`, `phone_number`, `personal_email`, `date_created`, `photo_path`) VALUES
-(1, NULL, 'ar', 'ar@must.ac.ug', '$2y$10$GQF8pAt4Oc4EJyP/k4xEVu2npOoPUiSLLv50tQXv/OkdpZ.A3PZIe', 'ar', 'Mugabi', 'Praise', '0757003628', 'praise@gmail.com', '2025-04-09 20:15:47', NULL),
-(2, 9, 'hrm', 'hrm@must.ac.ug', '$2y$10$yGUKLVHLji2ZybkxjpGXD.XMvYyV6f42s46iktELm4nawd1znaSJS', 'hrm', 'Byaruhanga', 'Isamel', '0757003628', 'byaruhangaisamelk@gmail.com', '2025-04-09 20:15:47', 'uploads/profile_photos/user_2_1744229873.png'),
-(3, NULL, 'hod', 'hod@must.ac.ug', '$2y$10$MD7A6e554ok4jURO/q.R7OeF8.4AfUQ8/m4IBl8RjGhFMotqjD5L.', 'hod', 'Mutungi', 'Felix', '0757003620', 'byaruhangangaisamelk@gmail.com', '2025-04-09 20:15:47', 'uploads/profile_photos/user_3_1744223535.jpeg'),
-(4, 2, 'dean', 'dean@must.ac.ug', '$2y$10$nkXlTcl.7.c8HmVRfHoNW.RkYpaDJqBwRERlHHvxOWxzk4TNeE./K', 'dean', 'Akanyoreka', 'Smith', '0757001010', 'akanyoreka@gmail.com', '2025-04-11 13:36:47', 'uploads/profile_photos/user_4_1744367945.png'),
-(5, NULL, 'grants', 'grants@gmail.com', '$2y$10$/1SjpyseSz.D0Sq5yiuBmewAbQdZ30oH0s4ClGuz2EGfX6G2IIQDm', 'grants', 'Odongo', 'Samuel', '0757003621', 'sam@gmail.com', '2025-04-13 13:29:48', 'uploads/profile_photos/user_5_1744540848.png');
+INSERT INTO `users1` (`user_id`, `staff_id`, `employee_id`, `email`, `password`, `role`, `first_name`, `last_name`, `phone_number`, `personal_email`, `date_created`, `photo_path`, `reset_token`, `reset_token_expiry`) VALUES
+(1, NULL, 'ar', 'ar@must.ac.ug', '$2y$10$GQF8pAt4Oc4EJyP/k4xEVu2npOoPUiSLLv50tQXv/OkdpZ.A3PZIe', 'ar', 'Mugabi', 'Praise', '0757003628', 'praise@gmail.com', '2025-04-09 20:15:47', 'uploads/profile_photos/user_1_1744734471.png', 'fa3af6f64503d47f073c0076363c2bd6950f2172c9f15cf0714e08b4969b8c37', '2025-04-14 01:39:04'),
+(2, 3, 'hrm', 'hrm@must.ac.ug', '$2y$10$vJFVJ3399r5XEPjjeTmMU.UR3iKYRytHVzyQ21qYYMPdw/JHvNLHW', 'hrm', 'Isamel.k', 'Byaruhanga', '0757094854', 'byaruhangaisamelk@gmail.com', '2025-04-09 20:15:47', 'uploads/profile_pictures/user_2_1744703588.png', '5b6d1e69f13ea506741dc3ad5c96a9eec8c7dc69dc205850f992e01018bed984', '2025-04-14 03:08:03'),
+(3, 8, 'hod', 'hod@must.ac.ug', '$2y$10$MD7A6e554ok4jURO/q.R7OeF8.4AfUQ8/m4IBl8RjGhFMotqjD5L.', 'hod', 'Mutungi3', 'Felix', '0757003621', 'byaruhangangaisamelk@gmail.com', '2025-04-09 20:15:47', 'uploads/profile_photos/user_3_1744716530.png', NULL, NULL),
+(4, 2, 'dean', 'dean@must.ac.ug', '$2y$10$nkXlTcl.7.c8HmVRfHoNW.RkYpaDJqBwRERlHHvxOWxzk4TNeE./K', 'dean', 'Akanyoreka', 'Smith', '0757001010', 'akanyoreka@gmail.com', '2025-04-11 13:36:47', 'uploads/profile_photos/user_4_1744367945.png', NULL, NULL),
+(5, NULL, 'grants', 'grants@gmail.com', '$2y$10$/1SjpyseSz.D0Sq5yiuBmewAbQdZ30oH0s4ClGuz2EGfX6G2IIQDm', 'grants', 'Odongo', 'Samuel', '0757003621', 'sam@gmail.com', '2025-04-13 13:29:48', 'uploads/profile_photos/user_5_1744734448.png', NULL, NULL),
+(6, 8, 'staff-001', 'staff@gmail.com', '$2y$10$kbk6Kynao.1TQE/.3pZcwurW6brsmKWCwbB/MF4jNytTaqfvf/paK', 'staff', 'Mukama', 'Martin', '0757000011', 'martn@gmail.com', '2025-04-13 19:24:56', 'uploads/profile_photos/user_6_1744636243.png', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -533,7 +578,7 @@ ALTER TABLE `criteria`
 ALTER TABLE `csv_approvals`
   ADD PRIMARY KEY (`id`),
   ADD KEY `reviewed_by` (`reviewed_by`),
-  ADD KEY `fk_submitted_by` (`submitted_by`);
+  ADD KEY `submitted_by_fk` (`submitted_by`);
 
 --
 -- Indexes for table `degrees`
@@ -567,12 +612,18 @@ ALTER TABLE `innovations`
   ADD PRIMARY KEY (`innovation_id`);
 
 --
+-- Indexes for table `password_change_log`
+--
+ALTER TABLE `password_change_log`
+  ADD PRIMARY KEY (`password_change_lid`);
+
+--
 -- Indexes for table `performance_metrics`
 --
 ALTER TABLE `performance_metrics`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `staff_id` (`staff_id`),
-  ADD KEY `department_id` (`department_id`);
+  ADD KEY `department_id` (`department_id`),
+  ADD KEY `performance_metrics_ibfk_1` (`staff_id`);
 
 --
 -- Indexes for table `professionalbodies`
@@ -613,9 +664,9 @@ ALTER TABLE `supervision`
   ADD PRIMARY KEY (`supervision_id`);
 
 --
--- Indexes for table `users`
+-- Indexes for table `users1`
 --
-ALTER TABLE `users`
+ALTER TABLE `users1`
   ADD PRIMARY KEY (`user_id`),
   ADD KEY `profile_ibfk_1` (`staff_id`);
 
@@ -633,13 +684,13 @@ ALTER TABLE `academicactivities`
 -- AUTO_INCREMENT for table `communityservice`
 --
 ALTER TABLE `communityservice`
-  MODIFY `community_service_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `community_service_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `criteria`
 --
 ALTER TABLE `criteria`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `csv_approvals`
@@ -651,25 +702,31 @@ ALTER TABLE `csv_approvals`
 -- AUTO_INCREMENT for table `degrees`
 --
 ALTER TABLE `degrees`
-  MODIFY `degree_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `degree_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `departments`
 --
 ALTER TABLE `departments`
-  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `grants`
 --
 ALTER TABLE `grants`
-  MODIFY `grant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `grant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `innovations`
 --
 ALTER TABLE `innovations`
-  MODIFY `innovation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `innovation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `password_change_log`
+--
+ALTER TABLE `password_change_log`
+  MODIFY `password_change_lid` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `performance_metrics`
@@ -705,7 +762,7 @@ ALTER TABLE `service`
 -- AUTO_INCREMENT for table `staff`
 --
 ALTER TABLE `staff`
-  MODIFY `staff_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `staff_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `supervision`
@@ -714,10 +771,10 @@ ALTER TABLE `supervision`
   MODIFY `supervision_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT for table `users1`
 --
-ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+ALTER TABLE `users1`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -727,8 +784,7 @@ ALTER TABLE `users`
 -- Constraints for table `csv_approvals`
 --
 ALTER TABLE `csv_approvals`
-  ADD CONSTRAINT `csv_approvals_ibfk_2` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `fk_submitted_by` FOREIGN KEY (`submitted_by`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `submitted_by_fk` FOREIGN KEY (`submitted_by`) REFERENCES `staff` (`staff_id`);
 
 --
 -- Constraints for table `departments`
@@ -740,7 +796,7 @@ ALTER TABLE `departments`
 -- Constraints for table `performance_metrics`
 --
 ALTER TABLE `performance_metrics`
-  ADD CONSTRAINT `performance_metrics_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`),
+  ADD CONSTRAINT `performance_metrics_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `performance_metrics_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `departments` (`department_id`);
 
 --
@@ -751,9 +807,9 @@ ALTER TABLE `staff`
   ADD CONSTRAINT `fk_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`);
 
 --
--- Constraints for table `users`
+-- Constraints for table `users1`
 --
-ALTER TABLE `users`
+ALTER TABLE `users1`
   ADD CONSTRAINT `profile_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
