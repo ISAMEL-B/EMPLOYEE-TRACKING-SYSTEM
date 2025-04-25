@@ -329,6 +329,9 @@ try {
 } catch (Exception $e) {
     error_log("Top performers query error: " . $e->getMessage());
 }
+
+
+
 ?>
 
 

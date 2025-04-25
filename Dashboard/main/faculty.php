@@ -55,22 +55,24 @@
     /// graphs
         //overview section
         //departmental scores graph
-        $overviewData = [];
+        $facOverview_chart_data = [];
+
         $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
         $stmt->bind_param("i", $faculty_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $department_id = $row['department_id'];
-            $department_name = get_department_name($conn, $department_id);
-            $overviewscores = get_department_performance($conn, $department_id);
+            $facOverview_dept_id = $row['department_id'];
+            $facOverview_dept_name = get_department_name($conn, $facOverview_dept_id);
+            $facOverview_scores = get_department_performance($conn, $facOverview_dept_id);
 
-            $overviewData[] = [
-                'department' => $department_name,
-                'total_score' => round($overviewscores['total_score'], 2) // Round for cleaner display
+            $facOverview_chart_data[] = [
+                'department' => $facOverview_dept_name,
+                'total_score' => round($facOverview_scores['total_score'], 2)
             ];
         }
+
 
         // academic performance (academic performance tab)
         //quick stats
@@ -181,9 +183,78 @@
             ];
         }
 
+        // community service
+        $communityData = [];
+
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $deptResult = $stmt->get_result();
+
+        while ($deptRow = $deptResult->fetch_assoc()) {
+            $dept_id = $deptRow['department_id'];
+            $dept_name = get_department_name($conn, $dept_id);
+
+            $studentsSupervised = 0;
+            $communityOutreaches = 0;
+            $totalBeneficiaries = 0;
+
+            // Get all staff in this department
+            $staffStmt = $conn->prepare("SELECT staff_id FROM staff WHERE department_id = ?");
+            $staffStmt->bind_param("i", $dept_id);
+            $staffStmt->execute();
+            $staffResult = $staffStmt->get_result();
+
+            while ($staffRow = $staffResult->fetch_assoc()) {
+                $staff_id = $staffRow['staff_id'];
+
+                // Get community services for this staff
+                $commStmt = $conn->prepare("SELECT description, beneficiaries FROM communityservice WHERE staff_id = ?");
+                $commStmt->bind_param("i", $staff_id);
+                $commStmt->execute();
+                $commResult = $commStmt->get_result();
+
+                while ($commRow = $commResult->fetch_assoc()) {
+                    $serviceType = strtolower(trim($commRow['description']));
+                    $beneficiaries = intval($commRow['beneficiaries']);
+
+                    if ($serviceType === 'student supervision') {
+                        $studentsSupervised++;
+                    } else {
+                        $communityOutreaches++;
+                    }
+
+                    $totalBeneficiaries += $beneficiaries;
+                }
+                $commStmt->close();
+            }
+            $staffStmt->close();
+
+            $communityData[] = [
+                'department' => $dept_name,
+                'students_supervised' => $studentsSupervised,
+                'community_outreaches' => $communityOutreaches,
+                'total_beneficiaries' => $totalBeneficiaries
+            ];
+
+            //get to total community performance for the whole faculty
+            $totalStudentsSupervised = 0;
+            $totalCommunityOutreaches = 0;
+            $totalBeneficiaries = 0;
+
+            foreach ($communityData as $entry) {
+                $totalStudentsSupervised += $entry['students_supervised'];
+                $totalCommunityOutreaches += $entry['community_outreaches'];
+                $totalBeneficiaries += $entry['total_beneficiaries'];
+            }
+
+        }
+
 
 
     ?>
+
+    
             
 
 
@@ -651,7 +722,7 @@
                     </div> -->
                     <div class="large-card">
                         <div class="section-title">
-                            <h2>Publication Types</h2>
+                            <h2>Publication Types By Department</h2>
                         </div>
                         <div class="chart-container">
                             <canvas id="publicationTypesChart"></canvas>
@@ -664,14 +735,14 @@
             <!-- Research & Innovations Tab Content -->
             <div class="tab-content" id="research">
                 <div class="main-content">
-                    <div class="large-card">
+                    <!-- <div class="large-card">
                         <div class="section-title">
                             <h2>Research Grants</h2>
                         </div>
                         <div class="chart-container">
                             <canvas id="grantTrendChart"></canvas>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="large-card">
                         <div class="section-title">
                             <h2>Innovations</h2>
@@ -690,17 +761,17 @@
                     <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                         <div class="card stat-card" style="width: 300px;">
                             <h3>Total student supervised for community placements</h3>
-                            <div class="value">34</div>
+                            <div class="value"><?= $totalStudentsSupervised?></div>
                             
                         </div>
                         <div class="card stat-card" style="width: 300px;">
                             <h3>other community outreaches</h3>
-                            <div class="value">72</div>
+                            <div class="value"><?= $totalCommunityOutreaches ?></div>
                             
                         </div>
                         <div class="card stat-card" style="width: 300px;">
                             <h3> total number of beneficiaries</h3>
-                            <div class="value">72</div>
+                            <div class="value"><?= $totalBeneficiaries ?></div>
                             
                         </div>
                     </div>
@@ -727,54 +798,56 @@
                             <th>Department</th>
                             <th>Total Score</th>
                             <th>Publications</th>
-                            <th>Grants (UGX)</th>
+                            <th>Grants (UGX Billions)</th>
                             <th>Innovations</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        <!-- Faculty name row -->
                         <tr>
-                            <td>Medicine</td>
-                            <td>8.2</td>
-                            <td>12.4</td>
-                            <td>1.8B</td>
-                            <td>24</td>
-                            <td><a href="#" class="view-details">View Details</a></td>
+                            <td colspan="6" style="font-weight: bold; background-color: #f0f0f0;">
+                                <?php echo htmlspecialchars($faculty_name); ?>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Surgery</td>
-                            <td>7.9</td>
-                            <td>10.1</td>
-                            <td>1.2B</td>
-                            <td>18</td>
-                            <td><a href="#" class="view-details">View Details</a></td>
-                        </tr>
-                        <tr>
-                            <td>Pediatrics</td>
-                            <td>7.5</td>
-                            <td>8.7</td>
-                            <td>800M</td>
-                            <td>15</td>
-                            <td><a href="#" class="view-details">View Details</a></td>
-                        </tr>
-                        <tr>
-                            <td>Pathology</td>
-                            <td>6.8</td>
-                            <td>7.2</td>
-                            <td>500M</td>
-                            <td>10</td>
-                            <td><a href="#" class="view-details">View Details</a></td>
-                        </tr>
-                        <tr>
-                            <td>Public Health</td>
-                            <td>6.2</td>
-                            <td>5.8</td>
-                            <td>300M</td>
-                            <td>8</td>
-                            <td><a href="#" class="view-details">View Details</a></td>
-                        </tr>
+
+                        <?php
+                        // Fetch departments under this faculty
+                        $dept_stmt = $conn->prepare("SELECT department_id, department_name FROM departments WHERE faculty_id = ?");
+                        $dept_stmt->bind_param("i", $faculty_id);
+                        $dept_stmt->execute();
+                        $dept_result = $dept_stmt->get_result();
+
+                        while ($dept = $dept_result->fetch_assoc()) {
+                            $department_id = $dept['department_id'];
+                            $department_name = $dept['department_name'];
+
+                            // Get performance data for this department
+                            $dept_perf = get_department_performance($conn, $department_id);
+
+                            // Extract values
+                            $total_score = $dept_perf['total_score'] ?? 0;
+                            $total_publications = $dept_perf['total_publications'] ?? 0;
+                            $total_grant_amount = $dept_perf['total_grant_amount'] ?? 0;
+                            $grant_billions = number_format($total_grant_amount / 1_000_000_000, 1);
+                            $total_innovations = $dept_perf['total_innovations'] ?? 0;
+
+                            echo "<tr>
+                                    <td>" . htmlspecialchars($department_name) . "</td>
+                                    <td>" . $total_score . "</td>
+                                    <td>" . $total_publications . "</td>
+                                    <td>" . $grant_billions . "</td>
+                                    <td>" . $total_innovations . "</td>
+                                    <td><a href='department.php?id=" . urlencode($department_id) . "' class='view-details'>View Details</a></td>
+                                </tr>";
+                        }
+                        ?>
                     </tbody>
                 </table>
+
+
+
+
             </div>
 
             <div class="footer-notes">
@@ -800,18 +873,20 @@
         // Charts initialization
         document.addEventListener('DOMContentLoaded', function() {
             // Faculty Overview Chart
-            const overviewData = <?php echo json_encode($overviewData); ?>;
-            const overviewlabels = overviewData.map(item => item.department);
-            const scores = overviewData.map(item => item.total_score);
+            const facOverviewData = <?php echo json_encode($facOverview_chart_data); ?>;
 
-            const overviewCtx = document.getElementById('facultyOverviewChart').getContext('2d');
-            new Chart(overviewCtx, {
+            const facOverviewLabels = facOverviewData.map(item => item.department);
+            const facOverviewScores = facOverviewData.map(item => item.total_score);
+
+            const facOverviewCtx = document.getElementById('facultyOverviewChart').getContext('2d');
+
+            new Chart(facOverviewCtx, {
                 type: 'bar',
                 data: {
-                    labels: overviewlabels,
+                    labels: facOverviewLabels,
                     datasets: [{
                         label: 'Overall Performance',
-                        data: scores,
+                        data: facOverviewScores,
                         backgroundColor: 'rgba(52, 152, 219, 0.7)',
                         borderColor: 'rgba(41, 128, 185, 1)',
                         borderWidth: 1
@@ -821,12 +896,25 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 10, // adjust based on your scoring system
+                        x: {
                             title: {
                                 display: true,
-                                text: 'Score (out of 10)'
+                                text: 'Departments',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Score',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                }
                             }
                         }
                     },
@@ -838,10 +926,24 @@
                         tooltip: {
                             mode: 'index',
                             intersect: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Faculty Performance Overview by Department',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
+                            }
                         }
                     }
                 }
             });
+
+
 
             // Key Metrics Chart
             const keyMetricsChartData = <?php echo json_encode($keyMetricsData); ?>;
@@ -918,7 +1020,7 @@
                             title: {
                                 display: true,
                                 text: 'Department',
-                                font: { weight: 'bold', size: 14 }
+                                font: { weight: 'bold', size: 16 }
                             },
                             grid: { display: false }
                         },
@@ -928,8 +1030,8 @@
                             ticks: { stepSize: 2 },
                             title: {
                                 display: true,
-                                text: 'Average Score',
-                                font: { weight: 'bold', size: 14 }
+                                text: 'Score',
+                                font: { weight: 'bold', size: 16 }
                             },
                             grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         }
@@ -991,15 +1093,23 @@
                             stacked: false,
                             grid: {
                                 display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Department', 
+                                font: { weight: 'bold', size: 16 }
                             }
+                            
                         },
                         y: {
                             stacked: false,
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Number of Staff'
-                            }
+                                text: 'Number', 
+                                font: { weight: 'bold', size: 16 }
+                            } 
+                            
                         }
                     },
                     plugins: {
@@ -1171,15 +1281,15 @@
                             title: {
                                 display: true,
                                 text: 'Department',
-                                font: { weight: 'bold' }
+                                font: { weight: 'bold', size: 16 },
                             }
                         },
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Number of Publications',
-                                font: { weight: 'bold' }
+                                text: 'Number',
+                                font: { weight: 'bold', size: 16 },
                             },
                             grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         }
@@ -1194,7 +1304,6 @@
                         },
                         title: {
                             display: true,
-                            text: 'Publication Types by Department',
                             font: { size: 16, weight: 'bold' },
                             padding: { bottom: 20 }
                         },
@@ -1212,49 +1321,49 @@
             
 
             // Grant Trend Chart
-            const grantCtx = document.getElementById('grantTrendChart').getContext('2d');
-            new Chart(grantCtx, {
-                type: 'line',
-                data: {
-                    labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
-                    datasets: [
-                        {
-                            label: 'Medicine',
-                            data: [500, 650, 800, 950, 1200, 1800],
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Surgery',
-                            data: [300, 400, 450, 600, 750, 1200],
-                            borderColor: 'rgba(46, 204, 113, 1)',
-                            backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3
-                        },
-                        {
-                            label: 'Public Health',
-                            data: [100, 150, 200, 250, 300, 500],
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3
-                        }
-                    ]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Grant Amount (Millions UGX)'
-                            }
-                        }
-                    }
-                }
-            });
+            // const grantCtx = document.getElementById('grantTrendChart').getContext('2d');
+            // new Chart(grantCtx, {
+            //     type: 'line',
+            //     data: {
+            //         labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+            //         datasets: [
+            //             {
+            //                 label: 'Medicine',
+            //                 data: [500, 650, 800, 950, 1200, 1800],
+            //                 borderColor: 'rgba(52, 152, 219, 1)',
+            //                 backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            //                 borderWidth: 2,
+            //                 tension: 0.3
+            //             },
+            //             {
+            //                 label: 'Surgery',
+            //                 data: [300, 400, 450, 600, 750, 1200],
+            //                 borderColor: 'rgba(46, 204, 113, 1)',
+            //                 backgroundColor: 'rgba(46, 204, 113, 0.1)',
+            //                 borderWidth: 2,
+            //                 tension: 0.3
+            //             },
+            //             {
+            //                 label: 'Public Health',
+            //                 data: [100, 150, 200, 250, 300, 500],
+            //                 borderColor: 'rgba(231, 76, 60, 1)',
+            //                 backgroundColor: 'rgba(231, 76, 60, 0.1)',
+            //                 borderWidth: 2,
+            //                 tension: 0.3
+            //             }
+            //         ]
+            //     },
+            //     options: {
+            //         scales: {
+            //             y: {
+            //                 title: {
+            //                     display: true,
+            //                     text: 'Grant Amount (Millions UGX)'
+            //                 }
+            //             }
+            //         }
+            //     }
+            // });
 
             // Innovations Chart
             const innovationsData = <?php echo json_encode($innovationData); ?>;
@@ -1319,15 +1428,15 @@
                             title: {
                                 display: true,
                                 text: 'Department',
-                                font: { weight: 'bold' }
+                                font: { weight: 'bold', size: 16 },
                             }
                         },
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Count',
-                                font: { weight: 'bold' }
+                                text: 'Number',
+                                font: { weight: 'bold', size: 16 },
                             },
                             grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         }
@@ -1343,7 +1452,7 @@
                         },
                         title: {
                             display: true,
-                            text: 'Innovations by Department and Type',
+                            text: 'Innovations Type by Department',
                             font: { size: 16, weight: 'bold' },
                             padding: { bottom: 20 }
                         },
@@ -1360,32 +1469,38 @@
                 }
             });
 
+            //community service chart
+            const communityData = <?php echo json_encode($communityData); ?>;
 
-            // Community Engagement Chart
-            const communityCtx = document.getElementById('communityEngagementChart').getContext('2d');
-            new Chart(communityCtx, {
+            const departmentLabelsComm = communityData.map(item => item.department);
+            const studentsSupervisedData = communityData.map(item => item.students_supervised);
+            const communityOutreachesData = communityData.map(item => item.community_outreaches);
+            const totalBeneficiariesData = communityData.map(item => item.total_beneficiaries);
+
+            const ctx = document.getElementById('communityEngagementChart').getContext('2d');
+            const communityServiceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Pharmacy', 'Pharmacology', 'Medical Lab Science'],
+                    labels: departmentLabelsComm,
                     datasets: [
                         {
                             label: 'Students Supervised',
-                            data: [120, 25, 8, 30],
-                            backgroundColor: 'rgba(255, 99, 132, 0.8)',  // Vibrant Pink
+                            data: studentsSupervisedData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Community Outreaches',
-                            data: [100, 20, 5, 43],
-                            backgroundColor: 'rgba(54, 162, 235, 0.8)',  // Bright Blue
+                            data: communityOutreachesData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Total Beneficiaries',
-                            data: [85, 18, 6, 49],
-                            backgroundColor: 'rgba(75, 192, 192, 0.8)',  // Refreshing Teal
+                            data: totalBeneficiariesData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
                         }
@@ -1407,7 +1522,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Number of Participants',
+                                text: 'Number',
                                 font: { weight: 'bold', size: 14 }
                             },
                             grid: { color: 'rgba(0, 0, 0, 0.05)' }
