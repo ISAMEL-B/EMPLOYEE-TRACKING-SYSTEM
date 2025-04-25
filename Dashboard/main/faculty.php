@@ -710,7 +710,7 @@
                         <div class="value">72</div>
                         
                     </div>
-
+                    <!-- <div class="card stat-card" style="width: 300px;"> i have added something -->
                 </div>
                     <!-- <div class="large-card">
                         <div class="section-title">
