@@ -138,13 +138,14 @@ $year2025Data = [
         var donut = new Morris.Donut({
             element: 'daily-inquery',
             resize: true,
-            colors: ["#dc3545", "#ffc107", "#0d6efd", "#198754", "#20c997"],
+            colors: ["#dc3545", "#ffc107", "#0d6efd", "#198754", "#20c997", "#174a29"],
             data: [
                 {label: "First Author", value: <?= $journal ?? 0 ?>},
                 {label: "Corresponding Author", value: <?= $articles ?? 0 ?>},
                 {label: "Co-author", value: <?= $co_author ?? 0 ?>},
                 {label: "Book with ISBN", value: <?= $book ?? 0 ?>},
                 {label: "Book Chapter", value: <?= $book_chapter ?? 0 ?>}
+                {label: "Conference Presentation", value: <?= $conference ?? 0 ?>}
             ],
             hideHover: 'auto',
             formatter: function (value) { 

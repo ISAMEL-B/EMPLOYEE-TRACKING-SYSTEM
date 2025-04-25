@@ -1,61 +1,143 @@
-<?php
+﻿<?php
+//report all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
+$current_ur = 'index.php';
+$current_pag = 'index';
+
 // Check if user is NOT logged in OR not HRM
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
 
-// Database connection
-require_once 'head/approve/config.php';
+//include backend calculator
+// include '/EMPLOYEE-TRACKING-SYSTEM/scoring_calculator/university score/university_score.php';
+include '../../scoring_calculator/university score/university_score.php';
+
+// Verify the connection is available
+if (!isset($mysqli) || !($mysqli instanceof mysqli)) {
+    die("Database connection not established in university_score.php");
+}
+
+// 1. PUBLICATIONS
+$pubQuery = $mysqli->query("
+    SELECT 
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Author' THEN 1 END) as first_author,
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Co-Author' THEN 1 END) as co_author,
+        COUNT(*) as total
+    FROM publications 
+    WHERE YEAR(CURDATE()) = YEAR(CURDATE())
+");
+if (!$pubQuery) {
+    die("Publications query failed: " . $mysqli->error);
+}
+$currentPublications = $pubQuery->fetch_assoc();
+$pubQuery->close();
+
+$pubQuery = $mysqli->query("
+    SELECT 
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Author' THEN 1 END) as first_author,
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Co-Author' THEN 1 END) as co_author,
+        COUNT(*) as total
+    FROM publications 
+    WHERE YEAR(CURDATE())-1 = YEAR(CURDATE())
+");
+if (!$pubQuery) {
+    die("Previous publications query failed: " . $mysqli->error);
+}
+$previousPublications = $pubQuery->fetch_assoc();
+$pubQuery->close();
+
+// 2. GRANTS
+$grantQuery = $mysqli->query("SELECT SUM(grant_amount) as total FROM grants WHERE YEAR(CURDATE()) = YEAR(CURDATE())");
+if (!$grantQuery) {
+    die("Grants query failed: " . $mysqli->error);
+}
+$currentGrants = $grantQuery->fetch_row()[0] ?? 0;
+$grantQuery->close();
+
+$grantQuery = $mysqli->query("SELECT SUM(grant_amount) as total FROM grants WHERE YEAR(CURDATE())-1 = YEAR(CURDATE())");
+if (!$grantQuery) {
+    die("Previous grants query failed: " . $mysqli->error);
+}
+$previousGrants = $grantQuery->fetch_row()[0] ?? 0;
+$grantQuery->close();
+
+// 3. PATENTS
+$patentQuery = $mysqli->query("SELECT COUNT(*) FROM innovations WHERE innovation_type = 'Patent' AND YEAR(CURDATE()) = YEAR(CURDATE())");
+if (!$patentQuery) {
+    die("Patents query failed: " . $mysqli->error);
+}
+$currentPatents = $patentQuery->fetch_row()[0] ?? 0;
+$patentQuery->close();
+
+$patentQuery = $mysqli->query("SELECT COUNT(*) FROM innovations WHERE innovation_type = 'Patent' AND YEAR(CURDATE())-1 = YEAR(CURDATE())");
+if (!$patentQuery) {
+    die("Previous patents query failed: " . $mysqli->error);
+}
+$previousPatents = $patentQuery->fetch_row()[0] ?? 0;
+$patentQuery->close();
+
+// Prepare data
+$currentData = [
+    'publications' => $currentPublications['total'] ?? 0,
+    'grants' => $currentGrants ?? 0,
+    'patents' => $currentPatents ?? 0,
+    'first_author' => $currentPublications['first_author'] ?? 0,
+    'co_author' => $currentPublications['co_author'] ?? 0
+];
+
+$previousData = [
+    'publications' => $previousPublications['total'] ?? 0,
+    'grants' => $previousGrants ?? 0,
+    'patents' => $previousPatents ?? 0
+];
+
+// Number formatting function
+function formatNumber($number) {
+    return number_format($number ?? 0, 0, '.', ',');
+}
+
+// Percentage calculation function
+function calculateChange($current, $previous) {
+    if ($previous > 0) {
+        return round((($current - $previous) / $previous) * 100, 1);
+    }
+    return 0;
+}
+
+// Calculate all percentages
+$percentages = [
+    'publications' => calculateChange($currentData['publications'], $previousData['publications']),
+    'grants' => calculateChange($currentData['grants'], $previousData['grants']),
+    'patents' => calculateChange($currentData['patents'], $previousData['patents'])
+];
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUST Employee Performance Dashboard</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        :root {
-            --must-blue: rgb(16, 19, 111);
-            --must-green: rgb(17, 123, 21);
-            --must-yellow: rgb(251, 250, 249);
-            --must-light: #f8f9fa;
-            --must-light-green: #E5F2E9;
-            --must-light-blue: #E6F0FA;
-        }
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../components/images/favicon.ico">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-        }
+    <title>Dashboard</title>
 
-        .dashboard-header {
-            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
-            color: white;
-            padding: 25px 0;
-            margin-bottom: 30px;
-            border-bottom: 5px solid var(--must-yellow);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+    <!-- mine Style-->
+    <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
+    <!-- Style-->
+    <link rel="stylesheet" href="../components/src/css/style.css">
+    <link rel="stylesheet" href="css/stat-cards.css">';
 
-        .section-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 30px;
-            border-top: 4px solid var(--must-yellow);
-            background-color: white;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
 
         .section-card:hover {
             transform: translateY(-5px);
@@ -247,27 +329,8 @@ require_once 'head/approve/config.php';
     </style>
 </head>
 
-<body>
-    <!-- Top Navigation Bar -->
-    <?php include 'bars/nav_bar.php'; ?>
+<body class="hold-transition light-skin sidebar-mini theme-primary fixed sidebar-collapse">
 
-    <!-- Sidebar -->
-    <?php include 'bars/side_bar.php'; ?>
-    <!-- Dashboard Header -->
-    <header class="dashboard-header mt-5" style="width: 80%; margin-left: 20%;">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1><i class="fas fa-university me-2"></i>Mbarara University of Science and Technology</h1>
-                    <p class="mb-0 fs-5">Employee Performance Tracking Dashboard</p>
-                </div>
-                <div class="col-md-4 text-md-end">
-                    <p class="mb-0"><i class="fas fa-calendar-alt me-1"></i><span id="current-date"></span></p>
-                    <button class="btn btn-must-primary btn-sm mt-2"><i class="fas fa-download me-1"></i>Export Report</button>
-                </div>
-            </div>
-        </div>
-    </header>
 
     <!-- <div class="content-wrapper"> -->
     <div class="content-wrapper mt-5" style="width: 80%; margin-left: 20%;">
@@ -308,10 +371,50 @@ require_once 'head/approve/config.php';
                 </div>
             </div>
 
-            <!-- Academic Performance Section -->
-            <div class="card section-card">
-                <div class="card-body">
-                    <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
+        <!-- <div id="loader"></div> -->
+
+        <!--side bar  -->
+        <?php include 'bars/nav_bar.php';
+        ?>
+        <?php include 'bars/side_bar.php';
+        ?>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <div class="container-full">
+                <!-- Main content -->
+                <section class="content">
+                    <!-- ---------------------------------------------------------------------------------------------------  
+
+
+                           SECTION FOR ACADEMIC PERFORMANCE
+
+
+                       ------------------------------------------------------------------------------------------------------>
+                    <div class="row">
+                        <div class="col-lg-12 col-12">
+                            <div class="box">
+                                <div class="box-header" style="text-align : center ;">
+                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>ACADEMIC PERFORMANCE</b></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- actual dynamic data from your database / API -->
+                    <?php
+
+                    $phds = $university_data['PhD']; // Dynamic value for PhD's
+                    $masters = $university_data['Masters']; // Dynamic value for Masters Degrees
+                    $bachelors_first_class = $university_data['First Class']; // Dynamic value for Bachelor's Honors
+                    $trainings = $university_data['Other']; // Dynamic value for Professional Trainings
+                    $patents = $currentData['patents']; // Dynamic value for Patents from database
+                    $publications = $currentData['publications']; // Dynamic value for publications from database
+                    $journal = $currentData['first_author']; // Dynamic value for Journal Articles for First Author from database     
+                    $articles = $currentData['co_author']; // Dynamic value for Journal Articles for Co-author from database
+                    $grants = $currentData['grants']; // Dynamic value for Grants from database
+
+                    ?>
 
                     <!-- <div class="row">
                         <div class="col-md-6">
@@ -625,160 +728,257 @@ require_once 'head/approve/config.php';
                     <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Community Service Participation</h5>
-                            <div class="chart-container">
-                                <canvas id="communityServiceChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Service Types</h5>
-                            <div class="chart-container">
-                                <canvas id="serviceTypesChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-4">
-                        <div class="col-md-4">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value">187</div>
-                                            <div class="metric-label">Employees Engaged</div>
-                                        </div>
-                                        <i class="fas fa-users fa-3x text-muted opacity-25"></i>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>22%</span> <small>from last year</small>
-                                    </div>
+                        <div class="col-xl-3 col-12"> </div>
+                        <div class="col-xl-12 col-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title"><b>ACADEMIC PERFORMANCE</b></h3>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value">64</div>
-                                            <div class="metric-label">Community Projects</div>
-                                        </div>
-                                        <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>18%</span> <small>from last year</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value">2,450</div>
-                                            <div class="metric-label">Hours Contributed</div>
-                                        </div>
-                                        <i class="fas fa-clock fa-3x text-muted opacity-25"></i>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success"><i class="fas fa-arrow-up me-1"></i>30%</span> <small>from last year</small>
-                                    </div>
+                                <div class="box-body">
+                                    <ul class="list-inline text-end">
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-info"></i>Phd's </h5>
+                                        </li>
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text--bs-indigo"></i>Masters</h5>
+                                        </li>
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First class</h5>
+                                        </li>
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First class</h5>
+                                        </li>
+                                    </ul>
+                                    <div id="morris-area-chart3" style="height: 245px;"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <h5 class="text-must-green"><i class="fas fa-trophy me-1"></i>Top Community Service Initiatives</h5>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Initiative</th>
-                                        <th>Lead Department</th>
-                                        <th>Participants</th>
-                                        <th>Impact Level</th>
-                                        <th>Duration</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Health Camp - Western Region</td>
-                                        <td>Medicine</td>
-                                        <td>28</td>
-                                        <td><span class="badge impact-high">High Impact</span></td>
-                                        <td>3 months</td>
-                                    </tr>
-                                    <tr>
-                                        <td>STEM Education Outreach</td>
-                                        <td>Science & Education</td>
-                                        <td>35</td>
-                                        <td><span class="badge impact-high">High Impact</span></td>
-                                        <td>Ongoing</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Agricultural Training</td>
-                                        <td>Agriculture</td>
-                                        <td>22</td>
-                                        <td><span class="badge impact-medium">Medium Impact</span></td>
-                                        <td>6 weeks</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ICT Literacy Program</td>
-                                        <td>Computing</td>
-                                        <td>18</td>
-                                        <td><span class="badge impact-medium">Medium Impact</span></td>
-                                        <td>2 months</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Water Sanitation Project</td>
-                                        <td>Engineering</td>
-                                        <td>15</td>
-                                        <td><span class="badge impact-high">High Impact</span></td>
-                                        <td>4 months</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <!-- ---------------------------------------------------------------------------------------------------
+
+                                    SECTION FOR RESEARCH AND INNOVATIONS
+
+                    ---------------------------------------------------------------------------------------------------- -->
+
+                    <div class="row">
+                        <div class="col-lg-12 col-12">
+                            <div class="box">
+                                <div class="box-header" style="text-align: center;">
+                                    <h3 class="box-title" style="font-size: 40px;"><b>RESEARCH AND INNOVATIONS</b></h3>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="row">
+                        <div class="col-12 col-lg-4">
+                            <div class="box">
+                                <div class="box-header with-border">
+                                    <h5 class="box-title">Publications by type</h5>
+                                </div>                                
+                                <div class="box-body" style="padding: 15px;">
+                                    <div class="box-body chart-responsive" style="height: 180px;">
+                                        <div class="chart" id="daily-inquery" style="height: 180px;"></div>
+                                    </div>
+                                    <ul class="list-inline" style="margin-bottom: 0;">
+                                        <li class="flexbox mb-3 text-fade"> <!-- Reduced from mb-5 to mb-3 -->
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-danger"></span>
+                                                <span>First Author</span>
+                                            </div>
+                                            <div><?= $journal ?></div>
+                                        </li>
+                                        <li class="flexbox mb-3 text-fade">
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
+                                                <span>Co-author</span>
+                                            </div>
+                                            <div><?= $articles ?></div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>    
+                        </div>
+
+                        <div class="col-lg-8 col-12">
+                            <!-- Stat Cards Container -->
+                            <div class="stat-cards-container">
+                                <!-- Publications Card -->
+                                <div class="stat-card">
+                                    <h3>Publications</h3>
+                                    <p class="stat-number formatted-number"><b><?= formatNumber($currentData['publications']) ?></b></p>
+                                    <p class="stat-change <?= ($percentages['publications'] >= 0) ? 'positive' : 'negative' ?>">
+                                        <?= ($percentages['publications'] >= 0) ? '+' : '' ?><?= $percentages['publications'] ?>% from last year
+                                        <span class="stat-detail">(<?= formatNumber($previousData['publications']) ?>)</span>
+                                    </p>
+                                </div>
+
+                                <!-- Grants Card -->
+                                <div class="stat-card grants">
+                                    <h3>Grants</h3>
+                                    <p class="stat-number formatted-number"><b>$<?= formatNumber($currentData['grants']) ?></b></p>
+                                    <p class="stat-change <?= ($percentages['grants'] >= 0) ? 'positive' : 'negative' ?>">
+                                        <?= ($percentages['grants'] >= 0) ? '+' : '' ?><?= $percentages['grants'] ?>% from last year
+                                        <span class="stat-detail">($<?= formatNumber($previousData['grants']) ?>)</span>
+                                    </p>
+                                </div>
+
+                                <!-- Patents Card -->
+                                <div class="stat-card patents">
+                                    <h3>Patents</h3>
+                                    <p class="stat-number formatted-number"><b><?= formatNumber($currentData['patents']) ?></b></p>
+                                    <p class="stat-change <?= ($percentages['patents'] >= 0) ? 'positive' : 'negative' ?>">
+                                        <?= ($percentages['patents'] >= 0) ? '+' : '' ?><?= $percentages['patents'] ?>% from last year
+                                        <span class="stat-detail">(<?= formatNumber($previousData['patents']) ?>)</span>
+                                    </p>
+                                </div>
+                            </div>                           
+                        </div>
+                    </div>
+
+
+                    <!---------------------------------------------------------------------------------------------------
+
+
+                                       SECTION FOR COMMUNITY SERVICES
+                                      
+                   ---------------------------------------------------------------------------------------------------->
+                    <div class="row">
+                        <div class="col-lg-12 col-12">
+                            <div class="box">
+                                <div class="box-header" style="text-align : center ;">
+                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>COMMUNITY SERVICE</b></h3>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-info rounded"><i class="fa fa-id-card"></i></span>
+                                <div class="info-box-content text-fade">
+                                    <span class="info-box-number" style="font-size:40px"><b>85</b><small></small></span><br><br>
+                                    <span class="info-box-text">Community Outreach Programs <br> </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-success rounded"><i class="fas fa-thumbs-up"></i></span>
+                                <div class="info-box-content text-fade">
+                                    <span class="info-box-number" style="font-size:40px"><b>600</b></span>
+                                    <span class="info-box-text">Clinical Practices <br> </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-12">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
+                                <div class="info-box-content text-fade">
+                                    <span class="info-box-number" style="font-size:40px"><b>900</b></span>
+                                    <span class="info-box-text">Supervisions of students <br>in community placements</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-lg-4">
+                            <div class="box">
+                                <div class="box-header with-border">
+                                    <h5 class="box-title">Community outreach programs</h5>
+                                </div>
+                                <div class="box-body">
+                                    <div class="box-body chart-responsive">
+                                        <div class="chart" id="communityoutreachprograms" style="height: 305px;"></div>
+                                    </div>
+
+
+                                    <!-- <div class="text-center py-20">
+                                       <div class="communityoutreachprograms">
+                                           data-peity='{ "fill": ["#ef5350", "#fec801", "#398bf7"], "radius": 78, "innerRadius": 58  }'
+                                           9,6,5
+                                       </div>
+                                   </div> -->
+
+
+                                    <ul class="list-inline">
+                                        <li class="flexbox mb-5 text-fade">
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
+                                                <span>Awareness campaigns</span>
+                                            </div>
+                                            <div>300</div>
+                                        </li>
+                                        <li class="flexbox mb-5 text-fade">
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-info"></span>
+                                                <span>Embedded projects</span>
+                                            </div>
+                                            <div>55</div>
+                                        </li>
+                                        <li class="flexbox text-fade">
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-danger"></span>
+                                                <span>Workshops/Trainings</span>
+                                            </div>
+                                            <div>100</div>
+                                        </li>
+
+                                        <li class="flexbox text-fade">
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-8 col-12">
+                            <div class="box">
+                                <div class="box-header">
+                                    <h3 class="box-title"><b>COMMUNITY SERVICE</b></h3>
+                                </div>
+                                <div class="box-body">
+                                    <ul class="list-inline text-center">
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Supervision of Students in Community/Industrial Placements</h5>
+                                        </li>
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-success"></i>Community Outreach Programs </h5>
+                                        </li>
+                                        <li>
+                                            <h5><i class="fa fa-circle me-5 text-danger"></i>Clinical Practices</h5>
+                                        </li>
+                                    </ul>
+                                    <div class="chart">
+                                        <div class="chart" id="communityservice" style="height: 233px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- /.content -->
             </div>
         </div>
+        <!-- /.content-wrapper -->
+
+        <!-- footer -->
+        <?php //include 'bars/footer.php'; ?>
+
     </div>
-    <footer class="py-4 mt-5">
-        <div class="container text-center">
-            <img src="https://via.placeholder.com/150x50?text=MUST+Logo" alt="MUST Logo" class="mb-3">
-            <p class="mb-1">© 2023 Mbarara University of Science and Technology</p>
-            <p class="mb-0">Human Resource Management System | <small>Data updated hourly | For official use only</small></p>
-        </div>
-    </footer>
+    <!-- ./wrapper -->
 
-    <!-- Floating Action Button -->
-    <div class="floating-action-btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Quick Actions">
-        <i class="fas fa-bolt"></i>
-    </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Custom JS -->
-    <script>
-        // Set current date
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'long'
-        });
+    <!-- Page Content overlay -->
+    <?php include 'bars/chatbot_overlay.php'; ?>
 
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
 
         // Academic Qualifications Chart
         const qualificationsCtx = document.getElementById('qualificationsChart').getContext('2d');
@@ -907,33 +1107,6 @@ require_once 'head/approve/config.php';
             }
         });
 
-        // Grants Chart
-        const grantsCtx = document.getElementById('grantsChart').getContext('2d');
-        const grantsChart = new Chart(grantsCtx, {
-            type: 'polarArea',
-            data: {
-                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
-                datasets: [{
-                    data: [18, 12, 8, 6, 5, 3],
-                    backgroundColor: [
-                        '#003366',
-                        '#6699CC',
-                        '#FF9900',
-                        '#CCCCCC',
-                        '#999999',
-                        '#666666'
-                    ],
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    }
-                }
-            }
-        });
 
         
 
@@ -1047,5 +1220,4 @@ require_once 'head/approve/config.php';
         });
     </script>
 </body>
-
 </html>

@@ -75,6 +75,38 @@
     height: 12px;
     margin-right: 3px;
 }
+/* Stat Card Numbers Formatting */
+.stat-card .stat-number {
+    font-size: clamp(1.5rem, 3vw, 2.5rem); /* Responsive font size */
+    font-weight: 700;
+    line-height: 1;
+    margin: 0.5rem 0;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Number formatting for large values */
+.stat-number.formatted-number {
+    font-feature-settings: "tnum"; /* Tabular numbers */
+    letter-spacing: 0.5px;
+}
+/* Percentage change styling */
+.stat-change.positive {
+    color: #28a745;
+}
+.stat-change.negative {
+    color: #dc3545;
+}
+.stat-detail {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-left: 5px;
+}
+/* Compact stat change text */
+.stat-change {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
 @media (max-width: 768px) {
     .stat-card {
         width: 100%; /* Full width on mobile */
@@ -102,4 +134,14 @@
 }
 .box-title {
     font-size: 14px;
+}
+/* Adjustments for very large numbers */
+@media (max-width: 768px) {
+    .stat-card .stat-number {
+        font-size: clamp(1.25rem, 4vw, 1.75rem);
+    }
+    
+    .stat-number.formatted-number {
+        letter-spacing: normal;
+    }
 }
