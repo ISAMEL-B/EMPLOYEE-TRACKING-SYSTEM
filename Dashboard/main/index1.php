@@ -1,6 +1,14 @@
-<?php
+﻿<?php
+//report all errors
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
-if ($_SESSION['user_role'] !== 'hrm') {
+$current_ur = 'index.php';
+$current_pag = 'index';
+
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role'])) {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
@@ -8,140 +16,109 @@ if ($_SESSION['user_role'] !== 'hrm') {
 // Database connection
 require_once 'head/approve/config.php';
 
-// Fetch academic performance data
-$academic_data = [
-    'phds' => 0,
-    'masters' => 0,
-    'bachelors' => 0,
-    'trainings' => 0
-];
-
-// Get PhD count
-$phd_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%PhD%'";
-$phd_result = $conn->query($phd_query);
-if ($phd_result && $row = $phd_result->fetch_assoc()) {
-    $academic_data['phds'] = $row['count'];
-}
-
-// Get Masters count
-$masters_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%Master%'";
-$masters_result = $conn->query($masters_query);
-if ($masters_result && $row = $masters_result->fetch_assoc()) {
-    $academic_data['masters'] = $row['count'];
-}
-
-// Get Bachelors count
-$bachelors_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%Bachelor%'";
-$bachelors_result = $conn->query($bachelors_query);
-if ($bachelors_result && $row = $bachelors_result->fetch_assoc()) {
-    $academic_data['bachelors'] = $row['count'];
-}
-
-// Get professional trainings count (assuming this is in degrees table)
-$trainings_query = "SELECT COUNT(*) as count FROM degrees WHERE degree_name LIKE '%Certificate%' OR degree_name LIKE '%Training%'";
-$trainings_result = $conn->query($trainings_query);
-if ($trainings_result && $row = $trainings_result->fetch_assoc()) {
-    $academic_data['trainings'] = $row['count'];
-}
-
-// Fetch research and innovations data
+// Get research and innovation data from database
 $research_data = [
     'publications' => [
-        'google' => 0,
-        'research_gate' => 0,
-        'academia' => 0,
-        'others' => 0,
+        'first_author' => 0,
+        'corresponding_author' => 0,
+        'co_author' => 0,
+        'book_isbn' => 0,
+        'book_chapter' => 0,
         'total' => 0
     ],
-    'peer_reviewed' => 0,
-    'citations' => 0,
-    'first_author' => 0,
-    'must_repository' => 0,
-    'co_authored' => 0
+    'grants' => [
+        'total_amount' => 0,
+        'count' => 0
+    ],
+    'patents' => 0,
+    'utility_models' => 0,
+    'copyrights' => 0
 ];
 
-// Get publications by platform (simplified - you may need to adjust based on actual data structure)
-$publications_query = "SELECT COUNT(*) as total FROM publications";
+// Get publications data
+$publications_query = "SELECT publication_type,role, COUNT(*) as count FROM publications GROUP BY publication_type";
 $publications_result = $conn->query($publications_query);
-if ($publications_result && $row = $publications_result->fetch_assoc()) {
-    $research_data['publications']['total'] = $row['total'];
-    // Distribute across platforms (adjust based on your actual data)
-    $research_data['publications']['google'] = round($row['total'] * 0.5);
-    $research_data['publications']['research_gate'] = round($row['total'] * 0.3);
-    $research_data['publications']['academia'] = round($row['total'] * 0.15);
-    $research_data['publications']['others'] = $row['total'] - ($research_data['publications']['google'] + $research_data['publications']['research_gate'] + $research_data['publications']['academia']);
+if ($publications_result) {
+    while ($row = $publications_result->fetch_assoc()) {
+        switch ($row['publication_type']) {
+            case 'Journal Article':
+                if (strpos($row['role'], 'Author') !== false) {
+                    $research_data['publications']['first_author'] += $row['count'];
+                } elseif (strpos($row['role'], 'Co-Author') !== false) {
+                    $research_data['publications']['co_author'] += $row['count'];
+                }
+                break;
+            case 'Conference Paper':
+                $research_data['publications']['corresponding_author'] += $row['count'];
+                break;
+            // Add other publication types as needed
+        }
+        $research_data['publications']['total'] += $row['count'];
+    }
 }
 
-// Get peer-reviewed publications count
-$peer_reviewed_query = "SELECT COUNT(*) as count FROM publications WHERE publication_type = 'Journal Article'";
-$peer_reviewed_result = $conn->query($peer_reviewed_query);
-if ($peer_reviewed_result && $row = $peer_reviewed_result->fetch_assoc()) {
-    $research_data['peer_reviewed'] = $row['count'];
+// Get grants data
+$grants_query = "SELECT COUNT(*) as count, SUM(grant_amount) as total FROM grants";
+$grants_result = $conn->query($grants_query);
+if ($grants_result && $row = $grants_result->fetch_assoc()) {
+    $research_data['grants']['count'] = $row['count'];
+    $research_data['grants']['total_amount'] = $row['total'] ? $row['total'] : 0;
 }
 
-// Get citations count (assuming this is stored somewhere)
-$citations_query = "SELECT SUM(citation_count) as total FROM publications"; // Adjust based on your schema
-$citations_result = $conn->query($citations_query);
-if ($citations_result && $row = $citations_result->fetch_assoc()) {
-    $research_data['citations'] = $row['total'] ? $row['total'] : 0;
+// Get innovations data
+$innovations_query = "SELECT innovation_type, COUNT(*) as count FROM innovations GROUP BY innovation_type";
+$innovations_result = $conn->query($innovations_query);
+if ($innovations_result) {
+    while ($row = $innovations_result->fetch_assoc()) {
+        switch ($row['innovation_type']) {
+            case 'Patent':
+                $research_data['patents'] = $row['count'];
+                break;
+            case 'Utility Model':
+                $research_data['utility_models'] = $row['count'];
+                break;
+            case 'Copyright':
+                $research_data['copyrights'] = $row['count'];
+                break;
+        }
+    }
 }
 
-// Get first-author publications
-$first_author_query = "SELECT COUNT(*) as count FROM publications WHERE role LIKE '%Author%'";
-$first_author_result = $conn->query($first_author_query);
-if ($first_author_result && $row = $first_author_result->fetch_assoc()) {
-    $research_data['first_author'] = $row['count'];
-}
-
-// Get co-authored publications
-$co_authored_query = "SELECT COUNT(*) as count FROM publications WHERE role LIKE '%Co-Author%'";
-$co_authored_result = $conn->query($co_authored_query);
-if ($co_authored_result && $row = $co_authored_result->fetch_assoc()) {
-    $research_data['co_authored'] = $row['count'];
-}
-
-// MUST repository count (assuming this is stored)
-$repository_query = "SELECT COUNT(*) as count FROM publications WHERE source = 'MUST Repository'"; // Adjust based on your schema
-$repository_result = $conn->query($repository_query);
-if ($repository_result && $row = $repository_result->fetch_assoc()) {
-    $research_data['must_repository'] = $row['count'] * 100; // Multiply for demonstration
-}
-
-// Fetch community service data
+// Get community service data
 $community_data = [
-    'outreach_programs' => 0,
-    'clinical_practices' => 0,
-    'student_supervisions' => 0,
+    'students_supervised' => 0,
+    'outreaches' => 0,
+    'beneficiaries' => 0,
     'awareness_campaigns' => 0,
     'embedded_projects' => 0,
     'workshops' => 0
 ];
 
-// Get community service counts
-$community_query = "SELECT COUNT(*) as total FROM communityservice";
-$community_result = $conn->query($community_query);
-if ($community_result && $row = $community_result->fetch_assoc()) {
-    $community_data['outreach_programs'] = $row['total'];
-    // Distribute across types
+// Get supervision data
+$supervision_query = "SELECT COUNT(*) as total FROM supervision";
+$supervision_result = $conn->query($supervision_query);
+if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
+    $community_data['students_supervised'] = $row['total'];
+}
+
+// Get community service data (simplified - you may need to adjust based on your actual data structure)
+$community_service_query = "SELECT COUNT(*) as total FROM communityservice";
+$community_service_result = $conn->query($community_service_query);
+if ($community_service_result && $row = $community_service_result->fetch_assoc()) {
+    $community_data['outreaches'] = $row['total'];
+    // Assuming each outreach has about 15 beneficiaries on average
+    $community_data['beneficiaries'] = $row['total'] * 15;
+    
+    // Rough estimates for different types (adjust based on your actual data)
     $community_data['awareness_campaigns'] = round($row['total'] * 0.5);
     $community_data['embedded_projects'] = round($row['total'] * 0.3);
     $community_data['workshops'] = round($row['total'] * 0.2);
 }
 
-// Get clinical practices count (assuming this is in communityservice table)
-$clinical_query = "SELECT COUNT(*) as count FROM communityservice WHERE description LIKE '%Clinical%'";
-$clinical_result = $conn->query($clinical_query);
-if ($clinical_result && $row = $clinical_result->fetch_assoc()) {
-    $community_data['clinical_practices'] = $row['count'];
-}
-
-// Get student supervisions count
-$supervision_query = "SELECT COUNT(*) as count FROM supervision";
-$supervision_result = $conn->query($supervision_query);
-if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
-    $community_data['student_supervisions'] = $row['count'];
-}
+//include backend calculator
+include '../../scoring_calculator/university score/university_score.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -159,62 +136,9 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
     <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
     <!-- Style-->
     <link rel="stylesheet" href="../components/src/css/style.css">
+    <link rel="stylesheet" href="css/stat-cards.css">
 
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
-
-    <style>
-        /* Main content adjustments */
-        .content-wrapper {
-            margin-top: 15px;
-            /* Small margin for all devices */
-        }
-
-        /* Mobile - full width */
-        @media (max-width: 991.98px) {
-            .content-wrapper {
-                margin-left: 0 !important;
-                margin-top: 12% !important;
-                /* Smaller margin for mobile */
-                padding-top: 0;
-            }
-        }
-
-        /* Remove extra spacing from boxes */
-        .box {
-            margin-bottom: 1rem;
-        }
-
-        .box-header {
-            padding: 0.75rem 1.25rem;
-        }
-
-        /* Info boxes adjustments */
-        .info-box {
-            margin-bottom: 1rem;
-        }
-
-        /* Chart containers */
-        .chart {
-            margin-top: 0.5rem;
-        }
-
-        /* Specific section headers */
-        .box-title {
-            margin-bottom: 0.5rem;
-            font-size: 1.5rem;
-        }
-
-        /* Smaller font size for section headers on mobile */
-        @media (max-width: 767.98px) {
-            .box-title {
-                font-size: 1.25rem;
-            }
-
-            .box-header h3.box-title {
-                font-size: 1.75rem !important;
-            }
-        }
-    </style>
 
 </head>
 
@@ -232,9 +156,13 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                 <!-- Main content -->
                 <section class="content">
                     <!-- ---------------------------------------------------------------------------------------------------  
+
+
                            SECTION FOR ACADEMIC PERFORMANCE
+
+
                        ------------------------------------------------------------------------------------------------------>
-                    <div class="row">
+                       <div class="row">
                         <div class="col-lg-12 col-12">
                             <div class="box">
                                 <div class="box-header" style="text-align : center ;">
@@ -244,13 +172,34 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                         </div>
                     </div>
 
+                    <!-- actual dynamic data from your database / API -->
+                    <?php
+
+                    $phds = $university_data['PhD']; // Dynamic value for PhD's
+                    $masters = $university_data['Masters']; // Dynamic value for Masters Degrees
+                    $bachelors_first_class = $university_data['First Class']; // Dynamic value for Bachelor's Honors
+                    $trainings = $university_data['Other']; // Dynamic value for Professional Trainings
+                    $patents = $university_data['Patent']; // Dynamic value for Patents
+                    $publications = $university_data['Journal Articles (First Author)'] + $university_data['Journal Articles (Corresponding Author)'] + $university_data['Journal Articles (Co-author)'] + $university_data['Book with ISBN'] + $university_data['Book Chapter'];// Dynamic value for publications
+                    $journal = $university_data['Journal Articles (First Author)']; // Dynamic value for Journal Articles for First Author      
+                    $articles = $university_data['Journal Articles (Corresponding Author)']; // Dynamic value for Journal Articles for Corresponding Author
+                    $co_author = $university_data['Journal Articles (Co-author)']; // Dynamic value for Journal Articles for Co-author
+                    $book = $university_data['Book with ISBN']; // Dynamic value for Book with ISBN
+                    $book_chapter = $university_data['Book Chapter']; // Dynamic value for Book Chapter
+                    
+                    $grants = $university_data['total_grant_amount']; // Dynamic value for Grants
+
+
+
+                    ?>
+
                     <div class="row">
                         <!-- PhD's Info Box -->
                         <div class="col-xl-3 col-md-6 col-12">
                             <div class="info-box">
                                 <span class="info-box-icon bg-info rounded"><i class="fa fa-id-card"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['phds']; ?></b></span><br><br>
+                                    <span class="info-box-number" style="font-size:40px"><?php echo $phds ?></b></span><br><br>
                                     <span class="info-box-text">Phd's</span>
                                 </div>
                             </div>
@@ -261,7 +210,7 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             <div class="info-box">
                                 <span class="info-box-icon bg-success rounded"><i class="fas fa-thumbs-up"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['masters']; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><?= $masters ?></span>
                                     <span class="info-box-text">Masters Degrees</span><br>
                                 </div>
                             </div>
@@ -272,7 +221,7 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             <div class="info-box">
                                 <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['bachelors']; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><?= $bachelors_first_class ?></span>
                                     <span class="info-box-text">Bachelor's Honors</span>
                                 </div>
                             </div>
@@ -283,7 +232,7 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             <div class="info-box">
                                 <span class="info-box-icon bg-danger rounded"><i class="fa fa-id-card"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?php echo $academic_data['trainings']; ?></b></span>
+                                    <span class="info-box-number" style="font-size:40px"><?= $trainings ?></span>
                                     <span class="info-box-text">Professional Trainings</span>
                                 </div>
                             </div>
@@ -291,6 +240,7 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                     </div>
 
                     <!-- FIRST PART OF ACADEMIC PERFORMANCE -->
+
                     <div class="row">
                         <div class="col-xl-3 col-12"> </div>
                         <div class="col-xl-12 col-12">
@@ -304,13 +254,13 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                                             <h5><i class="fa fa-circle me-5 text-info"></i>Phd's </h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-secondary"></i>Masters</h5>
+                                            <h5><i class="fa fa-circle me-5 text--bs-indigo"></i>Masters</h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Bachelor's</h5>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First class</h5>
                                         </li>
                                         <li>
-                                            <h5><i class="fa fa-circle me-5 text-danger"></i>Certifications</h5>
+                                            <h5><i class="fa fa-circle me-5 text-primary"></i>First class</h5>
                                         </li>
                                     </ul>
                                     <div id="morris-area-chart3" style="height: 245px;"></div>
@@ -318,15 +268,18 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- ---------------------------------------------------------------------------------------------------
-                   SECTION FOR RESEARCH AND INNOVATIONS
-                   ---------------------------------------------------------------------------------------------------- -->
+
+                                    SECTION FOR RESEARCH AND INNOVATIONS
+
+                    ---------------------------------------------------------------------------------------------------- -->
+
                     <div class="row">
                         <div class="col-lg-12 col-12">
                             <div class="box">
-                                <div class="box-header" style="text-align : center ;">
-                                    <h3 class="box-title" style="font-size: 40px; " style="text-align : center; "><b>RESEARCH AND INNOVATIONS</b></h3>
+                                <div class="box-header" style="text-align: center;">
+                                    <h3 class="box-title" style="font-size: 40px;"><b>RESEARCH AND INNOVATIONS</b></h3>
                                 </div>
                             </div>
                         </div>
@@ -336,115 +289,92 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                         <div class="col-12 col-lg-4">
                             <div class="box">
                                 <div class="box-header with-border">
-                                    <h5 class="box-title">Publications per publishing application</h5>
-                                </div>
-                                <div class="box-body">
-                                    <div class="box-body chart-responsive">
-                                        <div class="chart" id="daily-inquery" style="height: 305px;"></div>
+                                    <h5 class="box-title">Publications by type</h5>
+                                </div>                                
+                                <div class="box-body" style="padding: 15px;">
+                                    <div class="box-body chart-responsive" style="height: 180px;">
+                                        <div class="chart" id="daily-inquery" style="height: 180px;"></div>
                                     </div>
-                                    <ul class="list-inline">
-                                        <li class="flexbox mb-5 text-fade">
+                                    <ul class="list-inline" style="margin-bottom: 0;">
+                                        <li class="flexbox mb-3 text-fade">
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-danger"></span>
-                                                <span>Google</span>
+                                                <span>First Author</span>
                                             </div>
-                                            <div><?= $research_data['publications']['google'] ?></div>
+                                            <div><?= $research_data['publications']['first_author'] ?></div>
                                         </li>
-                                        <li class="flexbox mb-5 text-fade">
+                                        <li class="flexbox mb-3 text-fade">
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
-                                                <span>Research Gate</span>
+                                                <span>Corresponding Author</span>
                                             </div>
-                                            <div><?= $research_data['publications']['research_gate'] ?></div>
+                                            <div><?= $research_data['publications']['corresponding_author'] ?></div>
                                         </li>
-                                        <li class="flexbox text-fade">
+                                        <li class="flexbox mb-3 text-fade">
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-primary"></span>
-                                                <span>Academia</span>
+                                                <span>Co-author</span>
                                             </div>
-                                            <div><?= $research_data['publications']['academia'] ?></div>
+                                            <div><?= $research_data['publications']['co_author'] ?></div>
+                                        </li>
+                                        <li class="flexbox mb-3 text-fade">
+                                            <div>
+                                                <span class="badge badge-dot badge-lg me-1 bg-success"></span>
+                                                <span>Book with ISBN</span>
+                                            </div>
+                                            <div><?= $research_data['publications']['book_isbn'] ?></div>
                                         </li>
                                         <li class="flexbox text-fade">
                                             <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-success"></span>
-                                                <span>Others</span>
+                                                <span class="badge badge-dot badge-lg me-1 bg-info"></span>
+                                                <span>Book Chapter</span>
                                             </div>
-                                            <div><?= $research_data['publications']['others'] ?></div>
+                                            <div><?= $research_data['publications']['book_chapter'] ?></div>
                                         </li>
                                     </ul>
                                 </div>
-                            </div>
+                            </div>    
                         </div>
 
                         <div class="col-lg-8 col-12">
-                            <div class="box">
-                                <div class="box-header">
-                                    <h3 class="box-title"><b>PUBLICATIONS</b></h3>
+                            <!-- Stat Cards Container -->
+                            <div class="stat-cards-container">
+                                <!-- Publications Card -->
+                                <div class="stat-card">
+                                    <h3>Publications</h3>
+                                    <p class="stat-number"><b><?= $research_data['publications']['total'] ?></b></p>
+                                    <p class="stat-change positive">
+                                        +<?= round($research_data['publications']['total'] * 0.23) ?> from last year
+                                    </p>
                                 </div>
-                                <div class="box-body">
-                                    <ul class="list-inline text-center">
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-success"></i>Peer Reviewed Publications</h5>
-                                        </li>
-                                        <li>
-                                            <h5><i class="fa fa-circle me-5 text-primary"></i>Number of Citations</h5>
-                                        </li>
-                                    </ul>
-                                    <div class="chart">
-                                        <div class="chart" id="revenue-chart" style="height: 233px;"></div>
-                                    </div>
+                                
+                                <!-- Grants Card -->                        
+                                <div class="stat-card grants">
+                                    <h3>Grants</h3>
+                                    <p class="stat-number"><b>UGX <?= number_format($research_data['grants']['total_amount'], 0) ?></b></p>
+                                    <p class="stat-change positive">
+                                        +<?= round($research_data['grants']['count'] * 0.15) ?> from last year
+                                    </p>
                                 </div>
-                            </div>
+                                
+                                <!-- Patents Card -->
+                                <div class="stat-card patents">     
+                                    <h3>Patents</h3>
+                                    <p class="stat-number"><b><?= $research_data['patents'] ?></b></p>
+                                    <p class="stat-change positive">
+                                        +<?= round($research_data['patents'] * 0.1) ?> from last year
+                                    </p>
+                                </div>
+                            </div>                           
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-primary">
-                                <div class="flexbox">
-                                    <div id="linechart">1,4,3,7,6,4,8,9,6,8,12</div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b><?= $research_data['first_author'] ?></b></span><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs18 ms-1" style="font-size:20px">First-Author peer-reviewed</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-success">
-                                <div class="flexbox">
-                                    <div id="barchart">1,3,5</div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b><?= $research_data['must_repository'] ?></b></span><br><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs18 ms-1" style="font-size:20px">MUST repository</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-xl-4">
-                            <div class="box box-body bg-danger">
-                                <div class="flexbox">
-                                    <div id="discretechart">1,4,3,7,6,4,8,9,6,8,12</div>
-                                    <div class="text-end">
-                                        <span style="font-size:40px;"><b><?= $research_data['co_authored'] ?></b></span><br><br>
-                                        <span>
-                                            <i class="ion-ios-arrow-up text-white"></i>
-                                            <span class="fs-18 ms-1" style="font-size:20px;">Co authored</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!---------------------------------------------------------------------------------------------------
+
+
                                        SECTION FOR COMMUNITY SERVICES
+                                      
                    ---------------------------------------------------------------------------------------------------->
                     <div class="row">
                         <div class="col-lg-12 col-12">
@@ -461,8 +391,8 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             <div class="info-box">
                                 <span class="info-box-icon bg-info rounded"><i class="fa fa-id-card"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['outreach_programs'] ?></b></span><br><br>
-                                    <span class="info-box-text">Community Outreach Programs</span>
+                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['students_supervised'] ?></b></span><br><br>
+                                    <span class="info-box-text">Students supervised</span>
                                 </div>
                             </div>
                         </div>
@@ -470,8 +400,8 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             <div class="info-box">
                                 <span class="info-box-icon bg-success rounded"><i class="fas fa-thumbs-up"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['clinical_practices'] ?></b></span>
-                                    <span class="info-box-text">Clinical Practices</span><br>
+                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['outreaches'] ?></b></span>
+                                    <span class="info-box-text">Community Outreaches</span><br>
                                 </div>
                             </div>
                         </div>
@@ -479,8 +409,8 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
                             <div class="info-box">
                                 <span class="info-box-icon bg-primary rounded"><i class="fas fa-shopping-bag"></i></span>
                                 <div class="info-box-content text-fade">
-                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['student_supervisions'] ?></b></span>
-                                    <span class="info-box-text">Supervisions of students in community placements</span>
+                                    <span class="info-box-number" style="font-size:40px"><b><?= $community_data['beneficiaries'] ?></b></span>
+                                    <span class="info-box-text">Total Number of Beneficiaries in community placements</span>
                                 </div>
                             </div>
                         </div>
@@ -554,7 +484,8 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
         <!-- /.content-wrapper -->
 
         <!-- footer -->
-        <?php include 'bars/footer.php'; ?>
+        <?php //include 'bars/footer.php'; ?>
+
     </div>
     <!-- ./wrapper -->
 
@@ -578,40 +509,36 @@ if ($supervision_result && $row = $supervision_result->fetch_assoc()) {
     <script src="../components/assets/vendor_components/jquery.peity/jquery.peity.js"></script>
     <script src="../components/src/js/demo.js"></script>
     <script src="../components/src/js/template.js"></script>
+    <script src="js/stat-cards.js"></script>
+    <script src="../js/chart.js"></script>
     
     <script>
-    // Pass PHP data to JavaScript for charts
-    var academicData = {
-        phds: <?= $academic_data['phds'] ?>,
-        masters: <?= $academic_data['masters'] ?>,
-        bachelors: <?= $academic_data['bachelors'] ?>,
-        trainings: <?= $academic_data['trainings'] ?>
-    };
-
-    var researchData = {
+    // Chart data for Research and Innovations
+    var researchChartData = {
         publications: {
-            google: <?= $research_data['publications']['google'] ?>,
-            research_gate: <?= $research_data['publications']['research_gate'] ?>,
-            academia: <?= $research_data['publications']['academia'] ?>,
-            others: <?= $research_data['publications']['others'] ?>
+            first_author: <?= $research_data['publications']['first_author'] ?>,
+            corresponding_author: <?= $research_data['publications']['corresponding_author'] ?>,
+            co_author: <?= $research_data['publications']['co_author'] ?>,
+            book_isbn: <?= $research_data['publications']['book_isbn'] ?>,
+            book_chapter: <?= $research_data['publications']['book_chapter'] ?>
         },
-        peer_reviewed: <?= $research_data['peer_reviewed'] ?>,
-        citations: <?= $research_data['citations'] ?>,
-        first_author: <?= $research_data['first_author'] ?>,
-        must_repository: <?= $research_data['must_repository'] ?>,
-        co_authored: <?= $research_data['co_authored'] ?>
+        grants: <?= $research_data['grants']['total_amount'] ?>,
+        patents: <?= $research_data['patents'] ?>,
+        utility_models: <?= $research_data['utility_models'] ?>,
+        copyrights: <?= $research_data['copyrights'] ?>
     };
 
-    var communityData = {
-        outreach_programs: <?= $community_data['outreach_programs'] ?>,
-        clinical_practices: <?= $community_data['clinical_practices'] ?>,
-        student_supervisions: <?= $community_data['student_supervisions'] ?>,
+    // Chart data for Community Service
+    var communityChartData = {
+        students_supervised: <?= $community_data['students_supervised'] ?>,
+        outreaches: <?= $community_data['outreaches'] ?>,
+        beneficiaries: <?= $community_data['beneficiaries'] ?>,
         awareness_campaigns: <?= $community_data['awareness_campaigns'] ?>,
         embedded_projects: <?= $community_data['embedded_projects'] ?>,
         workshops: <?= $community_data['workshops'] ?>
     };
     </script>
     
-    <script src="../components/src/js/pages/dashboard.js"></script>
+    <?php include '../components/src/js/pages/dashboarddd.php'; ?>
 </body>
 </html>
