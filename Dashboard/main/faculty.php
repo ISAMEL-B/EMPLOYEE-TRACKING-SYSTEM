@@ -694,7 +694,7 @@
             <div class="tab-content" id="publications">
                 <div class="main-content">
                 <!-- status cards -->
-                <!-- <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                     <div class="card stat-card" style="width: 300px;">
                         <h3>Total peer reviewed publications</h3>
                         <div class="value">34</div>
@@ -711,7 +711,7 @@
                         
                     </div>
 
-                </div> -->
+                </div>
                     <!-- <div class="large-card">
                         <div class="section-title">
                             <h2>Publications vs Citations</h2>
