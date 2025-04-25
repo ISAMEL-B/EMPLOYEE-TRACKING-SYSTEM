@@ -3,7 +3,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-
 session_start();
 $current_ur = 'index.php';
 $current_pag = 'index';
@@ -17,6 +16,105 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
 //include backend calculator
 // include '/EMPLOYEE-TRACKING-SYSTEM/scoring_calculator/university score/university_score.php';
 include '../../scoring_calculator/university score/university_score.php';
+
+// Verify the connection is available
+if (!isset($mysqli) || !($mysqli instanceof mysqli)) {
+    die("Database connection not established in university_score.php");
+}
+
+// 1. PUBLICATIONS
+$pubQuery = $mysqli->query("
+    SELECT 
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Author' THEN 1 END) as first_author,
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Co-Author' THEN 1 END) as co_author,
+        COUNT(*) as total
+    FROM publications 
+    WHERE YEAR(CURDATE()) = YEAR(CURDATE())
+");
+if (!$pubQuery) {
+    die("Publications query failed: " . $mysqli->error);
+}
+$currentPublications = $pubQuery->fetch_assoc();
+$pubQuery->close();
+
+$pubQuery = $mysqli->query("
+    SELECT 
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Author' THEN 1 END) as first_author,
+        COUNT(CASE WHEN publication_type = 'Journal Article' AND role = 'Co-Author' THEN 1 END) as co_author,
+        COUNT(*) as total
+    FROM publications 
+    WHERE YEAR(CURDATE())-1 = YEAR(CURDATE())
+");
+if (!$pubQuery) {
+    die("Previous publications query failed: " . $mysqli->error);
+}
+$previousPublications = $pubQuery->fetch_assoc();
+$pubQuery->close();
+
+// 2. GRANTS
+$grantQuery = $mysqli->query("SELECT SUM(grant_amount) as total FROM grants WHERE YEAR(CURDATE()) = YEAR(CURDATE())");
+if (!$grantQuery) {
+    die("Grants query failed: " . $mysqli->error);
+}
+$currentGrants = $grantQuery->fetch_row()[0] ?? 0;
+$grantQuery->close();
+
+$grantQuery = $mysqli->query("SELECT SUM(grant_amount) as total FROM grants WHERE YEAR(CURDATE())-1 = YEAR(CURDATE())");
+if (!$grantQuery) {
+    die("Previous grants query failed: " . $mysqli->error);
+}
+$previousGrants = $grantQuery->fetch_row()[0] ?? 0;
+$grantQuery->close();
+
+// 3. PATENTS
+$patentQuery = $mysqli->query("SELECT COUNT(*) FROM innovations WHERE innovation_type = 'Patent' AND YEAR(CURDATE()) = YEAR(CURDATE())");
+if (!$patentQuery) {
+    die("Patents query failed: " . $mysqli->error);
+}
+$currentPatents = $patentQuery->fetch_row()[0] ?? 0;
+$patentQuery->close();
+
+$patentQuery = $mysqli->query("SELECT COUNT(*) FROM innovations WHERE innovation_type = 'Patent' AND YEAR(CURDATE())-1 = YEAR(CURDATE())");
+if (!$patentQuery) {
+    die("Previous patents query failed: " . $mysqli->error);
+}
+$previousPatents = $patentQuery->fetch_row()[0] ?? 0;
+$patentQuery->close();
+
+// Prepare data
+$currentData = [
+    'publications' => $currentPublications['total'] ?? 0,
+    'grants' => $currentGrants ?? 0,
+    'patents' => $currentPatents ?? 0,
+    'first_author' => $currentPublications['first_author'] ?? 0,
+    'co_author' => $currentPublications['co_author'] ?? 0
+];
+
+$previousData = [
+    'publications' => $previousPublications['total'] ?? 0,
+    'grants' => $previousGrants ?? 0,
+    'patents' => $previousPatents ?? 0
+];
+
+// Number formatting function
+function formatNumber($number) {
+    return number_format($number ?? 0, 0, '.', ',');
+}
+
+// Percentage calculation function
+function calculateChange($current, $previous) {
+    if ($previous > 0) {
+        return round((($current - $previous) / $previous) * 100, 1);
+    }
+    return 0;
+}
+
+// Calculate all percentages
+$percentages = [
+    'publications' => calculateChange($currentData['publications'], $previousData['publications']),
+    'grants' => calculateChange($currentData['grants'], $previousData['grants']),
+    'patents' => calculateChange($currentData['patents'], $previousData['patents'])
+];
 
 
 ?>
@@ -85,17 +183,11 @@ include '../../scoring_calculator/university score/university_score.php';
                     $masters = $university_data['Masters']; // Dynamic value for Masters Degrees
                     $bachelors_first_class = $university_data['First Class']; // Dynamic value for Bachelor's Honors
                     $trainings = $university_data['Other']; // Dynamic value for Professional Trainings
-                    $patents = $university_data['Patent']; // Dynamic value for Patents
-                    $publications = $university_data['Journal Articles (First Author)'] + $university_data['Journal Articles (Corresponding Author)'] + $university_data['Journal Articles (Co-author)'] + $university_data['Book with ISBN'] + $university_data['Book Chapter'];// Dynamic value for publications
-                    $journal = $university_data['Journal Articles (First Author)']; // Dynamic value for Journal Articles for First Author      
-                    $articles = $university_data['Journal Articles (Corresponding Author)']; // Dynamic value for Journal Articles for Corresponding Author
-                    $co_author = $university_data['Journal Articles (Co-author)']; // Dynamic value for Journal Articles for Co-author
-                    $book = $university_data['Book with ISBN']; // Dynamic value for Book with ISBN
-                    $book_chapter = $university_data['Book Chapter']; // Dynamic value for Book Chapter
-                    
-                    $grants = $university_data['total_grant_amount']; // Dynamic value for Grants
-
-
+                    $patents = $currentData['patents']; // Dynamic value for Patents from database
+                    $publications = $currentData['publications']; // Dynamic value for publications from database
+                    $journal = $currentData['first_author']; // Dynamic value for Journal Articles for First Author from database     
+                    $articles = $currentData['co_author']; // Dynamic value for Journal Articles for Co-author from database
+                    $grants = $currentData['grants']; // Dynamic value for Grants from database
 
                     ?>
 
@@ -212,30 +304,9 @@ include '../../scoring_calculator/university score/university_score.php';
                                         <li class="flexbox mb-3 text-fade">
                                             <div>
                                                 <span class="badge badge-dot badge-lg me-1 bg-warning"></span>
-                                                <span>Corresponding Author</span>
-                                            </div>
-                                            <div><?= $articles ?></div>
-                                        </li>
-                                        <li class="flexbox mb-3 text-fade"> <!-- Added mb-3 for consistency -->
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-primary"></span>
                                                 <span>Co-author</span>
                                             </div>
-                                            <div><?= $co_author ?></div>
-                                        </li>
-                                        <li class="flexbox mb-3 text-fade">
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-success"></span>
-                                                <span>Book with ISBN</span>
-                                            </div>
-                                            <div><?= $book ?></div>
-                                        </li>
-                                        <li class="flexbox text-fade"> <!-- Last item doesn't need margin-bottom -->
-                                            <div>
-                                                <span class="badge badge-dot badge-lg me-1 bg-info"></span>
-                                                <span>Book Chapter</span>
-                                            </div>
-                                            <div><?= $book_chapter ?></div>
+                                            <div><?= $articles ?></div>
                                         </li>
                                     </ul>
                                 </div>
@@ -248,27 +319,30 @@ include '../../scoring_calculator/university score/university_score.php';
                                 <!-- Publications Card -->
                                 <div class="stat-card">
                                     <h3>Publications</h3>
-                                    <p class="stat-number"><b><?= $publications ?></b></p>
-                                    <p class="stat-change positive">
-                                        +23% from last year
+                                    <p class="stat-number formatted-number"><b><?= formatNumber($currentData['publications']) ?></b></p>
+                                    <p class="stat-change <?= ($percentages['publications'] >= 0) ? 'positive' : 'negative' ?>">
+                                        <?= ($percentages['publications'] >= 0) ? '+' : '' ?><?= $percentages['publications'] ?>% from last year
+                                        <span class="stat-detail">(<?= formatNumber($previousData['publications']) ?>)</span>
                                     </p>
                                 </div>
-                                
-                                <!-- Grants Card -->                        
+
+                                <!-- Grants Card -->
                                 <div class="stat-card grants">
                                     <h3>Grants</h3>
-                                    <p class="stat-number"><b><?= $grants ?></b></p>
-                                    <p class="stat-change positive">
-                                        +15% from last year
+                                    <p class="stat-number formatted-number"><b>$<?= formatNumber($currentData['grants']) ?></b></p>
+                                    <p class="stat-change <?= ($percentages['grants'] >= 0) ? 'positive' : 'negative' ?>">
+                                        <?= ($percentages['grants'] >= 0) ? '+' : '' ?><?= $percentages['grants'] ?>% from last year
+                                        <span class="stat-detail">($<?= formatNumber($previousData['grants']) ?>)</span>
                                     </p>
                                 </div>
-                                
+
                                 <!-- Patents Card -->
-                                <div class="stat-card patents">     
+                                <div class="stat-card patents">
                                     <h3>Patents</h3>
-                                    <p class="stat-number"><b><?= $patents ?></b></p>
-                                    <p class="stat-change positive">
-                                        +10% from last year
+                                    <p class="stat-number formatted-number"><b><?= formatNumber($currentData['patents']) ?></b></p>
+                                    <p class="stat-change <?= ($percentages['patents'] >= 0) ? 'positive' : 'negative' ?>">
+                                        <?= ($percentages['patents'] >= 0) ? '+' : '' ?><?= $percentages['patents'] ?>% from last year
+                                        <span class="stat-detail">(<?= formatNumber($previousData['patents']) ?>)</span>
                                     </p>
                                 </div>
                             </div>                           
@@ -445,6 +519,4 @@ include '../../scoring_calculator/university score/university_score.php';
 
 
 </body>
-
-
 </html>
