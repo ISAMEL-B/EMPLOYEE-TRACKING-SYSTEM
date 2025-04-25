@@ -757,7 +757,7 @@ try {
                         <?php endif; ?>
 
                         <div class="text-end mt-2">
-                            <a href="#" class="text-primary">View Full Ranking →</a>
+                            <a href="individual_view.php?staff_id=<?= $staff_id ?? 0 ?>" class="text-primary">View Full Ranking →</a>
                         </div>
                     </div>
                 </div>
@@ -1173,4 +1173,5 @@ try {
         });
     </script>
 </body>
+
 </html>
