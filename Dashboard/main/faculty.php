@@ -1,12 +1,191 @@
 
 <?php
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+
     session_start();
     // Check if user is NOT logged in OR not HRM
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
         header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
         exit();
     }
-?>
+
+    //department performance
+    // include '../../scoring_calculator/department score/department_score.php';
+
+    //get faculty score
+    include '../../scoring_calculator/faculty score/faculty_score.php';
+
+    
+
+    //get count of employees in a faculty
+    include '../../scoring_calculator/faculty score/faculty_employees.php';
+
+    $faculty_id = $_GET['id'] ?? null;
+
+    if ($faculty_id) {
+        $faculty_data = get_faculty_performance($conn, $faculty_id);
+        $faculty_name = get_faculty_name($conn, $faculty_id);
+    } else {
+        // Fallback
+        die("No faculty selected.");
+    }
+
+    // total publications
+    $totalPublications = $faculty_data['Journal Articles (First Author)'] + 
+                         $faculty_data['Journal Articles (Co-author)'] + 
+                         $faculty_data['Journal Articles (Corresponding Author)'] +
+                         $faculty_data['Book Chapter'] +
+                         $faculty_data['Book with ISBN'];
+
+    // total grants
+    $totalGrants = $faculty_data['total_grant_amount'];
+
+    // total innovations
+    $totalInnovations = $faculty_data['Patent'] + 
+    $faculty_data['Utility Model'] +
+    $faculty_data['Copyright'] +
+    $faculty_data['Product'] +
+    $faculty_data['Trademark'];
+
+    //total employees
+    $total_employees = getTotalEmployeesByFaculty($faculty_id, $conn);
+
+
+    /// graphs
+        //overview section
+        //departmental scores graph
+        $overviewData = [];
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $department_id = $row['department_id'];
+            $department_name = get_department_name($conn, $department_id);
+            $overviewscores = get_department_performance($conn, $department_id);
+
+            $overviewData[] = [
+                'department' => $department_name,
+                'total_score' => round($overviewscores['total_score'], 2) // Round for cleaner display
+            ];
+        }
+
+        // academic performance (academic performance tab)
+        //quick stats
+        $phdHolders = $faculty_data['PhD'];
+        $mastersHolders = $faculty_data['Masters'];
+        $firstClass = $faculty_data['First Class'];
+        $secondUpper = $faculty_data['Second Upper'];
+
+        //academic performance comparison
+        $academicData = [];
+
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        while ($row = $result->fetch_assoc()) {
+            $department_id = $row['department_id'];
+            $department_name = get_department_name($conn, $department_id); // make sure this is $department_name
+            $scores = get_department_performance($conn, $department_id); // also rename for clarity
+        
+            $academicData[] = [
+                'department' => $department_name,
+                'PhD' => $scores['PhD'],
+                'Masters' => $scores['Masters'], 
+                'First Class' => $scores['First Class'],
+                'Second Upper' => $scores['Second Upper'],
+            ];
+        }
+    
+        //comparison
+        $keyMetricsData = [];
+
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $department_id = $row['department_id'];
+            $department_name = get_department_name($conn, $department_id);
+
+            // Get detailed metrics from department performance function
+            $scores = get_department_performance($conn, $department_id);
+
+            $publications = isset($scores['total_publications']) ? $scores['total_publications'] : 0;
+            $grants = isset($scores['total_grant_amount']) ? round($scores['total_grant_amount'] / 1000000000, 1) : 0;
+            $supervisions = (isset($scores['Masters Supervised']) ? $scores['Masters Supervised'] : 0)
+                        + (isset($scores['PhD Supervised']) ? $scores['PhD Supervised'] : 0);
+            $innovations = isset($scores['total_innovations']) ? $scores['total_innovations'] : 0;
+
+            $keyMetricsData[] = [
+                'department' => $department_name,
+                'publications' => $publications,
+                'grants' => $grants,
+                'supervisions' => $supervisions,
+                'innovations' => $innovations,
+            ];
+        }
+
+        // publications
+        $publicationTypeData = [];
+
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $dept_id = $row['department_id'];
+            $dept_name = get_department_name($conn, $dept_id);
+            $pub_scores = get_department_performance($conn, $dept_id);
+
+            $publicationTypeData[] = [
+                'department' => $dept_name,
+                'journal_articles' => 
+                    (isset($pub_scores['Journal Articles (First Author)']) ? $pub_scores['Journal Articles (First Author)'] : 0) +
+                    (isset($pub_scores['Journal Articles (Corresponding Author)']) ? $pub_scores['Journal Articles (Corresponding Author)'] : 0) +
+                    (isset($pub_scores['Journal Articles (Co-author)']) ? $pub_scores['Journal Articles (Co-author)'] : 0),
+                
+                'book_chapters' => isset($pub_scores['Book Chapter']) ? $pub_scores['Book Chapter'] : 0,
+                
+                'books' => isset($pub_scores['Book with ISBN']) ? $pub_scores['Book with ISBN'] : 0
+            ];
+            
+        }
+
+        //innovations
+        $innovationData = [];
+
+        $stmt = $conn->prepare("SELECT department_id FROM departments WHERE faculty_id = ?");
+        $stmt->bind_param("i", $faculty_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $dept_id = $row['department_id'];
+            $dept_name = get_department_name($conn, $dept_id);
+            $innovation_scores = get_department_performance($conn, $dept_id);
+
+            $innovationData[] = [
+                'department' => $dept_name,
+                'patents' => isset($innovation_scores['Patent']) ? $innovation_scores['Patent'] : 0,
+                'utility_models' => isset($innovation_scores['Utility Model']) ? $innovation_scores['Utility Model'] : 0,
+                'copyrights' => isset($innovation_scores['Copyright']) ? $innovation_scores['Copyright'] : 0,
+                'products' => isset($innovation_scores['Product']) ? $innovation_scores['Product'] : 0,
+                'trademarks' => isset($innovation_scores['Trademark']) ? $innovation_scores['Trademark'] : 0
+            ];
+        }
+
+
+
+    ?>
+            
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -328,7 +507,7 @@
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h1 class="display-5 fw-bold">Faculty of computing and informartics</h1>
+                            <h1 class="display-5 fw-bold">Faculty of <?= htmlspecialchars($faculty_name) ?></h1>
                         </div>
                         <div class="col-md-4 text-md-end">
                             <i class="fas fa-trophy fa-4x opacity-75"></i>
@@ -354,20 +533,19 @@
             <div class="summary-cards">
                 <div class="card">
                     <h3>Total Staff</h3>
-                    <div class="value">142</div>
-                    <div class="subtext">32 Professors, 65 Lecturers</div>
+                    <div class="value"><?= $total_employees ?></div>
                 </div>
                 <div class="card trend-up">
                     <h3>Total publications</h3>
-                    <div class="value">34</div>
+                    <div class="value"><?= $totalPublications; ?></div>
                 </div>
                 <div class="card trend-up">
                     <h3>Research Grants</h3>
-                    <div class="value">UGX 3.2B</div>
+                    <div class="value"><?= 'UGX ' . number_format($faculty_data['total_grant_amount'] / 1_000_000_000) . 'B' ?></div>
                 </div>
                 <div class="card trend-down">
                     <h3>Total Innovations</h3>
-                    <div class="value">43</div>
+                    <div class="value"><?= $totalInnovations?></div>
                 </div>
             </div>
 
@@ -413,23 +591,19 @@
                     <div class="summary-cards">
                         <div class="card stat-card">
                             <h3>PhD Holders</h3>
-                            <div class="value">25</div>
-                            <div class="subtext">32% of faculty</div>
+                            <div class="value"><?= $phdHolders?></div>
                         </div>
                         <div class="card stat-card">
                             <h3>Masters</h3>
-                            <div class="value">45</div>
-                            <div class="subtext">58% of faculty</div>
+                            <div class="value"><?= $mastersHolders ?></div>
                         </div>
                         <div class="card stat-card">
                             <h3>First Class</h3>
-                            <div class="value">34</div>
-                            <div class="subtext">44% of faculty</div>
+                            <div class="value"><?= $firstClass ?></div>
                         </div>
                         <div class="card stat-card">
                             <h3>Second Class</h3>
-                            <div class="value">72</div>
-                            <div class="subtext">93% of faculty</div>
+                            <div class="value"><?php echo $secondUpper ?></div>
                         </div>
                     </div>
 
@@ -449,7 +623,7 @@
             <div class="tab-content" id="publications">
                 <div class="main-content">
                 <!-- status cards -->
-                <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <!-- <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                     <div class="card stat-card" style="width: 300px;">
                         <h3>Total peer reviewed publications</h3>
                         <div class="value">34</div>
@@ -466,15 +640,15 @@
                         
                     </div>
 
-                </div>
-                    <div class="large-card">
+                </div> -->
+                    <!-- <div class="large-card">
                         <div class="section-title">
                             <h2>Publications vs Citations</h2>
                         </div>
                         <div class="chart-container">
                             <canvas id="pubCitationChart"></canvas>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="large-card">
                         <div class="section-title">
                             <h2>Publication Types</h2>
@@ -626,58 +800,87 @@
         // Charts initialization
         document.addEventListener('DOMContentLoaded', function() {
             // Faculty Overview Chart
+            const overviewData = <?php echo json_encode($overviewData); ?>;
+            const overviewlabels = overviewData.map(item => item.department);
+            const scores = overviewData.map(item => item.total_score);
+
             const overviewCtx = document.getElementById('facultyOverviewChart').getContext('2d');
             new Chart(overviewCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Surgery', 'Pediatrics', 'Pathology', 'Public Health'],
+                    labels: overviewlabels,
                     datasets: [{
                         label: 'Overall Performance',
-                        data: [8.2, 7.9, 7.5, 6.8, 6.2],
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)'
+                        data: scores,
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(41, 128, 185, 1)',
+                        borderWidth: 1
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 10
+                            max: 10, // adjust based on your scoring system
+                            title: {
+                                display: true,
+                                text: 'Score (out of 10)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
                         }
                     }
                 }
             });
 
             // Key Metrics Chart
+            const keyMetricsChartData = <?php echo json_encode($keyMetricsData); ?>;
+            const keyMetricsLabels = keyMetricsChartData.map(item => item.department);
+            const keyMetricsPublications = keyMetricsChartData.map(item => item.publications);
+            const keyMetricsGrants = keyMetricsChartData.map(item => item.grants);
+            const keyMetricsSupervisions = keyMetricsChartData.map(item => item.supervisions);
+            const keyMetricsInnovations = keyMetricsChartData.map(item => item.innovations);
+
             const keyMetricsCtx = document.getElementById('keyMetricsChart').getContext('2d');
             new Chart(keyMetricsCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Engineering', 'Science', 'Arts', 'Business', 'Law'], // Departments on x-axis
+                    labels: keyMetricsLabels,
                     datasets: [
                         {
                             label: 'Publications',
-                            data: [9.2, 8.1, 7.5, 6.8, 7.2, 6.5], // Scores for each department
+                            data: keyMetricsPublications,
                             backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Grants',
-                            data: [8.8, 9.2, 7.8, 6.2, 8.1, 5.8],
+                            data: keyMetricsGrants,
                             backgroundColor: 'rgba(46, 204, 113, 0.8)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Postgraduate Supervisions',
-                            data: [8.5, 7.8, 8.2, 7.5, 6.9, 7.1],
+                            data: keyMetricsSupervisions,
                             backgroundColor: 'rgba(155, 89, 182, 0.8)',
                             borderColor: 'rgba(155, 89, 182, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Innovations',
-                            data: [7.2, 8.5, 6.9, 5.8, 7.5, 6.2],
+                            data: keyMetricsInnovations,
                             backgroundColor: 'rgba(255, 193, 7, 0.8)',
                             borderColor: 'rgba(255, 193, 7, 1)',
                             borderWidth: 1
@@ -736,37 +939,44 @@
                 }
             });
 
-            // Qualifications by Department Chart
+            //Qualifications by Department Chart
+            const academicData = <?php echo json_encode($academicData); ?>;
+            const labels = academicData.map(item => item.department);
+            const phdData = academicData.map(item => item.PhD);
+            const mastersData = academicData.map(item => item.Masters);
+            const firstClassData = academicData.map(item => item['First Class']);
+            const secondUpperData = academicData.map(item => item['Second Upper']);
+
             const qualDeptCtx = document.getElementById('qualificationsByDeptChart').getContext('2d');
             new Chart(qualDeptCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Surgery', 'Pediatrics', 'Pathology', 'Public Health'],
+                    labels: labels,
                     datasets: [
                         {
                             label: 'PhD',
-                            data: [15, 12, 8, 5, 10],
+                            data: phdData,
                             backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Masters',
-                            data: [25, 18, 15, 12, 20],
+                            data: mastersData,
                             backgroundColor: 'rgba(46, 204, 113, 0.8)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'First Class',
-                            data: [18, 15, 12, 8, 10],
+                            data: firstClassData,
                             backgroundColor: 'rgba(231, 76, 60, 0.8)',
                             borderColor: 'rgba(231, 76, 60, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Second Class',
-                            data: [30, 25, 20, 15, 25],
+                            label: 'Second Upper',
+                            data: secondUpperData,
                             backgroundColor: 'rgba(241, 196, 15, 0.8)',
                             borderColor: 'rgba(241, 196, 15, 1)',
                             borderWidth: 1
@@ -804,140 +1014,148 @@
                 }
             });
 
+
             // Publications vs Citations Chart
-            const pubCiteCtx = document.getElementById('pubCitationChart').getContext('2d');
-            new Chart(pubCiteCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Medicine', 'Surgery', 'Public Health', 'mental health'],
-                    datasets: [
-                        {
-                            label: 'Publications',
-                            data: [12, 10, 6, 10], // Average publications per department
-                            backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                            borderColor: 'rgba(52, 152, 219, 1)',
-                            borderWidth: 1,
-                            barPercentage: 0.6
-                        },
-                        {
-                            label: 'Citations',
-                            data: [45, 32, 12, 34], // Average citations per department
-                            backgroundColor: 'rgba(231, 76, 60, 0.8)',
-                            borderColor: 'rgba(231, 76, 60, 1)',
-                            borderWidth: 1,
-                            barPercentage: 0.6
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            title: {
-                                display: true,
-                                text: 'Department',
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                }
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Count',
-                                font: {
-                                    weight: 'bold',
-                                    size: 14
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 12
-                                },
-                                usePointStyle: true,
-                                boxWidth: 12
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Publications and Citations by Department',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            },
-                            padding: {
-                                top: 10,
-                                bottom: 20
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleFont: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            bodyFont: {
-                                size: 12
-                            },
-                            padding: 12,
-                            cornerRadius: 4,
-                            displayColors: true,
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.raw;
-                                }
-                            }
-                        }
-                    },
-                    layout: {
-                        padding: {
-                            left: 10,
-                            right: 10,
-                            top: 10,
-                            bottom: 10
-                        }
-                    }
-                }
-            });
+            // const pubCiteCtx = document.getElementById('pubCitationChart').getContext('2d');
+            // new Chart(pubCiteCtx, {
+            //     type: 'bar',
+            //     data: {
+            //         labels: ['Medicine', 'Surgery', 'Public Health', 'mental health'],
+            //         datasets: [
+            //             {
+            //                 label: 'Publications',
+            //                 data: [12, 10, 6, 10], // Average publications per department
+            //                 backgroundColor: 'rgba(52, 152, 219, 0.8)',
+            //                 borderColor: 'rgba(52, 152, 219, 1)',
+            //                 borderWidth: 1,
+            //                 barPercentage: 0.6
+            //             },
+            //             {
+            //                 label: 'Citations',
+            //                 data: [45, 32, 12, 34], // Average citations per department
+            //                 backgroundColor: 'rgba(231, 76, 60, 0.8)',
+            //                 borderColor: 'rgba(231, 76, 60, 1)',
+            //                 borderWidth: 1,
+            //                 barPercentage: 0.6
+            //             }
+            //         ]
+            //     },
+            //     options: {
+            //         responsive: true,
+            //         maintainAspectRatio: false,
+            //         scales: {
+            //             x: {
+            //                 grid: {
+            //                     display: false
+            //                 },
+            //                 title: {
+            //                     display: true,
+            //                     text: 'Department',
+            //                     font: {
+            //                         weight: 'bold',
+            //                         size: 14
+            //                     }
+            //                 }
+            //             },
+            //             y: {
+            //                 beginAtZero: true,
+            //                 title: {
+            //                     display: true,
+            //                     text: 'Count',
+            //                     font: {
+            //                         weight: 'bold',
+            //                         size: 14
+            //                     }
+            //                 },
+            //                 grid: {
+            //                     color: 'rgba(0, 0, 0, 0.05)'
+            //                 }
+            //             }
+            //         },
+            //         plugins: {
+            //             legend: {
+            //                 position: 'top',
+            //                 labels: {
+            //                     font: {
+            //                         size: 12
+            //                     },
+            //                     usePointStyle: true,
+            //                     boxWidth: 12
+            //                 }
+            //             },
+            //             title: {
+            //                 display: true,
+            //                 text: 'Publications and Citations by Department',
+            //                 font: {
+            //                     size: 16,
+            //                     weight: 'bold'
+            //                 },
+            //                 padding: {
+            //                     top: 10,
+            //                     bottom: 20
+            //                 }
+            //             },
+            //             tooltip: {
+            //                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            //                 titleFont: {
+            //                     size: 14,
+            //                     weight: 'bold'
+            //                 },
+            //                 bodyFont: {
+            //                     size: 12
+            //                 },
+            //                 padding: 12,
+            //                 cornerRadius: 4,
+            //                 displayColors: true,
+            //                 callbacks: {
+            //                     label: function(context) {
+            //                         return context.dataset.label + ': ' + context.raw;
+            //                     }
+            //                 }
+            //             }
+            //         },
+            //         layout: {
+            //             padding: {
+            //                 left: 10,
+            //                 right: 10,
+            //                 top: 10,
+            //                 bottom: 10
+            //             }
+            //         }
+            //     }
+            // });
 
             // Publication Types Chart
+            const pubTypeChartData = <?php echo json_encode($publicationTypeData); ?>;
+
+            const pubTypeLabels = pubTypeChartData.map(item => item.department);
+            const journalArticlesData = pubTypeChartData.map(item => item.journal_articles);
+            const bookChaptersData = pubTypeChartData.map(item => item.book_chapters);
+            const booksData = pubTypeChartData.map(item => item.books);
+
             const pubTypesCtx = document.getElementById('publicationTypesChart').getContext('2d');
             new Chart(pubTypesCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['medicine', 'pharmarcy', 'pharmacology', 'medical lab science'],
+                    labels: pubTypeLabels,
                     datasets: [
                         {
-                            label: 'Journal articles',
-                            data: [120, 25, 8, 30], // Sample data for Medicine department
+                            label: 'Journal Articles',
+                            data: journalArticlesData,
                             backgroundColor: 'rgba(52, 152, 219, 0.8)',
                             borderColor: 'rgba(52, 152, 219, 1)',
                             borderWidth: 1
                         },
                         {
-                            label: 'Book chapters',
-                            data: [100, 20, 5, 43], // Sample data for Surgery department
+                            label: 'Book Chapters',
+                            data: bookChaptersData,
                             backgroundColor: 'rgba(46, 204, 113, 0.8)',
                             borderColor: 'rgba(46, 204, 113, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Books',
-                            data: [85, 18, 6, 49], // Sample data for Public Health department
+                            data: booksData,
                             backgroundColor: 'rgba(155, 89, 182, 0.8)',
                             borderColor: 'rgba(155, 89, 182, 1)',
                             borderWidth: 1
@@ -949,15 +1167,11 @@
                     maintainAspectRatio: false,
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
+                            grid: { display: false },
                             title: {
                                 display: true,
                                 text: 'Department',
-                                font: {
-                                    weight: 'bold'
-                                }
+                                font: { weight: 'bold' }
                             }
                         },
                         y: {
@@ -965,35 +1179,24 @@
                             title: {
                                 display: true,
                                 text: 'Number of Publications',
-                                font: {
-                                    weight: 'bold'
-                                }
+                                font: { weight: 'bold' }
                             },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
                         }
                     },
                     plugins: {
                         legend: {
                             position: 'top',
                             labels: {
-                                font: {
-                                    size: 12
-                                },
+                                font: { size: 12 },
                                 usePointStyle: true
                             }
                         },
                         title: {
                             display: true,
                             text: 'Publication Types by Department',
-                            font: {
-                                size: 16,
-                                weight: 'bold'
-                            },
-                            padding: {
-                                bottom: 20
-                            }
+                            font: { size: 16, weight: 'bold' },
+                            padding: { bottom: 20 }
                         },
                         tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -1054,44 +1257,54 @@
             });
 
             // Innovations Chart
-            const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
-            new Chart(innovationsCtx, {
+            const innovationsData = <?php echo json_encode($innovationData); ?>;
+            const departmentsLabels_innov = innovationsData.map(item => item.department);
+
+            const patentsData = innovationsData.map(item => item.patents);
+            const utilityModelsData = innovationsData.map(item => item.utility_models);
+            const copyrightsData = innovationsData.map(item => item.copyrights);
+            const productsData = innovationsData.map(item => item.products);
+            const trademarksData = innovationsData.map(item => item.trademarks);
+
+            const innovationsCtxChart = document.getElementById('innovationsChart').getContext('2d');
+
+            new Chart(innovationsCtxChart, {
                 type: 'bar',
                 data: {
-                    labels: ['Medicine', 'Surgery', 'Public Health'], // Departments on x-axis
+                    labels: departmentsLabels_innov,
                     datasets: [
                         {
                             label: 'Patents',
-                            data: [3, 2, 3], // Medicine, Surgery, Public Health
-                            backgroundColor: 'rgba(75, 192, 192, 0.8)',  // Teal
+                            data: patentsData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.8)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Utility Models',
-                            data: [5, 3, 4],
-                            backgroundColor: 'rgba(255, 159, 64, 0.8)',   // Orange
+                            data: utilityModelsData,
+                            backgroundColor: 'rgba(255, 159, 64, 0.8)',
                             borderColor: 'rgba(255, 159, 64, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Copyrights',
-                            data: [6, 4, 5],
-                            backgroundColor: 'rgba(54, 162, 235, 0.8)',  // Blue
+                            data: copyrightsData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
                             borderColor: 'rgba(54, 162, 235, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Products',
-                            data: [2, 1, 2],
-                            backgroundColor: 'rgba(153, 102, 255, 0.8)',  // Purple
+                            data: productsData,
+                            backgroundColor: 'rgba(153, 102, 255, 0.8)',
                             borderColor: 'rgba(153, 102, 255, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Trademarks',
-                            data: [1, 1, 1],
-                            backgroundColor: 'rgba(255, 99, 132, 0.8)',  // Pink
+                            data: trademarksData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
                             borderColor: 'rgba(255, 99, 132, 1)',
                             borderWidth: 1
                         }
@@ -1146,6 +1359,7 @@
                     categoryPercentage: 0.9
                 }
             });
+
 
             // Community Engagement Chart
             const communityCtx = document.getElementById('communityEngagementChart').getContext('2d');

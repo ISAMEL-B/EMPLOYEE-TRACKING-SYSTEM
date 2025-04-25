@@ -8,11 +8,18 @@ error_reporting(E_ALL);
 
 // Ensure the uploads directory exists
 if (!file_exists('uploads')) {
-    mkdir('uploads', 0777, true);
+    if (!mkdir('uploads', 0777, true)) {
+        $_SESSION['notification'] = [
+            'type' => 'error',
+            'message' => "Failed to create upload directory. Please check permissions."
+        ];
+        header('Location: upload_csv.php');
+        exit;
+    }
 }
 
 // Database connection
-include 'config.php';
+include '../approve/config.php';
 
 // Expected column counts for validation (excluding auto-increment IDs)
 $expected_columns = [
@@ -31,57 +38,81 @@ $expected_columns = [
     'degrees' => 3          // staff_id, degree_name, degree_classification
 ];
 
+// Human-readable column names for error messages
+$column_names = [
+    'roles' => ['Role Name'],
+    'faculties' => ['Faculty Name'],
+    'departments' => ['Department Name', 'Faculty ID'],
+    'staff' => ['First Name', 'Last Name', 'Scholar Type', 'Role ID', 'Department ID', 'Years of Experience', 'Performance Score'],
+    'publications' => ['Staff ID', 'Publication Type', 'Role'],
+    'grants' => ['Staff ID', 'Grant Amount'],
+    'supervision' => ['Staff ID', 'Student Level'],
+    'innovations' => ['Staff ID', 'Innovation Type'],
+    'academicactivities' => ['Staff ID', 'Activity Type'],
+    'service' => ['Staff ID', 'Service Type'],
+    'communityservice' => ['Staff ID', 'Description', 'Beneficiaries'],
+    'professionalbodies' => ['Staff ID', 'Body Name'],
+    'degrees' => ['Staff ID', 'Degree Name', 'Degree Classification']
+];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $table = $_POST['table_name'];
-    $file = $_FILES['csv_file']['tmp_name'];
-    $action = $_POST['action'] ?? '';
+    $table = $_POST['table_name'] ?? '';
+    $file = $_FILES['csv_file']['tmp_name'] ?? '';
+    $force_upload = isset($_POST['force_upload']) ? true : false;
+    $csv_file_path = $_POST['csv_file_path'] ?? '';
+
+    // Validate table selection
+    if (!array_key_exists($table, $expected_columns)) {
+        $_SESSION['notification'] = [
+            'type' => 'error',
+            'message' => "Invalid table selection. Please select a valid table from the dropdown."
+        ];
+        header('Location: upload_csv.php');
+        exit;
+    }
+
+    // Handle forced upload from modal
+    if ($force_upload && $csv_file_path) {
+        $table = $_POST['table_name'];
+        $file = $csv_file_path;
+    }
 
     if (is_uploaded_file($file)) {
-        $file_name = $_FILES['csv_file']['name'];
+        $file_name = $force_upload ? basename($csv_file_path) : $_FILES['csv_file']['name'];
         $destination = "uploads/" . $file_name;
-        move_uploaded_file($file, $destination);
+        
+        if (!$force_upload) {
+            if (!move_uploaded_file($file, $destination)) {
+                $_SESSION['notification'] = [
+                    'type' => 'error',
+                    'message' => "Failed to move uploaded file. Please check directory permissions."
+                ];
+                header('Location: upload_csv.php');
+                exit;
+            }
+        } else {
+            $destination = $csv_file_path;
+        }
 
         if (($handle = fopen($destination, "r")) !== FALSE) {
             $header = fgetcsv($handle);
             $received_columns = count($header);
 
-            // Validate the column count
-            if ($received_columns != $expected_columns[$table]) {
-                // Store file info in session for potential reprocessing
-                $_SESSION['pending_upload'] = [
+            // Validate the column count if not forcing upload
+            if (!$force_upload && $received_columns != $expected_columns[$table]) {
+                // Store detailed file info in session for confirmation
+                $_SESSION['csv_validation'] = [
                     'table' => $table,
-                    'file' => $destination,
-                    'expected_columns' => $expected_columns[$table],
-                    'received_columns' => $received_columns
+                    'expected' => $expected_columns[$table],
+                    'received' => $received_columns,
+                    'file_path' => $destination,
+                    'expected_columns' => $column_names[$table],
+                    'received_columns' => $header
                 ];
                 
-                // Determine the type of mismatch
-                if ($received_columns < $expected_columns[$table]) {
-                    $_SESSION['notification'] = [
-                        'type' => 'warning',
-                        'message' => "The CSV file has fewer columns than expected. Expected: {$expected_columns[$table]}, Found: {$received_columns}.",
-                        'requires_confirmation' => true,
-                        'confirmation_message' => "The CSV has fewer columns than expected. Some data might be missing. Do you want to proceed with the available columns?"
-                    ];
-                } else {
-                    $_SESSION['notification'] = [
-                        'type' => 'warning',
-                        'message' => "The CSV file has more columns than expected. Expected: {$expected_columns[$table]}, Found: {$received_columns}.",
-                        'requires_confirmation' => true,
-                        'confirmation_message' => "The CSV has more columns than expected. Extra columns will be ignored. Do you want to proceed with the expected columns?"
-                    ];
-                }
-                
                 fclose($handle);
-                header('Location: ../head/upload_csv.php');
+                header('Location: upload_csv.php');
                 exit;
-            }
-
-            // If this is a confirmed upload after column mismatch
-            if ($action === 'confirm_upload') {
-                // Reprocess the file with user confirmation
-                $handle = fopen($destination, "r");
-                $header = fgetcsv($handle); // Skip header again
             }
 
             // Prepare queries based on the selected table (without ID fields)
@@ -143,10 +174,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($query_map[$table])) {
                 $_SESSION['notification'] = [
                     'type' => 'error',
-                    'message' => "Invalid table selection."
+                    'message' => "Invalid table selection. No query mapping found for table: {$table}"
                 ];
                 fclose($handle);
-                header('Location: ../head/upload_csv.php');
+                header('Location: upload_csv.php');
                 exit;
             }
 
@@ -154,9 +185,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare($insert_query);
             $check_stmt = $conn->prepare($check_query);
 
+            if (!$stmt || !$check_stmt) {
+                $_SESSION['notification'] = [
+                    'type' => 'error',
+                    'message' => "Database preparation failed: " . $conn->error
+                ];
+                fclose($handle);
+                header('Location: upload_csv.php');
+                exit;
+            }
+
             $is_updated = false;
             $new_records = 0;
             $updated_records = 0;
+            $skipped_records = 0;
+            $error_records = 0;
+            $error_details = [];
             $roles = [];
             $departments = [];
             $faculties = [];
@@ -164,23 +208,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Fetch foreign keys if necessary
             if ($table === 'staff') {
                 $role_result = $conn->query("SELECT role_id, role_name FROM roles");
+                if (!$role_result) {
+                    $_SESSION['notification'] = [
+                        'type' => 'error',
+                        'message' => "Failed to fetch roles: " . $conn->error
+                    ];
+                    fclose($handle);
+                    header('Location: upload_csv.php');
+                    exit;
+                }
                 while ($row = $role_result->fetch_assoc()) {
                     $roles[$row['role_name']] = $row['role_id'];
                 }
+                
                 $department_result = $conn->query("SELECT department_id, department_name FROM departments");
+                if (!$department_result) {
+                    $_SESSION['notification'] = [
+                        'type' => 'error',
+                        'message' => "Failed to fetch departments: " . $conn->error
+                    ];
+                    fclose($handle);
+                    header('Location: upload_csv.php');
+                    exit;
+                }
                 while ($row = $department_result->fetch_assoc()) {
                     $departments[$row['department_name']] = $row['department_id'];
                 }
             } elseif ($table === 'departments') {
                 $faculty_result = $conn->query("SELECT faculty_id, faculty_name FROM faculties");
+                if (!$faculty_result) {
+                    $_SESSION['notification'] = [
+                        'type' => 'error',
+                        'message' => "Failed to fetch faculties: " . $conn->error
+                    ];
+                    fclose($handle);
+                    header('Location: upload_csv.php');
+                    exit;
+                }
                 while ($row = $faculty_result->fetch_assoc()) {
                     $faculties[$row['faculty_name']] = $row['faculty_id'];
                 }
             }
 
             $conn->begin_transaction();
+            $line_number = 1; // Start counting from header + 1
 
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                $line_number++;
+                
+                // Skip empty rows
+                if (count(array_filter($data)) === 0) {
+                    $skipped_records++;
+                    continue;
+                }
+
                 // Handle column mismatch by truncating or padding data
                 if ($received_columns != $expected_columns[$table]) {
                     if ($received_columns < $expected_columns[$table]) {
@@ -193,7 +274,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $should_insert = false;
+                $record_errors = [];
                 
+                // Validate data types and foreign keys
+                switch ($table) {
+                    case 'departments':
+                        if (!isset($faculties[$data[1]])) {
+                            $record_errors[] = "Faculty '{$data[1]}' not found in database";
+                        }
+                        break;
+                    case 'staff':
+                        if (!isset($roles[$data[3]])) {
+                            $record_errors[] = "Role '{$data[3]}' not found in database";
+                        }
+                        if (!isset($departments[$data[4]])) {
+                            $record_errors[] = "Department '{$data[4]}' not found in database";
+                        }
+                        if (!is_numeric($data[5])) {
+                            $record_errors[] = "Years of experience must be numeric";
+                        }
+                        if (!is_numeric($data[6])) {
+                            $record_errors[] = "Performance score must be numeric";
+                        }
+                        break;
+                    case 'grants':
+                        if (!is_numeric($data[1])) {
+                            $record_errors[] = "Grant amount must be numeric";
+                        }
+                        break;
+                }
+
+                if (!empty($record_errors)) {
+                    $error_details[] = "Line {$line_number}: " . implode(", ", $record_errors);
+                    $error_records++;
+                    continue;
+                }
+
                 // Bind parameters for checking existing records
                 switch ($table) {
                     case 'roles':
@@ -235,7 +351,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                 }
 
-                $check_stmt->execute();
+                if (!$check_stmt->execute()) {
+                    $error_details[] = "Line {$line_number}: Failed to check existing record - " . $check_stmt->error;
+                    $error_records++;
+                    continue;
+                }
+                
                 $result = $check_stmt->get_result();
                 
                 if ($result->num_rows == 0) {
@@ -278,6 +399,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($has_changes) {
                         $should_insert = true;
                         $updated_records++;
+                    } else {
+                        $skipped_records++;
                     }
                 }
 
@@ -290,13 +413,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             break;
                         case 'departments':
                             $faculty_id = $faculties[$data[1]] ?? null;
-                            if (!$faculty_id) continue 2;
+                            if (!$faculty_id) {
+                                $error_details[] = "Line {$line_number}: Faculty '{$data[1]}' not found";
+                                $error_records++;
+                                continue 2;
+                            }
                             $stmt->bind_param("si", $data[0], $faculty_id);
                             break;
                         case 'staff':
                             $role_id = $roles[$data[3]] ?? null;
                             $department_id = $departments[$data[4]] ?? null;
-                            if (!$role_id || !$department_id) continue 2;
+                            if (!$role_id || !$department_id) {
+                                $missing = [];
+                                if (!$role_id) $missing[] = "role '{$data[3]}'";
+                                if (!$department_id) $missing[] = "department '{$data[4]}'";
+                                $error_details[] = "Line {$line_number}: " . implode(" and ", $missing) . " not found";
+                                $error_records++;
+                                continue 2;
+                            }
                             $stmt->bind_param("sssiiii", $data[0], $data[1], $data[2], $role_id, $department_id, $data[5], $data[6]);
                             break;
                         case 'publications':
@@ -330,46 +464,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     if ($stmt->execute()) {
                         $is_updated = true;
+                    } else {
+                        $error_details[] = "Line {$line_number}: Failed to insert record - " . $stmt->error;
+                        $error_records++;
                     }
                 }
             }
 
-            $conn->commit();
+            if ($conn->commit()) {
+                $is_updated = true;
+            } else {
+                $error_details[] = "Commit failed: " . $conn->error;
+                $error_records++;
+            }
+            
             fclose($handle);
 
-            // Clear pending upload session
+            // Clear session data
+            unset($_SESSION['csv_validation']);
             unset($_SESSION['pending_upload']);
 
             if ($is_updated) {
-                $message = "Data successfully processed for {$table}. ";
-                if ($new_records > 0) {
-                    $message .= "Added {$new_records} new records. ";
+                $message = "Data processing completed for {$table}. ";
+                $message .= "Records: {$new_records} new, {$updated_records} updated, {$skipped_records} unchanged";
+                
+                if ($error_records > 0) {
+                    $message .= ", {$error_records} with errors";
+                    $_SESSION['error_details'] = $error_details;
                 }
-                if ($updated_records > 0) {
-                    $message .= "Updated {$updated_records} existing records.";
-                }
+                
                 $_SESSION['notification'] = [
                     'type' => 'success',
                     'message' => $message
                 ];
             } else {
+                $message = "No new or changed data found in the CSV file.";
+                
+                if ($error_records > 0) {
+                    $message .= " Found {$error_records} records with errors.";
+                    $_SESSION['error_details'] = $error_details;
+                }
+                
                 $_SESSION['notification'] = [
                     'type' => 'info',
-                    'message' => "No new or changed data found in the CSV file."
+                    'message' => $message
                 ];
             }
         } else {
             $_SESSION['notification'] = [
                 'type' => 'error',
-                'message' => "Failed to open the CSV file."
+                'message' => "Failed to open the CSV file. Please check if the file is not corrupted and is a valid CSV."
             ];
         }
     } else {
         $_SESSION['notification'] = [
             'type' => 'error',
-            'message' => "No file uploaded or file error."
+            'message' => "No file uploaded or file upload error. Please ensure you selected a file and the file size does not exceed the limit."
         ];
     }
+} else {
+    $_SESSION['notification'] = [
+        'type' => 'error',
+        'message' => "Invalid request method. Please use the form to upload files."
+    ];
 }
 
-header('Location: ../head/upload_csv.php');
+header('Location: upload_csv.php');
+exit;

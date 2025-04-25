@@ -166,7 +166,9 @@ function get_department_performance($conn, $department_id) {
         $department_data['university_service_score'] += $service_details['score'] ?? 0;
     }
 
-    return $department_data;
+
+
+return $department_data;
 }
 
 
@@ -197,7 +199,7 @@ function get_department_staff_count($conn, $department_id) {
 
 
 // Usage
-// $department_id = 17;
+// $department_id = 2;
 // $dept_data = get_department_performance($conn, $department_id);
 // $department_name = get_department_name($conn, $department_id);
 
