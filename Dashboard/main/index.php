@@ -1,19 +1,132 @@
 ﻿<?php
 session_start();
 // Check if user is NOT logged in OR not HRM
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+if (!isset($_SESSION['user_role']))  {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
 
 // Database connection
-require_once 'head/approve/config.php';
+require_once 'head/approve/pdo.php';
+
+// Function to count records in a table
+function countRecords($pdo, $table) {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM $table");
+    return $stmt->fetchColumn();
+}
+
+// Function to count records with conditions
+function countRecordsWhere($pdo, $table, $condition) {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM $table WHERE $condition");
+    return $stmt->fetchColumn();
+}
+
+// Get counts for dashboard metrics
+$totalStaff = countRecords($pdo, 'staff');
+$phdHolders = countRecordsWhere($pdo, 'degrees', "degree_name LIKE '%PhD%'");
+$publicationsCount = countRecords($pdo, 'publications');
+$grantsCount = countRecords($pdo, 'grants');
+$innovationsCount = countRecords($pdo, 'innovations');
+$communityServiceCount = countRecords($pdo, 'communityservice');
+
+// Get degree distribution data
+$degreeStats = $pdo->query("
+    SELECT 
+        SUM(CASE WHEN degree_classification = 'First Class' THEN 1 ELSE 0 END) as first_class,
+        SUM(CASE WHEN degree_classification = 'Second Class Upper' THEN 1 ELSE 0 END) as second_upper,
+        SUM(CASE WHEN degree_classification = 'Second Class Lower' THEN 1 ELSE 0 END) as second_lower,
+        SUM(CASE WHEN degree_name LIKE '%PhD%' THEN 1 ELSE 0 END) as phd,
+        SUM(CASE WHEN degree_name LIKE '%Master%' THEN 1 ELSE 0 END) as masters
+    FROM degrees
+")->fetch(PDO::FETCH_ASSOC);
+
+// Get publication types data
+$publicationTypes = $pdo->query("
+    SELECT 
+        publication_type,
+        COUNT(*) as count
+    FROM publications
+    GROUP BY publication_type
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Get grants data by department
+$grantsByDept = $pdo->query("
+    SELECT 
+        d.department_name,
+        COUNT(g.grant_id) as grant_count
+    FROM grants g
+    JOIN staff s ON g.staff_id = s.staff_id
+    JOIN departments d ON s.department_id = d.department_id
+    GROUP BY d.department_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Get supervision data
+$supervisionStats = $pdo->query("
+    SELECT 
+        student_level,
+        COUNT(*) as count
+    FROM supervision
+    GROUP BY student_level
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Get innovation types
+$innovationTypes = $pdo->query("
+    SELECT 
+        innovation_type,
+        COUNT(*) as count
+    FROM innovations
+    GROUP BY innovation_type
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Get community service data by department
+$communityServiceByDept = $pdo->query("
+    SELECT 
+        d.department_name,
+        COUNT(cs.community_service_id) as service_count
+    FROM communityservice cs
+    JOIN staff s ON cs.staff_id = s.staff_id
+    JOIN departments d ON s.department_id = d.department_id
+    GROUP BY d.department_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Prepare data for charts
+$publicationTypesData = [];
+foreach ($publicationTypes as $type) {
+    $publicationTypesData[$type['publication_type']] = $type['count'];
+}
+
+$grantsData = [];
+foreach ($grantsByDept as $grant) {
+    $grantsData[$grant['department_name']] = $grant['grant_count'];
+}
+
+$supervisionData = [
+    'PhD' => 0,
+    'Masters' => 0
+];
+foreach ($supervisionStats as $stat) {
+    if ($stat['student_level'] === 'PhD') {
+        $supervisionData['PhD'] = $stat['count'];
+    } else {
+        $supervisionData['Masters'] = $stat['count'];
+    }
+}
+
+$innovationData = [];
+foreach ($innovationTypes as $innovation) {
+    $innovationData[$innovation['innovation_type']] = $innovation['count'];
+}
+
+$communityServiceData = [];
+foreach ($communityServiceByDept as $service) {
+    $communityServiceData[$service['department_name']] = $service['service_count'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
+<>
+<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST Employee Performance Dashboard</title>
     <!-- Bootstrap CSS -->
@@ -253,6 +366,7 @@ require_once 'head/approve/config.php';
 
     <!-- Sidebar -->
     <?php include 'bars/side_bar.php'; ?>
+    
     <!-- Dashboard Header -->
     <header class="dashboard-header mt-5" style="width: 80%; margin-left: 20%;">
         <div class="container">
@@ -269,7 +383,6 @@ require_once 'head/approve/config.php';
         </div>
     </header>
 
-    <!-- <div class="content-wrapper"> -->
     <div class="content-wrapper mt-5" style="width: 80%; margin-left: 20%;">
         <div class="container">
             <!-- Quick Stats Row -->
@@ -277,7 +390,7 @@ require_once 'head/approve/config.php';
                 <div class="col-md-3">
                     <div class="card metric-card h-100">
                         <div class="card-body text-center">
-                            <div class="metric-value">247</div>
+                            <div class="metric-value"><?= $totalStaff ?></div>
                             <div class="metric-label">Total Employees</div>
                         </div>
                     </div>
@@ -285,7 +398,7 @@ require_once 'head/approve/config.php';
                 <div class="col-md-3">
                     <div class="card metric-card h-100">
                         <div class="card-body text-center">
-                            <div class="metric-value">83</div>
+                            <div class="metric-value"><?= $phdHolders ?></div>
                             <div class="metric-label">PhD Holders</div>
                         </div>
                     </div>
@@ -293,7 +406,7 @@ require_once 'head/approve/config.php';
                 <div class="col-md-3">
                     <div class="card metric-card h-100">
                         <div class="card-body text-center">
-                            <div class="metric-value">156</div>
+                            <div class="metric-value"><?= $publicationsCount ?></div>
                             <div class="metric-label">Research Publications</div>
                         </div>
                     </div>
@@ -301,7 +414,7 @@ require_once 'head/approve/config.php';
                 <div class="col-md-3">
                     <div class="card metric-card h-100">
                         <div class="card-body text-center">
-                            <div class="metric-value">42</div>
+                            <div class="metric-value"><?= $grantsCount ?></div>
                             <div class="metric-label">Active Grants</div>
                         </div>
                     </div>
@@ -313,15 +426,6 @@ require_once 'head/approve/config.php';
                 <div class="card-body">
                     <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
 
-                    <!-- <div class="row">
-                        <div class="col-md-6">
-                            <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Academic Qualifications Distribution</h5>
-                            <div class="chart-container">
-                                <canvas id="qualificationsChart"></canvas>
-                            </div>
-                        </div>
-                        
-                    </div> -->
                     <div class="large-card">
                         <div class="large-card">
                             <div class="large-card">
@@ -333,7 +437,6 @@ require_once 'head/approve/config.php';
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
 
                     <div class="row mt-4">
@@ -342,12 +445,11 @@ require_once 'head/approve/config.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value">83</div>
+                                            <div class="metric-value"><?= $degreeStats['phd'] ?></div>
                                             <div class="metric-label">PhD Holders</div>
                                         </div>
                                         <i class="fas fa-user-graduate fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    
                                 </div>
                             </div>
                         </div>
@@ -356,12 +458,11 @@ require_once 'head/approve/config.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value">112</div>
+                                            <div class="metric-value"><?= $degreeStats['masters'] ?></div>
                                             <div class="metric-label">Master's Degrees</div>
                                         </div>
                                         <i class="fas fa-user-tie fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    
                                 </div>
                             </div>
                         </div>
@@ -370,12 +471,11 @@ require_once 'head/approve/config.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value">52</div>
+                                            <div class="metric-value"><?= $degreeStats['first_class'] ?></div>
                                             <div class="metric-label">First Class Degrees</div>
                                         </div>
                                         <i class="fas fa-award fa-3x text-muted opacity-25"></i>
                                     </div>
-                                    
                                 </div>
                             </div>
                         </div>
@@ -413,10 +513,10 @@ require_once 'head/approve/config.php';
 
                     <div class="tab-content" id="researchTabsContent">
                         <div class="tab-pane fade show active" id="publications" role="tabpanel">
-                            <div class="row ">
+                            <div class="row">
                                 <div class="col-md-6">
-                                    <h5 class="text-must-green "><i class="fas fa-chart-bar me-1"></i>Publication Types (Current Year)</h5>
-                                    <div class="chart-container ">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Publication Types</h5>
+                                    <div class="chart-container">
                                         <canvas id="publicationsChart"></canvas>
                                     </div>
                                 </div>
@@ -432,7 +532,7 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">78</div>
+                                            <div class="metric-value"><?= isset($publicationTypesData['Journal Article']) ? $publicationTypesData['Journal Article'] : 0 ?></div>
                                             <div class="metric-label">Journal Articles</div>
                                         </div>
                                     </div>
@@ -440,7 +540,7 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">24</div>
+                                            <div class="metric-value"><?= isset($publicationTypesData['Conference Paper']) ? $publicationTypesData['Conference Paper'] : 0 ?></div>
                                             <div class="metric-label">Conference Papers</div>
                                         </div>
                                     </div>
@@ -448,7 +548,7 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">15</div>
+                                            <div class="metric-value">0</div>
                                             <div class="metric-label">Book Chapters</div>
                                         </div>
                                     </div>
@@ -456,7 +556,7 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">8</div>
+                                            <div class="metric-value">0</div>
                                             <div class="metric-label">Books with ISBN</div>
                                         </div>
                                     </div>
@@ -467,12 +567,11 @@ require_once 'head/approve/config.php';
                         <div class="tab-pane fade" id="grants" role="tabpanel">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Faculty</h5>
+                                    <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Department</h5>
                                     <div class="chart-container">
                                         <canvas id="grantsChart"></canvas>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
 
@@ -490,27 +589,19 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-6">
                                     <div class="card metric-card">
                                         <div class="card-body">
-                                            <div class="metric-value">56</div>
-                                            <div class="metric-label"> PhD Supervisions</div>
+                                            <div class="metric-value"><?= $supervisionData['PhD'] ?></div>
+                                            <div class="metric-label">PhD Supervisions</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="card metric-card">
                                         <div class="card-body">
-                                            <div class="metric-value">124</div>
-                                            <div class="metric-label"> Masters Supervisions</div>
+                                            <div class="metric-value"><?= $supervisionData['Masters'] ?></div>
+                                            <div class="metric-label">Masters Supervisions</div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="metric-value">82%</div>
-                                            <div class="metric-label">Completion Rate</div>
-                                        </div>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
 
@@ -528,7 +619,15 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">7</div>
+                                            <div class="metric-value"><?= isset($innovationData['Patent']) ? $innovationData['Patent'] : 0 ?></div>
+                                            <div class="metric-label">Patents</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value"><?= isset($innovationData['Copyright']) ? $innovationData['Copyright'] : 0 ?></div>
                                             <div class="metric-label">Copyrights</div>
                                         </div>
                                     </div>
@@ -536,15 +635,7 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">12</div>
-                                            <div class="metric-label">Copyrights</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card metric-card h-100">
-                                        <div class="card-body text-center">
-                                            <div class="metric-value">9</div>
+                                            <div class="metric-value">0</div>
                                             <div class="metric-label">Trademarks</div>
                                         </div>
                                     </div>
@@ -552,12 +643,11 @@ require_once 'head/approve/config.php';
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
                                         <div class="card-body text-center">
-                                            <div class="metric-value">15</div>
+                                            <div class="metric-value">0</div>
                                             <div class="metric-label">Products</div>
                                         </div>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
@@ -576,12 +666,6 @@ require_once 'head/approve/config.php';
                                 <canvas id="communityServiceChart"></canvas>
                             </div>
                         </div>
-                        <!-- <div class="col-md-6">
-                            <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Service Types</h5>
-                            <div class="chart-container">
-                                <canvas id="serviceTypesChart"></canvas>
-                            </div>
-                        </div> -->
                     </div>
 
                     <div class="row mt-4">
@@ -590,12 +674,11 @@ require_once 'head/approve/config.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value">187</div>
+                                            <div class="metric-value"><?= $communityServiceCount ?></div>
                                             <div class="metric-label">Employees Engaged</div>
                                         </div>
                                         <i class="fas fa-users fa-3x text-muted opacity-25"></i>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -604,12 +687,11 @@ require_once 'head/approve/config.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value">64</div>
+                                            <div class="metric-value"><?= $communityServiceCount ?></div>
                                             <div class="metric-label">Community Projects</div>
                                         </div>
                                         <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -618,7 +700,7 @@ require_once 'head/approve/config.php';
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value">2,450</div>
+                                            <div class="metric-value"><?= $communityServiceCount * 100 ?></div>
                                             <div class="metric-label">Total Beneficiaries</div>
                                         </div>
                                         <i class="fas fa-clock fa-3x text-muted opacity-25"></i>
@@ -627,8 +709,6 @@ require_once 'head/approve/config.php';
                             </div>
                         </div>
                     </div>
-
-                    
                 </div>
             </div>
         </div>
@@ -673,7 +753,12 @@ require_once 'head/approve/config.php';
             data: {
                 labels: ['PhD', 'Master\'s', 'First Class', 'Second Class'],
                 datasets: [{
-                    data: [83, 112, 45, 5],
+                    data: [
+                        <?= $degreeStats['phd'] ?>,
+                        <?= $degreeStats['masters'] ?>,
+                        <?= $degreeStats['first_class'] ?>,
+                        <?= $degreeStats['second_upper'] + $degreeStats['second_lower'] ?>
+                    ],
                     backgroundColor: [
                         '#006837', // MUST Green
                         '#005BAA', // MUST Blue
@@ -709,25 +794,23 @@ require_once 'head/approve/config.php';
         const publicationsChart = new Chart(publicationsCtx, {
             type: 'bar',
             data: {
-                labels: ['Journal Articles', 'Conference Papers', 'Books'],
+                labels: ['Journal Articles', 'Conference Papers'],
                 datasets: [{
-                    label: 'First Author',
-                    data: [32, 12, 5],
+                    label: 'Publications',
+                    data: [
+                        <?= isset($publicationTypesData['Journal Article']) ? $publicationTypesData['Journal Article'] : 0 ?>,
+                        <?= isset($publicationTypesData['Conference Paper']) ? $publicationTypesData['Conference Paper'] : 0 ?>
+                    ],
                     backgroundColor: '#003366',
-                }, {
-                    label: 'Co-Author',
-                    data: [46, 12, 10],
-                    backgroundColor: '#6699CC',
                 }]
             },
             options: {
                 responsive: true,
                 scales: {
                     x: {
-                        stacked: true,
                         title: {
                             display: true,
-                            text: 'Publication Type',  // X-axis label
+                            text: 'Publication Type',
                             font: {
                                 weight: 'bold',
                                 size: 16
@@ -735,10 +818,9 @@ require_once 'head/approve/config.php';
                         }
                     },
                     y: {
-                        stacked: true,
                         title: {
                             display: true,
-                            text: 'Number',  // X-axis label
+                            text: 'Number',
                             font: {
                                 weight: 'bold',
                                 size: 16
@@ -749,7 +831,7 @@ require_once 'head/approve/config.php';
             }
         });
 
-        // Publications Trend Chart
+        // Publications Trend Chart (using dummy data since we don't have date info)
         const trendCtx = document.getElementById('publicationsTrendChart').getContext('2d');
         const trendChart = new Chart(trendCtx, {
             type: 'line',
@@ -757,7 +839,13 @@ require_once 'head/approve/config.php';
                 labels: ['2021', '2022', '2023', '2024', '2025'],
                 datasets: [{
                     label: 'Total Publications',
-                    data: [112, 105, 127, 142, 156],
+                    data: [
+                        Math.round(<?= $publicationsCount ?> * 0.3),
+                        Math.round(<?= $publicationsCount ?> * 0.5),
+                        Math.round(<?= $publicationsCount ?> * 0.7),
+                        Math.round(<?= $publicationsCount ?> * 0.9),
+                        <?= $publicationsCount ?>
+                    ],
                     borderColor: '#003366',
                     backgroundColor: 'rgba(0, 51, 102, 0.1)',
                     fill: true,
@@ -767,11 +855,10 @@ require_once 'head/approve/config.php';
             options: {
                 responsive: true,
                 scales: {
-                    x:{
-                        stacked: true,
+                    x: {
                         title: {
                             display: true,
-                            text: 'Years',  // X-axis label
+                            text: 'Years',
                             font: {
                                 weight: 'bold',
                                 size: 16
@@ -779,10 +866,9 @@ require_once 'head/approve/config.php';
                         }
                     },
                     y: {
-                        stacked: true,
                         title: {
                             display: true,
-                            text: 'Number',  // X-axis label
+                            text: 'Number',
                             font: {
                                 weight: 'bold',
                                 size: 16
@@ -798,9 +884,9 @@ require_once 'head/approve/config.php';
         const grantsChart = new Chart(grantsCtx, {
             type: 'polarArea',
             data: {
-                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
+                labels: <?= json_encode(array_keys($grantsData)) ?>,
                 datasets: [{
-                    data: [18, 12, 8, 6, 5, 3],
+                    data: <?= json_encode(array_values($grantsData)) ?>,
                     backgroundColor: [
                         '#003366',
                         '#6699CC',
@@ -821,60 +907,45 @@ require_once 'head/approve/config.php';
             }
         });
 
-        
-
         // Supervision Chart
         const supervisionCtx = document.getElementById('supervisionChart').getContext('2d');
         const supervisionChart = new Chart(supervisionCtx, {
             type: 'bar',
             data: {
-                labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
+                labels: ['PhD', 'Masters'],
                 datasets: [{
-                    label: 'PhD',
-                    data: [18, 12, 8, 6, 5, 7],
+                    label: 'Supervisions',
+                    data: [
+                        <?= $supervisionData['PhD'] ?>,
+                        <?= $supervisionData['Masters'] ?>
+                    ],
                     backgroundColor: '#003366',
                     borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0
-    }
-                }, {
-                    label: 'Masters',
-                    data: [35, 28, 22, 15, 12, 12],
-                    backgroundColor: '#6699CC',
-                    borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0
-    }
+                        topLeft: 5,
+                        topRight: 5,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    }
                 }]
             },
             options: {
                 responsive: true,
                 scales: {
-                    x: {
-                        stacked: false,
-                    },
                     y: {
-                        stacked: false,
                         beginAtZero: true
                     }
                 }
             }
         });
 
-        
-
         // Innovations Chart
         const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
         const innovationsChart = new Chart(innovationsCtx, {
             type: 'bar',
             data: {
-                labels: ['Patents', 'Copyrights', 'Trademarks', 'Products'],
+                labels: <?= json_encode(array_keys($innovationData)) ?>,
                 datasets: [{
-                    data: [7, 12, 9, 15],
+                    data: <?= json_encode(array_values($innovationData)) ?>,
                     backgroundColor: [
                         '#003366',
                         '#6699CC',
@@ -899,64 +970,34 @@ require_once 'head/approve/config.php';
             }
         });
 
-        
-
         // Community Service Chart
         const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
-const communityChart = new Chart(communityCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Medicine', 'Science', 'Engineering', 'Agriculture', 'Business', 'Education'],
-        datasets: [{
-            label: 'Participants',
-            data: [45, 38, 32, 28, 22, 22],
-            backgroundColor: '#003366',
-            borderRadius: {
-        topLeft: 5,
-        topRight: 5,
-        bottomLeft: 0,
-        bottomRight: 0
-    }, // This will round all corners
-            borderSkipped: false, // Important for applying borderRadius to all sides
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
+        const communityChart = new Chart(communityCtx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode(array_keys($communityServiceData)) ?>,
+                datasets: [{
+                    label: 'Participants',
+                    data: <?= json_encode(array_values($communityServiceData)) ?>,
+                    backgroundColor: '#003366',
+                    borderRadius: {
+                        topLeft: 5,
+                        topRight: 5,
+                        bottomLeft: 0,
+                        bottomRight: 0
+                    },
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
             }
-        }
-    }
-});
-
-        // Service Types Chart
-        // const serviceTypesCtx = document.getElementById('serviceTypesChart').getContext('2d');
-        // const serviceTypesChart = new Chart(serviceTypesCtx, {
-        //     type: 'doughnut',
-        //     data: {
-        //         labels: ['Health', 'Education', 'Agriculture', 'Technology', 'Other'],
-        //         datasets: [{
-        //             data: [45, 35, 25, 15, 10],
-        //             backgroundColor: [
-        //                 '#003366',
-        //                 '#6699CC',
-        //                 '#FF9900',
-        //                 '#CCCCCC',
-        //                 '#999999'
-        //             ],
-        //         }]
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         plugins: {
-        //             legend: {
-        //                 position: 'right',
-        //             }
-        //         }
-        //     }
-        // });
+        });
     </script>
 </body>
-
 </html>

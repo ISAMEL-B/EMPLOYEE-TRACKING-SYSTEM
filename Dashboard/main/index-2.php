@@ -1,585 +1,527 @@
-﻿<?php
-    session_start();
-    if ($_SESSION['user_role'] !== 'hrm') {
-        header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-        exit();
-    }
-include 'criteria/config.php';
-
-// Fetch all data from database
-$stats = [];
-
-// 1. Academic Performance Data
-$academicQuery = $conn->query("
-    SELECT 
-        COUNT(DISTINCT CASE WHEN d.degree_classification = 'First Class' THEN d.staff_id END) as first_class,
-        COUNT(DISTINCT CASE WHEN d.degree_classification LIKE 'Second%' THEN d.staff_id END) as second_class,
-        COUNT(DISTINCT s.staff_id) as total_staff
-    FROM staff s
-    LEFT JOIN degrees d ON s.staff_id = d.staff_id
-");
-
-if ($academicQuery) {
-    $stats['academic'] = $academicQuery->fetch_assoc();
-}
-
-// 2. Research Data
-$researchQuery = $conn->query("
-    SELECT 
-        COUNT(*) as total_publications,
-        SUM(CASE WHEN p.publication_type = 'Journal Article' THEN 1 ELSE 0 END) as journal_articles,
-        SUM(CASE WHEN p.publication_type = 'Conference Paper' THEN 1 ELSE 0 END) as conference_papers
-    FROM publications p
-");
-
-if ($researchQuery) {
-    $stats['research'] = $researchQuery->fetch_assoc();
-}
-
-// 3. Grants Data
-$grantsQuery = $conn->query("
-    SELECT 
-        SUM(grant_amount) as total_grants,
-        COUNT(*) as grant_count,
-        ROUND(AVG(grant_amount), 0) as avg_grant
-    FROM grants
-");
-if ($grantsQuery) {
-    $stats['grants'] = $grantsQuery->fetch_assoc();
-}
-
-// 4. Community Service Data
-$communityQuery = $conn->query("
-    SELECT 
-        COUNT(*) as total_services,
-        COUNT(DISTINCT cs.staff_id) as staff_involved,
-        COUNT(DISTINCT CASE WHEN cs.community_service_id = 'Consultancy' THEN cs.community_service_id END) as consultancies
-    FROM communityservice cs
-");
-
-if ($communityQuery) {
-    $stats['community'] = $communityQuery->fetch_assoc();
-}
-
-// 5. Supervision Data
-$supervisionQuery = $conn->query("
-    SELECT 
-        COUNT(*) as total_supervisions,
-        SUM(CASE WHEN student_level = 'PhD' THEN 1 ELSE 0 END) as phd_supervisions,
-        SUM(CASE WHEN student_level = 'Masters' THEN 1 ELSE 0 END) as masters_supervisions,
-        COUNT(DISTINCT staff_id) as supervisors
-    FROM supervision
-");
-
-if ($supervisionQuery) {
-    $stats['supervision'] = $supervisionQuery->fetch_assoc();
-}
-
-// 6. Innovation Data
-$innovationQuery = $conn->query("
-    SELECT 
-        COUNT(*) as total_innovations,
-        SUM(CASE WHEN innovation_type = 'Patent' THEN 1 ELSE 0 END) as patents,
-        SUM(CASE WHEN innovation_type = 'Utility Model' THEN 1 ELSE 0 END) as utility_models,
-        COUNT(DISTINCT staff_id) as innovators
-    FROM innovations
-");
-
-if ($innovationQuery) {
-    $stats['innovation'] = $innovationQuery->fetch_assoc();
-}
-
-// Close connection
-$conn->close();
-?>
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Performance Dashboard</title>
-
-    <!-- online files -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>MUST Employee Tracking Dashboard</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- local files -->
-    <!-- <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css"> -->
-    <!-- <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css"> -->
-
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- ApexCharts -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.css">
-
-    <link rel="stylesheet" href="styles/index2.css">
-    <!-- <link rel="stylesheet" href="bars/nav_sidebar/nav_side_bar.css"> -->
-
+    <style>
+        :root {
+            --must-green: #006633;
+            --must-yellow: #FFCC00;
+            --must-blue: #003366;
+            --must-light: #F5F5F5;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--must-light);
+        }
+        
+        .sidebar {
+            background-color: var(--must-blue);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            padding-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu li.active {
+            background-color: var(--must-green);
+        }
+        
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 20px;
+        }
+        
+        .dashboard-header {
+            background-color: var(--must-green);
+            color: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .section-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            padding: 20px;
+            border-top: 4px solid var(--must-yellow);
+        }
+        
+        .section-title {
+            color: var(--must-blue);
+            border-bottom: 2px solid var(--must-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            border-left: 4px solid var(--must-green);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--must-blue);
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .badge-must {
+            background-color: var(--must-yellow);
+            color: var(--must-blue);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .gauge-container {
+            height: 150px;
+            width: 100%;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .progress-bar {
+            background-color: var(--must-green);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: -250px;
+            }
+            .sidebar.active {
+                margin-left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .main-content.active {
+                margin-left: 250px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <?php
-    // nav_bar
-    include 'bars/nav_bar.php';
-    // <!-- Sidebar -->
-    include 'bars/side_bar.php';
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4><i data-feather="award"></i> MUST HR System</h4>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active">
+                <a href="#"><i data-feather="home"></i> Dashboard</a>
+            </li>
+            <li>
+                <a href="#"><i data-feather="users"></i> Staff Directory</a>
+            </li>
+            <li>
+                <a href="#"><i data-feather="book"></i> Academic Records</a>
+            </li>
+            <li>
+                <a href="#"><i data-feather="file-text"></i> Research & Publications</a>
+            </li>
+            <li>
+                <a href="#"><i data-feather="dollar-sign"></i> Grants & Funding</a>
+            </li>
+            <li>
+                <a href="#"><i data-feather="heart"></i> Community Service</a>
+            </li>
+            <li>
+                <a href="#"><i data-feather="settings"></i> Settings</a>
+            </li>
+        </ul>
+    </div>
 
-    ?>
-    <div class="content-wrapper">
-        <div class="container-fluid">
-            <!-- Main content -->
-            <section class="content">
-                <!-- Dashboard Header -->
-                <div class="dashboard-header">
-                    <h3>FACAULTY PERFORMANCE DASHBOARD</h3>
-                    <p class="mb-0">Comprehensive overview of academic, research, and community engagement metrics</p>
-                </div>
-
-                <!-- Key Metrics Summary -->
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="highlight-card text-center">
-                            <div class="highlight-value"><?= $stats['academic']['total_staff'] ?? 0 ?></div>
-                            <div class="highlight-label">Academic Staff</div>
-                            <div class="trend-indicator trend-up mt-2">
-                                <i class="fas fa-arrow-up"></i> 12% from last year
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="highlight-card text-center">
-                            <div class="highlight-value"><?= $stats['research']['total_publications'] ?? 0 ?></div>
-                            <div class="highlight-label">Research Publications</div>
-                            <div class="trend-indicator trend-up mt-2">
-                                <i class="fas fa-arrow-up"></i> 8% from last year
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="highlight-card text-center">
-                            <div class="highlight-value"><?= number_format($stats['grants']['total_grants'] ?? 0) ?></div>
-                            <div class="highlight-label">Research Grants (UGX)</div>
-                            <div class="trend-indicator trend-up mt-2">
-                                <i class="fas fa-arrow-up"></i> 15% from last year
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="highlight-card text-center">
-                            <div class="highlight-value"><?= $stats['innovation']['total_innovations'] ?? 0 ?></div>
-                            <div class="highlight-label">Innovations</div>
-                            <div class="trend-indicator trend-up mt-2">
-                                <i class="fas fa-arrow-up"></i> 5% from last year
-                            </div>
-                        </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container-fluid">
+                <button class="btn btn-sm d-md-none" id="sidebarToggle">
+                    <i data-feather="menu"></i>
+                </button>
+                <div class="navbar-nav ms-auto">
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i data-feather="user"></i> Admin User
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i data-feather="user"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="#"><i data-feather="settings"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i data-feather="log-out"></i> Logout</a></li>
+                        </ul>
                     </div>
                 </div>
+            </div>
+        </nav>
 
-                <!-- ACADEMIC PERFORMANCE SECTION -->
-                <div class="section-divider">
-                    <div class="card pt-3 pb-3">
-                        <h4 class="section-title">Academic Performance</h4>
-                    </div>
-
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i data-feather="users"></i> Employee Performance Dashboard</h2>
+                    <p class="mb-0">Comprehensive tracking of academic staff metrics and achievements</p>
                 </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-light text-dark me-2"><i data-feather="calendar"></i> June 2023</span>
+                    <button class="btn btn-sm btn-outline-light"><i data-feather="download"></i> Export</button>
+                </div>
+            </div>
+        </div>
 
-                <div class="row">
-                    <!-- First Class Degrees -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card academic">
-                            <div class="stat-icon">
-                                <i class="fas fa-award"></i>
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="metric-card text-center">
+                    <div class="metric-value">248</div>
+                    <div class="metric-label">Total Academic Staff</div>
+                    <div class="gauge-container mt-3">
+                        <canvas id="staffGauge"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card text-center">
+                    <div class="metric-value">73</div>
+                    <div class="metric-label">PhD Holders</div>
+                    <div class="gauge-container mt-3">
+                        <canvas id="phdGauge"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card text-center">
+                    <div class="metric-value">156</div>
+                    <div class="metric-label">Master's Holders</div>
+                    <div class="gauge-container mt-3">
+                        <canvas id="mastersGauge"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Performance Section -->
+        <div class="section-card">
+            <h3 class="section-title"><i data-feather="graduation-cap"></i> Academic Performance</h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Staff Qualifications</h5>
+                        <canvas id="qualificationChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Degree Classifications</h5>
+                        <canvas id="degreeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="metric-value">42</div>
+                                <div class="metric-label">First Class Degrees</div>
                             </div>
-                            <div class="stat-value"><?= $stats['academic']['first_class'] ?? 0 ?></div>
-                            <div class="stat-label">First Class Degrees</div>
-                            <div class="stat-description">
-                                Staff members with first class honors degrees
+                            <div class="text-success">
+                                <i data-feather="arrow-up"></i>
+                                <div>+5% from 2022</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="metric-value">167</div>
+                                <div class="metric-label">Second Class Degrees</div>
+                            </div>
+                            <div class="text-warning">
+                                <i data-feather="minus"></i>
+                                <div>No change</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <div class="metric-value">39</div>
+                                <div class="metric-label">Staff Pursuing PhDs</div>
+                            </div>
+                            <div class="text-success">
+                                <i data-feather="arrow-up"></i>
+                                <div>+12% from 2022</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Research & Innovations Section -->
+        <div class="section-card">
+            <h3 class="section-title"><i data-feather="book"></i> Research & Innovations</h3>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="chart-container">
+                        <h5>Publications Over Time</h5>
+                        <canvas id="publicationsChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="metric-card h-100">
+                        <h5>Research Highlights</h5>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Grants Won</span>
+                                <span>24</span>
                             </div>
                             <div class="progress">
-                                <div class="progress-bar" style="width: <?= ($stats['academic']['first_class'] / $stats['academic']['total_staff']) * 100 ?>%"></div>
+                                <div class="progress-bar" style="width: 65%"></div>
                             </div>
+                            <small class="text-muted">UGX 1.2B total value</small>
                         </div>
-                    </div>
-
-                    <!-- Second Class Degrees -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card academic">
-                            <div class="stat-icon">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['academic']['second_class'] ?? 0 ?></div>
-                            <div class="stat-label">Second Class Degrees</div>
-                            <div class="stat-description">
-                                Staff members with second class honors degrees
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Postgraduate Supervision</span>
+                                <span>89</span>
                             </div>
                             <div class="progress">
-                                <div class="progress-bar" style="width: <?= ($stats['academic']['second_class'] / $stats['academic']['total_staff']) * 100 ?>%"></div>
+                                <div class="progress-bar" style="width: 80%"></div>
                             </div>
+                            <small class="text-muted">62 Masters, 27 PhDs</small>
                         </div>
-                    </div>
-
-                    <!-- Total Staff -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card academic">
-                            <div class="stat-icon">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['academic']['total_staff'] ?? 0 ?></div>
-                            <div class="stat-label">Total Academic Staff</div>
-                            <div class="stat-description">
-                                Current teaching and research staff
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Innovations</span>
+                                <span>15</span>
                             </div>
                             <div class="progress">
-                                <div class="progress-bar" style="width: 100%"></div>
+                                <div class="progress-bar" style="width: 45%"></div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Staff with PhD -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card academic">
-                            <div class="stat-icon">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['supervision']['supervisors'] ?? 0 ?></div>
-                            <div class="stat-label">PhD Supervisors</div>
-                            <div class="stat-description">
-                                Staff qualified to supervise PhD students
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" style="width: <?= ($stats['supervision']['supervisors'] / $stats['academic']['total_staff']) * 100 ?>%"></div>
-                            </div>
+                            <small class="text-muted">3 patents, 5 copyrights</small>
                         </div>
                     </div>
                 </div>
-
-                <!-- Academic Performance Charts -->
-                <!-- <div class="row">
-                    <div class="col-lg-8">
-                        <div class="chart-container">
-                            <div class="chart-header d-flex justify-content-between align-items-center">
-                                <h4>Academic Qualifications Over Time</h4>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="academicDropdown" data-bs-toggle="dropdown">
-                                        Last 5 Years
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="#">Last 3 Years</a></li>
-                                        <li><a class="dropdown-item" href="#">Last 5 Years</a></li>
-                                        <li><a class="dropdown-item" href="#">Last 10 Years</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div id="academicTrendChart" style="height: 300px;"></div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Degree Class Distribution</h4>
-                            </div>
-                            <canvas id="degreePieChart" height="300"></canvas>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- RESEARCH AND INNOVATION SECTION -->
-                <div class="section-divider">
-                    <div class="card pt-3 pb-3">
-                        <h4 class="section-title">Research & Innovation</h4>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Grants by Department</h5>
+                        <canvas id="grantsChart"></canvas>
                     </div>
                 </div>
-
-                <div class="row">
-                    <!-- Publications -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card research">
-                            <div class="stat-icon">
-                                <i class="fas fa-book"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['research']['total_publications'] ?? 0 ?></div>
-                            <div class="stat-label">Total Publications</div>
-                            <div class="stat-description">
-                                Combined research outputs
-                            </div>
-                        </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Student Supervision</h5>
+                        <canvas id="supervisionChart"></canvas>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Grants -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card research">
-                            <div class="stat-icon">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="stat-value"><?= number_format($stats['grants']['total_grants'] ?? 0) ?></div>
-                            <div class="stat-label">Research Grants (UGX)</div>
-                            <div class="stat-description">
-                                Total funding secured
-                            </div>
-                        </div>
+        <!-- Community Service Section -->
+        <div class="section-card">
+            <h3 class="section-title"><i data-feather="heart"></i> Community Service</h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <h5>Service Hours by Department</h5>
+                        <canvas id="serviceHoursChart"></canvas>
                     </div>
-
-                    <!-- Innovations -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card innovation">
-                            <div class="stat-icon">
-                                <i class="fas fa-lightbulb"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['innovation']['total_innovations'] ?? 0 ?></div>
-                            <div class="stat-label">Innovations</div>
-                            <div class="stat-description">
-                                Patents and utility models
-                            </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="metric-card h-100">
+                        <h5>Community Engagement</h5>
+                        <div class="mb-3">
+                            <span class="badge badge-must me-1">128</span>
+                            <span>Total community projects</span>
                         </div>
-                    </div>
-
-                    <!-- Citations -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card research">
-                            <div class="stat-icon">
-                                <i class="fas fa-quote-right"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['research']['avg_citations'] ?? 0 ?></div>
-                            <div class="stat-label">Avg Citations</div>
-                            <div class="stat-description">
-                                Per publication
-                            </div>
+                        <div class="mb-3">
+                            <span class="badge badge-must me-1">42</span>
+                            <span>Staff involved in outreach</span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge badge-must me-1">1,240</span>
+                            <span>Total service hours</span>
+                        </div>
+                        <div class="mb-3">
+                            <span class="badge badge-must me-1">18</span>
+                            <span>Partnerships with local orgs</span>
                         </div>
                     </div>
                 </div>
-
-                <!-- Innovation Highlights -->
-                <div class="row mt-5">
-                    <div class="col-md-4">
-                        <div class="info-box">
-                            <div class="info-box-icon text-primary">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <h5>Patents Registered</h5>
-                            <div class="stat-value"><?= $stats['innovation']['patents'] ?? 0 ?></div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar" style="width: <?= ($stats['innovation']['patents'] / $stats['innovation']['total_innovations']) * 100 ?>%"></div>
-                            </div>
-                            <div class="stat-description mt-2">
-                                <?= round(($stats['innovation']['patents'] / $stats['innovation']['total_innovations']) * 100, 1) ?>% of all innovations
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-box">
-                            <div class="info-box-icon text-success">
-                                <i class="fas fa-tools"></i>
-                            </div>
-                            <h5>Utility Models</h5>
-                            <div class="stat-value"><?= $stats['innovation']['utility_models'] ?? 0 ?></div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar" style="width: <?= ($stats['innovation']['utility_models'] / $stats['innovation']['total_innovations']) * 100 ?>%"></div>
-                            </div>
-                            <div class="stat-description mt-2">
-                                <?= round(($stats['innovation']['utility_models'] / $stats['innovation']['total_innovations']) * 100, 1) ?>% of all innovations
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="info-box">
-                            <div class="info-box-icon text-warning">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h5>Innovators</h5>
-                            <div class="stat-value"><?= $stats['innovation']['innovators'] ?? 0 ?></div>
-                            <div class="progress mt-2">
-                                <div class="progress-bar" style="width: <?= ($stats['innovation']['innovators'] / $stats['academic']['total_staff']) * 100 ?>%"></div>
-                            </div>
-                            <div class="stat-description mt-2">
-                                <?= round(($stats['innovation']['innovators'] / $stats['academic']['total_staff']) * 100, 1) ?>% of academic staff
-                            </div>
-                        </div>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <h5>Types of Service Activities</h5>
+                        <canvas id="serviceTypesChart"></canvas>
                     </div>
                 </div>
-
-                <!-- COMMUNITY ENGAGEMENT SECTION -->
-                <div class="section-divider">
-                    <div class="card pt-3 pb-3">
-                        <h4 class="section-title">Community Engagement</h4>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Community Services -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card community">
-                            <div class="stat-icon">
-                                <i class="fas fa-hands-helping"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['community']['total_services'] ?? 0 ?></div>
-                            <div class="stat-label">Community Services</div>
-                            <div class="stat-description">
-                                Outreach programs and initiatives
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Staff Involved -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card community">
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['community']['staff_involved'] ?? 0 ?></div>
-                            <div class="stat-label">Staff Involved</div>
-                            <div class="stat-description">
-                                Participating in community projects
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Student Supervisions -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card community">
-                            <div class="stat-icon">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['supervision']['total_supervisions'] ?? 0 ?></div>
-                            <div class="stat-label">Help Involvement(s)</div>
-                            <div class="stat-description">
-                                PhD and Masters students
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Consultancies -->
-                    <div class="col-xl-3 col-md-6">
-                        <div class="stat-card community">
-                            <div class="stat-icon">
-                                <i class="fas fa-handshake"></i>
-                            </div>
-                            <div class="stat-value"><?= $stats['community']['consultancies'] ?? 0 ?></div>
-                            <div class="stat-label">Consultancies</div>
-                            <div class="stat-description">
-                                Professional services provided
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Community Engagement Charts -->
-                <!-- <div class="row">
-                    <div class="col-lg-6">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Supervision by Level</h4>
-                            </div>
-                            <canvas id="supervisionChart" height="300"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h4>Community Engagement Growth</h4>
-                            </div>
-                            <div id="communityTrendChart" style="height: 300px;"></div>
-                        </div>
-                    </div>
-                </div> -->
-            </section>
+            </div>
         </div>
     </div>
 
-    <!-- Required JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- ApexCharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0/dist/apexcharts.min.js"></script>
+    
     <script>
-        $(document).ready(function() {
-            // Academic Trend Chart (ApexCharts)
-            var academicTrendOptions = {
-                series: [{
-                    name: 'First Class',
-                    data: [12, 15, 18, 20, 22]
-                }, {
-                    name: 'Second Class',
-                    data: [45, 48, 50, 52, 55]
-                }, {
-                    name: 'Total Staff',
-                    data: [80, 85, 90, 95, 100]
-                }],
-                chart: {
-                    type: 'area',
-                    height: '100%',
-                    stacked: false,
-                    toolbar: {
-                        show: true
-                    },
-                    zoom: {
-                        enabled: true
-                    }
-                },
-                colors: ['#4361ee', '#4cc9f0', '#7209b7'],
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 2
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        opacityFrom: 0.6,
-                        opacityTo: 0.8,
-                    }
-                },
-                legend: {
-                    position: 'top',
-                    horizontalAlign: 'right'
-                },
-                xaxis: {
-                    categories: ['2018', '2019', '2020', '2021', '2022'],
-                    title: {
-                        text: 'Year'
-                    }
-                },
-                yaxis: {
-                    title: {
-                        text: 'Number of Staff'
-                    }
-                },
-                tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function(y) {
-                            if (typeof y !== "undefined") {
-                                return y.toFixed(0) + " staff";
-                            }
-                            return y;
-                        }
-                    }
-                }
-            };
-            var academicTrendChart = new ApexCharts(document.querySelector("#academicTrendChart"), academicTrendOptions);
-            academicTrendChart.render();
+        // Initialize Feather Icons
+        document.addEventListener('DOMContentLoaded', function() {
+            feather.replace();
+            
+            // Sidebar Toggle for Mobile
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+                document.querySelector('.main-content').classList.toggle('active');
+            });
+            
+            // Create all charts after DOM is fully loaded
+            createCharts();
+        });
 
-            // Degree Pie Chart (Chart.js)
-            var degreePieCtx = document.getElementById('degreePieChart').getContext('2d');
-            var degreePieChart = new Chart(degreePieCtx, {
+        function createGauge(chartId, value, max, label, color) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            const data = {
+                datasets: [{
+                    data: [value, max - value],
+                    backgroundColor: [color, '#f5f5f5'],
+                    borderWidth: 0,
+                    circumference: 180,
+                    rotation: -90,
+                    cutout: '80%'
+                }]
+            };
+            
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false },
+                        title: {
+                            display: true,
+                            text: label,
+                            position: 'bottom',
+                            font: { size: 14 }
+                        }
+                    },
+                    animation: { animateScale: true }
+                }
+            });
+        }
+
+        function createCharts() {
+            // Gauges
+            createGauge('staffGauge', 248, 300, 'Total Staff', '#006633');
+            createGauge('phdGauge', 73, 100, 'PhD Holders', '#003366');
+            createGauge('mastersGauge', 156, 200, "Master's Holders", '#FFCC00');
+            
+            // Qualification Chart (Doughnut)
+            new Chart(document.getElementById('qualificationChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['First Class', 'Second Class', 'Other'],
+                    labels: ['PhD Holders', "Master's Degree", "Bachelor's Degree", 'Other'],
                     datasets: [{
-                        data: [
-                            <?= $stats['academic']['first_class'] ?? 0 ?>,
-                            <?= $stats['academic']['second_class'] ?? 0 ?>,
-                            <?= ($stats['academic']['total_staff'] ?? 0) - ($stats['academic']['first_class'] ?? 0) - ($stats['academic']['second_class'] ?? 0) ?>
-                        ],
-                        backgroundColor: [
-                            '#4361ee',
-                            '#4cc9f0',
-                            '#adb5bd'
-                        ],
+                        data: [73, 156, 15, 4],
+                        backgroundColor: ['#006633', '#003366', '#FFCC00', '#CCCCCC'],
                         borderWidth: 1
                     }]
                 },
@@ -587,322 +529,198 @@ $conn->close();
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Staff Qualifications',
+                            font: { size: 16 }
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    var label = context.label || '';
-                                    var value = context.raw || 0;
-                                    var total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    var percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value} (${percentage}%)`;
-                                }
-                            }
-                        }
+                        legend: { position: 'right' }
                     }
                 }
             });
-
-            // Publication Type Chart (Chart.js)
-            var publicationTypeCtx = document.getElementById('publicationTypeChart').getContext('2d');
-            var publicationTypeChart = new Chart(publicationTypeCtx, {
+            
+            // Degree Chart (Bar)
+            new Chart(document.getElementById('degreeChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['Journal Articles', 'Conference Papers'],
+                    labels: ['First Class', 'Second Upper', 'Second Lower', 'Third Class', 'Pass'],
                     datasets: [{
-                        label: 'Publications',
-                        data: [
-                            <?= $stats['research']['journal_articles'] ?? 0 ?>,
-                            <?= $stats['research']['conference_papers'] ?? 0 ?>
-                        ],
-                        backgroundColor: [
-                            'rgba(67, 97, 238, 0.7)',
-                            'rgba(76, 201, 240, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(67, 97, 238, 1)',
-                            'rgba(76, 201, 240, 1)'
-                        ],
+                        label: 'Number of Staff',
+                        data: [42, 98, 69, 12, 5],
+                        backgroundColor: '#006633',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Publications'
-                            }
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Bachelor's Degree Classification",
+                            font: { size: 16 }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            // Publications Chart (Line)
+            new Chart(document.getElementById('publicationsChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [
+                        {
+                            label: 'Journal Articles',
+                            data: [45, 52, 58, 67, 72, 65],
+                            borderColor: '#006633',
+                            backgroundColor: 'rgba(0, 102, 51, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Conference Papers',
+                            data: [28, 31, 35, 42, 38, 45],
+                            borderColor: '#003366',
+                            backgroundColor: 'rgba(0, 51, 102, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Book Chapters',
+                            data: [12, 15, 18, 22, 25, 28],
+                            borderColor: '#FFCC00',
+                            backgroundColor: 'rgba(255, 204, 0, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Research Publications (2018-2023)',
+                            font: { size: 16 }
                         }
                     },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            // Grants Chart (Radar)
+            new Chart(document.getElementById('grantsChart').getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: ['Health Sciences', 'Engineering', 'Agriculture', 'Education', 'Business', 'Computing'],
+                    datasets: [{
+                        label: 'Grants Won',
+                        data: [8, 5, 4, 3, 2, 2],
+                        backgroundColor: 'rgba(0, 102, 51, 0.2)',
+                        borderColor: '#006633',
+                        pointBackgroundColor: '#006633',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#006633'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.raw + ' publications';
-                                }
-                            }
+                        title: {
+                            display: true,
+                            text: 'Grants by Department',
+                            font: { size: 16 }
+                        }
+                    },
+                    scales: {
+                        r: { angleLines: { display: true }, suggestedMin: 0 }
+                    }
+                }
+            });
+            
+            // Supervision Chart (Pie)
+            new Chart(document.getElementById('supervisionChart').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: ['Masters Completed', 'Masters Ongoing', 'PhDs Completed', 'PhDs Ongoing'],
+                    datasets: [{
+                        data: [42, 20, 15, 12],
+                        backgroundColor: ['#006633', '#003366', '#FFCC00', '#669966'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Postgraduate Student Supervision',
+                            font: { size: 16 }
                         }
                     }
                 }
             });
-
-            // Research Trend Chart (ApexCharts)
-            var researchTrendOptions = {
-                series: [{
-                    name: 'Publications',
-                    data: [45, 52, 60, 70, 75]
-                }, {
-                    name: 'Citations',
-                    data: [120, 150, 180, 210, 240]
-                }],
-                chart: {
-                    type: 'line',
-                    height: '100%',
-                    toolbar: {
-                        show: true
-                    },
-                    zoom: {
-                        enabled: true
-                    }
-                },
-                colors: ['#4361ee', '#f72585'],
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 3
-                },
-                markers: {
-                    size: 5
-                },
-                xaxis: {
-                    categories: ['2018', '2019', '2020', '2021', '2022'],
-                    title: {
-                        text: 'Year'
-                    }
-                },
-                yaxis: [{
-                        title: {
-                            text: 'Publications'
-                        }
-                    },
-                    {
-                        opposite: true,
-                        title: {
-                            text: 'Citations'
-                        }
-                    }
-                ],
-                tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function(y) {
-                            if (typeof y !== "undefined") {
-                                return y.toFixed(0);
-                            }
-                            return y;
-                        }
-                    }
-                }
-            };
-            var researchTrendChart = new ApexCharts(document.querySelector("#researchTrendChart"), researchTrendOptions);
-            researchTrendChart.render();
-
-            // Supervision Chart (Chart.js)
-            var supervisionCtx = document.getElementById('supervisionChart').getContext('2d');
-            var supervisionChart = new Chart(supervisionCtx, {
+            
+            // Service Hours Chart (Bar)
+            new Chart(document.getElementById('serviceHoursChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['PhD Supervisions', 'Masters Supervisions', 'Total'],
+                    labels: ['Medicine', 'Engineering', 'Agriculture', 'Education', 'Business', 'Computing'],
                     datasets: [{
-                        label: 'Supervisions',
-                        data: [
-                            <?= $stats['supervision']['phd_supervisions'] ?? 0 ?>,
-                            <?= $stats['supervision']['masters_supervisions'] ?? 0 ?>,
-                            <?= $stats['supervision']['total_supervisions'] ?? 0 ?>
-                        ],
-                        backgroundColor: [
-                            'rgba(67, 97, 238, 0.7)',
-                            'rgba(76, 201, 240, 0.7)',
-                            'rgba(114, 9, 183, 0.7)'
-                        ],
-                        borderColor: [
-                            'rgba(67, 97, 238, 1)',
-                            'rgba(76, 201, 240, 1)',
-                            'rgba(114, 9, 183, 1)'
-                        ],
-                        borderWidth: 1
+                        label: 'Service Hours',
+                        data: [320, 280, 210, 180, 150, 100],
+                        backgroundColor: '#006633'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Supervisions'
-                            }
-                        }
-                    },
                     plugins: {
-                        legend: {
-                            display: false
+                        title: {
+                            display: true,
+                            text: 'Community Service Hours by Department',
+                            font: { size: 16 }
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.raw + ' supervisions';
-                                }
-                            }
-                        }
-                    }
+                        legend: { display: false }
+                    },
+                    scales: { y: { beginAtZero: true } }
                 }
             });
-
-            // Community Trend Chart (ApexCharts)
-            var communityTrendOptions = {
-                series: [{
-                    name: 'Community Services',
-                    data: [15, 18, 22, 25, 28]
-                }, {
-                    name: 'Staff Involved',
-                    data: [30, 35, 40, 45, 50]
-                }],
-                chart: {
-                    type: 'area',
-                    height: '100%',
-                    stacked: false,
-                    toolbar: {
-                        show: true
+            
+            // Service Types Chart (Horizontal Bar)
+            new Chart(document.getElementById('serviceTypesChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Health Camps', 'School Outreach', 'Skills Training', 'Consultations', 'Public Lectures', 'Other'],
+                    datasets: [{
+                        label: 'Number of Activities',
+                        data: [32, 28, 24, 18, 15, 11],
+                        backgroundColor: '#FFCC00'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Types of Service Activities',
+                            font: { size: 16 }
+                        },
+                        legend: { display: false }
                     },
-                    zoom: {
-                        enabled: true
-                    }
-                },
-                colors: ['#f8961e', '#f72585'],
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 2
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        opacityFrom: 0.6,
-                        opacityTo: 0.8,
-                    }
-                },
-                legend: {
-                    position: 'top',
-                    horizontalAlign: 'right'
-                },
-                xaxis: {
-                    categories: ['2018', '2019', '2020', '2021', '2022'],
-                    title: {
-                        text: 'Year'
-                    }
-                },
-                yaxis: {
-                    title: {
-                        text: 'Number of Activities/Staff'
-                    }
-                },
-                tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function(y) {
-                            if (typeof y !== "undefined") {
-                                return y.toFixed(0);
-                            }
-                            return y;
-                        }
-                    }
+                    scales: { x: { beginAtZero: true } }
                 }
-            };
-            // Community Trend Chart (ApexCharts)
-            var communityTrendOptions = {
-                series: [{
-                    name: 'Community Services',
-                    data: [15, 18, 22, 25, 28] // Replace with actual data if available
-                }, {
-                    name: 'Staff Involved',
-                    data: [30, 35, 40, 45, 50] // Replace with actual data if available
-                }],
-                chart: {
-                    type: 'area',
-                    height: '100%',
-                    stacked: false,
-                    toolbar: {
-                        show: true
-                    },
-                    zoom: {
-                        enabled: true
-                    }
-                },
-                colors: ['#f8961e', '#f72585'],
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    curve: 'smooth',
-                    width: 2
-                },
-                fill: {
-                    type: 'gradient',
-                    gradient: {
-                        opacityFrom: 0.6,
-                        opacityTo: 0.8,
-                    }
-                },
-                legend: {
-                    position: 'top',
-                    horizontalAlign: 'right'
-                },
-                xaxis: {
-                    categories: ['2018', '2019', '2020', '2021', '2022'], // Replace with actual years if available
-                    title: {
-                        text: 'Year'
-                    }
-                },
-                yaxis: {
-                    title: {
-                        text: 'Number of Activities/Staff'
-                    }
-                },
-                tooltip: {
-                    shared: true,
-                    intersect: false,
-                    y: {
-                        formatter: function(y) {
-                            if (typeof y !== "undefined") {
-                                return y.toFixed(0);
-                            }
-                            return y;
-                        }
-                    }
-                }
-            };
-
-            var communityTrendChart = new ApexCharts(document.querySelector("#communityTrendChart"), communityTrendOptions);
-            communityTrendChart.render();
-        });
+            });
+        }
     </script>
 </body>
-
 </html>
