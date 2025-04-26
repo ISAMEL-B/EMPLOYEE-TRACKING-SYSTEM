@@ -69,21 +69,6 @@ $full_column_names = [
     'degrees' => ['degree_id', 'staff_id', 'degree_name', 'degree_classification']
 ];
 
-// Foreign key relationships - maps column names to lookup tables and columns
-$foreign_keys = [
-    'staff' => [
-        'role_id' => ['table' => 'roles', 'lookup_column' => 'role_name', 'id_column' => 'role_id'],
-        'department_id' => ['table' => 'departments', 'lookup_column' => 'department_name', 'id_column' => 'department_id']
-    ],
-    'departments' => [
-        'faculty_id' => ['table' => 'faculties', 'lookup_column' => 'faculty_name', 'id_column' => 'faculty_id']
-    ],
-    'publications' => [
-        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
-    ],
-    // Add similar mappings for other tables as needed
-];
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $table = $_POST['table_name'] ?? '';
     $file = $_FILES['csv_file']['tmp_name'] ?? '';
@@ -263,39 +248,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $new_records = 0;
             $updated_records = 0;
             $skipped_records = 0;
-            $skip_reasons = []; // Track reasons for skipping records
+            $roles = [];
+            $departments = [];
+            $faculties = [];
 
-            // Pre-fetch foreign key data for all tables that need it
-            $foreign_key_data = [];
-            if (isset($foreign_keys[$table])) {
-                foreach ($foreign_keys[$table] as $fk_column => $fk_info) {
-                    $lookup_table = $fk_info['table'];
-                    $lookup_column = $fk_info['lookup_column'];
-                    $id_column = $fk_info['id_column'];
-                    
-                    if (is_array($lookup_column)) {
-                        // For composite lookups (like first_name + last_name for staff)
-                        $select_columns = implode(', ', $lookup_column);
-                        $query = "SELECT $id_column, $select_columns FROM $lookup_table";
-                    } else {
-                        $query = "SELECT $id_column, $lookup_column FROM $lookup_table";
-                    }
-                    
-                    $result = $conn->query($query);
-                    $foreign_key_data[$fk_column] = [];
-                    
-                    while ($row = $result->fetch_assoc()) {
-                        if (is_array($lookup_column)) {
-                            $key_parts = [];
-                            foreach ($lookup_column as $col) {
-                                $key_parts[] = $row[$col];
-                            }
-                            $key = implode(' ', $key_parts);
-                        } else {
-                            $key = $row[$lookup_column];
-                        }
-                        $foreign_key_data[$fk_column][$key] = $row[$id_column];
-                    }
+            // Fetch foreign keys if necessary
+            if ($table === 'staff') {
+                $role_result = $conn->query("SELECT role_id, role_name FROM roles");
+                while ($row = $role_result->fetch_assoc()) {
+                    $roles[$row['role_name']] = $row['role_id'];
+                }
+                $department_result = $conn->query("SELECT department_id, department_name FROM departments");
+                while ($row = $department_result->fetch_assoc()) {
+                    $departments[$row['department_name']] = $row['department_id'];
+                }
+            } elseif ($table === 'departments') {
+                $faculty_result = $conn->query("SELECT faculty_id, faculty_name FROM faculties");
+                while ($row = $faculty_result->fetch_assoc()) {
+                    $faculties[$row['faculty_name']] = $row['faculty_id'];
                 }
             }
 
@@ -318,30 +288,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } elseif (count($data_values) > $expected_count) {
                     // Truncate to expected count
                     $data_values = array_slice($data_values, 0, $expected_count);
-                }
-
-                // Process foreign keys - replace names with IDs
-                if (isset($foreign_keys[$table])) {
-                    foreach ($foreign_keys[$table] as $fk_column => $fk_info) {
-                        $column_index = array_search($fk_column, $required_columns);
-                        if ($column_index !== false && isset($data_values[$column_index])) {
-                            $lookup_value = $data_values[$column_index];
-                            
-                            if (is_numeric($lookup_value)) {
-                                // Already an ID, no need to look up
-                                continue;
-                            }
-                            
-                            if (isset($foreign_key_data[$fk_column][$lookup_value])) {
-                                $data_values[$column_index] = $foreign_key_data[$fk_column][$lookup_value];
-                            } else {
-                                // Foreign key not found - skip this record
-                                $skipped_records++;
-                                $skip_reasons[] = "Record skipped: $fk_column '$lookup_value' not found";
-                                continue 2;
-                            }
-                        }
-                    }
                 }
 
                 $should_insert = false;
@@ -405,12 +351,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             // Names are unique, so if found, it's the same
                             break;
                         case 'departments':
-                            $has_changes = ($existing_data['faculty_id'] != $data_values[1]);
+                            $has_changes = ($existing_data['faculty_id'] != ($faculties[$data_values[1]] ?? null));
                             break;
                         case 'staff':
                             $has_changes = ($existing_data['scholar_type'] != $data_values[2] ||
-                                $existing_data['role_id'] != $data_values[3] ||
-                                $existing_data['department_id'] != $data_values[4] ||
+                                $existing_data['role_id'] != ($roles[$data_values[3]] ?? null) ||
+                                $existing_data['department_id'] != ($departments[$data_values[4]] ?? null) ||
                                 $existing_data['years_of_experience'] != $data_values[5] ||
                                 $existing_data['performance_score'] != $data_values[6]);
                             break;
@@ -440,7 +386,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'faculties':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Empty required field";
                                 continue 2;
                             }
                             $stmt->bind_param("s", $data_values[0]);
@@ -448,13 +393,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'departments':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Empty department_name";
                                 continue 2;
                             }
-                            $faculty_id = $data_values[1];
+                            $faculty_id = is_numeric($data_values[1]) ? $data_values[1] : ($faculties[$data_values[1]] ?? null);
                             if (!$faculty_id) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Invalid faculty_id";
                                 continue 2;
                             }
                             $stmt->bind_param("si", $data_values[0], $faculty_id);
@@ -462,14 +405,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'staff':
                             if (empty($data_values[0]) || empty($data_values[1]) || empty($data_values[3]) || empty($data_values[4])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing required field (first_name, last_name, role_id, or department_id)";
                                 continue 2;
                             }
-                            $role_id = $data_values[3];
-                            $department_id = $data_values[4];
+                            $role_id = is_numeric($data_values[3]) ? $data_values[3] : ($roles[$data_values[3]] ?? null);
+                            $department_id = is_numeric($data_values[4]) ? $data_values[4] : ($departments[$data_values[4]] ?? null);
                             if (!$role_id || !$department_id) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Invalid role_id or department_id";
                                 continue 2;
                             }
                             $stmt->bind_param("sssiiii", $data_values[0], $data_values[1], $data_values[2], $role_id, $department_id, $data_values[5], $data_values[6]);
@@ -477,7 +418,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'publications':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("iss", $data_values[0], $data_values[1], $data_values[2]);
@@ -485,7 +425,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'grants':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("id", $data_values[0], $data_values[1]);
@@ -493,7 +432,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'supervision':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("is", $data_values[0], $data_values[1]);
@@ -501,7 +439,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'innovations':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("is", $data_values[0], $data_values[1]);
@@ -509,7 +446,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'academicactivities':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("is", $data_values[0], $data_values[1]);
@@ -517,7 +453,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'service':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("is", $data_values[0], $data_values[1]);
@@ -525,7 +460,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'communityservice':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("iss", $data_values[0], $data_values[1], $data_values[2]);
@@ -533,7 +467,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'professionalbodies':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("is", $data_values[0], $data_values[1]);
@@ -541,7 +474,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         case 'degrees':
                             if (empty($data_values[0])) {
                                 $skipped_records++;
-                                $skip_reasons[] = "Record skipped: Missing staff_id";
                                 continue 2;
                             }
                             $stmt->bind_param("iss", $data_values[0], $data_values[1], $data_values[2]);
@@ -552,7 +484,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $is_updated = true;
                     } else {
                         $skipped_records++;
-                        $skip_reasons[] = "Record skipped: Database error - " . $stmt->error;
                     }
                 }
             }
@@ -569,12 +500,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message .= "Updated {$updated_records} existing records. ";
                 }
                 if ($skipped_records > 0) {
-                    $message .= "Skipped {$skipped_records} records. Reasons: " . implode("; ", array_unique($skip_reasons));
+                    $message .= "Skipped {$skipped_records} records due to missing required data or other issues.";
                 }
                 $_SESSION['notification'] = $message;
             } else {
                 $_SESSION['notification'] = "No new or changed data found in the CSV file. " .
-                    ($skipped_records > 0 ? "Skipped {$skipped_records} records. Reasons: " . implode("; ", array_unique($skip_reasons)) : "");
+                    ($skipped_records > 0 ? "Skipped {$skipped_records} records due to missing required data." : "");
             }
         } else {
             $_SESSION['notification'] = "Failed to open the CSV file.";

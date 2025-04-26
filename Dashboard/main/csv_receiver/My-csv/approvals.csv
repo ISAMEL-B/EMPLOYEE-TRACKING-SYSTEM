@@ -1,0 +1,11 @@
+table_name,file_path,submitted_by,record_count,status,reviewed_by,rejection_reason
+staff,/uploads/staff_20230501.csv,2,12,pending,2,
+publications,/uploads/publications_20230502.csv,3,8,pending,2,
+grants,/uploads/grants_20230503.csv,1,5,pending,,
+departments,/uploads/departments_20230504.csv,2,3,approved,2,
+staff,/uploads/staff_20230505.csv,3,7,rejected,2,dddf
+publications,/uploads/publications_20230506.csv,1,6,approved,2,
+grants,/uploads/grants_20230507.csv,2,4,approved,2,
+degrees,/uploads/degrees_20230508.csv,1,9,approved,2,
+staff,/uploads/staff_20230509.csv,2,11,approved,2,
+innovations,/uploads/innovations_20230510.csv,3,5,approved,2,

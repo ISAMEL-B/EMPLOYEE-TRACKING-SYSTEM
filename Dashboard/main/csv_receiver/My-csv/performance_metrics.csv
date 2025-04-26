@@ -1,0 +1,19 @@
+staff_name,department_name,metric_name,metric_value,target_value,period_start,period_end,recorded_at,remarks
+Akanyoreka Smith,Information Technology,Research Publications,5.00,10.00,2025-01-01,2025-06-30,Q1 research output
+David Wilson,Civil Engineering,Community Engagements,2.00,3.00,2025-01-01,2025-06-30,2025-04-10 04:08:02,Attended rural health workshop
+Mugabi Praise,Computer Science,Publications,4.00,6.00,2025-01-01,2025-06-30,2025-04-11 05:09:03,Two journal articles pending
+Maria Nabwire,Electrical Engineering,Student Evaluations,4.50,5.00,2025-01-01,2025-06-30,2025-04-12 06:10:04,Improved from last semester
+Peter Okello,Information Technology,Curriculum Development,3.00,4.00,2025-01-01,2025-06-30,2025-04-13 07:11:05,New course approved
+Sarah Kamani,Mechanical Engineerings,Community Service,5.00,4.00,2025-01-01,2025-06-30,2025-04-14 08:12:06,Exceeded target
+David Tumusiime,Electrical Engineering,Research Proposals,2.00,3.00,2025-01-01,2025-06-30,2025-04-15 09:13:07,One rejected
+Grace Achan,Computer Science,Conference Presentations,3.00,2.00,2025-01-01,2025-06-30,2025-04-16 10:14:08,International conference
+Michael Mwangi,Information Technology,Patents Filed,1.00,1.00,2025-01-01,2025-06-30,2025-04-17 11:15:09,Patent pending
+Linda Namatovu,Mechanical Engineerings,Student Advising,10.00,8.00,2025-01-01,2025-06-30,2025-04-18 12:16:10,Increased enrollment
+Akanjuna Joel,Computer Science,Workshops Attended,4.00,3.00,2025-01-01,2025-06-30,2025-04-19 13:17:11,Professional development
+Akambamu Mathias,Civil Engineering,Research Collaborations,3.00,2.00,2025-01-01,2025-06-30,2025-04-20 14:18:12,International partners
+Mugabi Praise,Human Resource Management,Publications,5.00,4.00,2025-01-01,2025-06-30,2025-04-21 15:19:13,High impact journals
+Mukama Martin,Information Technology,Student Performance,4.20,4.00,2025-01-01,2025-06-30,2025-04-22 16:20:14,Improved grades
+Emily Davidson,Mechanical Engineerings,Student Supervisions,3.00,5.00,2025-01-01,2025-06-30,Fewer due to leave
+David Wilson,Mathematics,Community Engagements,2.00,3.00,2025-01-01,2025-06-30,Attended rural health workshop
+Alice Williams,Information Technology,Grants Acquired,1.00,2.00,2025-01-01,2025-06-30,1 grant approved
+Linda Taylor,Mechanical Engineerings,Workshops Conducted,1.00,2.00,2025-01-01,2025-06-30,Limited by funding
