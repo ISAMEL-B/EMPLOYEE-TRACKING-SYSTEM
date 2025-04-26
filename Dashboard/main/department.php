@@ -648,7 +648,7 @@ $deptTrends_innovs_json = json_encode($deptTrends_innovations);
                     <div class="row">
                         <div class="col-12">
                             <?php foreach ($roles as $roleName => $staffMembers): ?>
-                                <div class="rank-section">
+                                <div class="rank-section" >
                                     <div class="rank-header">
                                         <span><?= htmlspecialchars($roleName) ?>s</span>
                                         <span class="rank-count"><?= count($staffMembers) ?> staff</span>
