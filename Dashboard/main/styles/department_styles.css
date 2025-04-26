@@ -194,7 +194,7 @@ body {
 }
 
 .rank-header {
-    background-color: var(--secondary-color);
+    background-color: #67c960 !important;
     color: white;
     padding: 15px 20px;
     font-size: 1.1rem;

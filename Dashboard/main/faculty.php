@@ -700,11 +700,11 @@
                         <div class="value">34</div>
                         
                     </div>
-                    <div class="card stat-card" style="width: 300px;">
+                    <!-- <div class="card stat-card" style="width: 300px;">
                         <h3>Total number of citations</h3>
                         <div class="value">72</div>
                         
-                    </div>
+                    </div> -->
                     <div class="card stat-card" style="width: 300px;">
                         <h3>Total peer reviewed publications uploaded to must repository</h3>
                         <div class="value">72</div>

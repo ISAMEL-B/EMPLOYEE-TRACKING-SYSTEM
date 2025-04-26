@@ -1,4 +1,4 @@
-department_id,department_name,faculty_name
+department_id,department_name,faculty_id
 1,Computer Science,faculty of computing and informartics
 2,Information Technology,faculty of computing and informartics
 3,Electrical Engineering,faculty of applied sciences

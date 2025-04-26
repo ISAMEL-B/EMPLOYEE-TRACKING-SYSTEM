@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 staff_id,first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
 1,John,Doe,Full_Time,Professor,Computer Science,10,85
 2,Jane,Smith,Part_Time,Assistant Professor,Mathematics,5,90
 3,Michael,Johnson,Full_Time,Lecturer,Physics,3,80
 4,Emily,Davidson,Part_Time,Professor,Biology,15,88
 5,David,Wilson,Full_Time,Lecturer,Engineering,8,75
+=======
+first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
+John,Doe,Full_Time,Professor,Computer Science,10,85
+Jane,Smith,Part_Time,Assistant Professor,Mathematics,5,90
+Michael,Johnson,Full_Time,Lecturer,Physics,3,80
+Emily,Davidson,Part_Time,Professor,Biology,15,88
+David,Wilson,Full_Time,Lecturer,Engineering,8,75
+>>>>>>> 1c93551f968c7d4969e61252c0147c842e4bdf10
