@@ -141,10 +141,8 @@
                 <input type="password" name="confirm_password" placeholder="Confirm Password" required
                     id="confirm-password" />
                 <p class="message" id="error-message">Passwords do not match!</p>
-                <button type="submit" name="signup">Register</button>
-
                 <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'hrm'): ?>
-                    <!-- <button type="submit" name="signup">Register</button> -->
+                    <button type="submit" name="signup">Register</button>
                 <?php endif; ?>
             </form>
         </div>
@@ -180,10 +178,9 @@
                 </div>
                 <div class="overlay-panel overlay-right">
                     <h1>Hello, MUST Associate!</h1>
-                    <p>Enter personal details and start journey with MUST</p>                        <button class="ghost" id="signUp">Register</button>
-
+                    <p>Enter personal details and start journey with MUST</p>
                     <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'hrm'): ?>
-                        <!-- <button class="ghost" id="signUp">Register</button> -->
+                        <button class="ghost" id="signUp">Register</button>
                     <?php endif; ?>
                 </div>
             </div>

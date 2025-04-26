@@ -147,13 +147,16 @@ foreach ($communityServiceByDept as $service) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST Employee Performance Dashboard</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../components/fontawesome/css/all.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="../components/datatables/css/dataTables.bootstrap5.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"> -->
     <!-- Custom CSS -->
     <style>
         :root {
@@ -166,6 +169,219 @@ foreach ($communityServiceByDept as $service) {
         }
 
         /* [Previous CSS styles remain unchanged...] */
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 5px solid var(--must-yellow);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-top: 4px solid var(--must-yellow);
+            background-color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-title {
+            color: var(--must-green);
+            border-bottom: 2px solid var(--must-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-card {
+            border-left: 4px solid var(--must-blue);
+            transition: all 0.3s ease;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--must-yellow);
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--must-blue);
+            line-height: 1;
+        }
+
+        .metric-label {
+            color: var(--must-green);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .chart-container {
+            position: relative;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            
+            height: 400px;
+            width: 100%;
+        }
+
+        .progress {
+            height: 25px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+        }
+
+        .badge-must {
+            background-color: var(--must-yellow);
+            color: #000;
+            font-weight: 500;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-pills .nav-link {
+            color: var(--must-blue);
+            font-weight: 500;
+            border: 1px solid #dee2e6;
+            margin-right: 5px;
+        }
+
+        .nav-pills .nav-link:hover {
+            background-color: var(--must-light-green);
+        }
+
+        .table thead {
+            background-color: var(--must-green);
+            color: white;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--must-light-green);
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            border-top: 3px solid var(--must-yellow);
+        }
+
+        .impact-high {
+            background-color: rgba(0, 104, 55, 0.1);
+            color: var(--must-green);
+            font-weight: 500;
+        }
+
+        .impact-medium {
+            background-color: rgba(255, 215, 0, 0.1);
+            color: #b38f00;
+            font-weight: 500;
+        }
+
+        .impact-low {
+            background-color: rgba(0, 91, 170, 0.1);
+            color: var(--must-blue);
+            font-weight: 500;
+        }
+
+        .bg-must-green {
+            background-color: var(--must-green);
+        }
+
+        .bg-must-blue {
+            background-color: var(--must-blue);
+        }
+
+        .bg-must-yellow {
+            background-color: var(--must-yellow);
+        }
+
+        .text-must-green {
+            color: var(--must-green);
+        }
+
+        .text-must-blue {
+            color: var(--must-blue);
+        }
+
+        .text-must-yellow {
+            color: var(--must-yellow);
+        }
+
+        .btn-must-primary {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-must-primary:hover {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 80%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .floating-action-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .large-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            height: auto;
+            margin-bottom: 20px;
+        }
+
 
         /* Community Service Table Styles */
         #communityServiceTable {
@@ -274,6 +490,244 @@ foreach ($communityServiceByDept as $service) {
             </div>
 
             <!-- [Previous sections remain unchanged...] -->
+
+
+                        <!-- Academic Performance Section -->
+                        <div class="card section-card">
+                <div class="card-body">
+                    <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
+
+                    <div class="large-card">
+                        <div class="large-card">
+                            <div class="large-card">
+                                <div class="section-title">
+                                    <h2>Faculty Overview</h2>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="qualificationsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+
+                                            <div class="metric-label">PhD Holders</div>
+                                        </div>
+                                        <i class="fas fa-user-graduate fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value"><?= $degreeStats['masters'] ?></div>
+                                            <div class="metric-label">Master's Degrees</div>
+                                        </div>
+                                        <i class="fas fa-user-tie fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value"><?= $degreeStats['first_class'] ?></div>
+                                            <div class="metric-label">First Class Degrees</div>
+                                        </div>
+                                        <i class="fas fa-award fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Research and Publications Section -->
+            <div class="card section-card">
+                <div class="card-body">
+                    <h2 class="section-title"><i class="fas fa-flask me-2 text-must-blue"></i>Research and Innovations</h2>
+
+                    <ul class="nav nav-pills mb-4" id="researchTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="publications-tab" data-bs-toggle="pill" data-bs-target="#publications" type="button" role="tab">
+                                <i class="fas fa-book me-1"></i>Publications
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="grants-tab" data-bs-toggle="pill" data-bs-target="#grants" type="button" role="tab">
+                                <i class="fas fa-money-bill-wave me-1"></i>Grants
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="supervision-tab" data-bs-toggle="pill" data-bs-target="#supervision" type="button" role="tab">
+                                <i class="fas fa-user-graduate me-1"></i>Supervision
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="innovations-tab" data-bs-toggle="pill" data-bs-target="#innovations" type="button" role="tab">
+                                <i class="fas fa-lightbulb me-1"></i>Innovations
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="researchTabsContent">
+                        <div class="tab-pane fade show active" id="publications" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Publication Types</h5>
+                                    <div class="chart-container">
+                                        <canvas id="publicationsChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-line me-1"></i>Publication Trends</h5>
+                                    <div class="chart-container">
+                                        <canvas id="publicationsTrendChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value"><?= isset($publicationTypesData['Journal Article']) ? $publicationTypesData['Journal Article'] : 0 ?></div>
+                                            <div class="metric-label">Journal Articles</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value"><?= isset($publicationTypesData['Conference Paper']) ? $publicationTypesData['Conference Paper'] : 0 ?></div>
+                                            <div class="metric-label">Conference Papers</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">0</div>
+                                            <div class="metric-label">Book Chapters</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">0</div>
+                                            <div class="metric-label">Books with ISBN</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="grants" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Department</h5>
+                                    <div class="chart-container">
+                                        <canvas id="grantsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="supervision" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-must-green"><i class="fas fa-users-graduate me-1"></i>Postgraduate Supervision</h5>
+                                    <div class="chart-container">
+                                        <canvas id="supervisionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value"><?= $supervisionData['PhD'] ?></div>
+                                            <div class="metric-label">PhD Supervisions</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="metric-value"><?= $supervisionData['Masters'] ?></div>
+                                            <div class="metric-label">Masters Supervisions</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="innovations" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5 class="text-must-green"><i class="fas fa-chart-pie me-1"></i>Innovation Types</h5>
+                                    <div class="chart-container">
+                                        <canvas id="innovationsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value"><?= isset($innovationData['Patent']) ? $innovationData['Patent'] : 0 ?></div>
+                                            <div class="metric-label">Patents</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value"><?= isset($innovationData['Copyright']) ? $innovationData['Copyright'] : 0 ?></div>
+                                            <div class="metric-label">Copyrights</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">0</div>
+                                            <div class="metric-label">Trademarks</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card metric-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="metric-value">0</div>
+                                            <div class="metric-label">Products</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
 
             <!-- Community Service Section -->
             <div class="card section-card">
