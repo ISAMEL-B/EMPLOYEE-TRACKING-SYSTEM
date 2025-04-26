@@ -761,17 +761,17 @@
                     <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                         <div class="card stat-card" style="width: 300px;">
                             <h3>Total student supervised for community placements</h3>
-                            <div class="value"><?= $totalStudentsSupervised?></div>
+                            <div class="value"><?= isset($totalStudentsSupervised) && !empty($totalStudentsSupervised) ? $totalStudentsSupervised : 0 ?></div>
                             
                         </div>
                         <div class="card stat-card" style="width: 300px;">
                             <h3>other community outreaches</h3>
-                            <div class="value"><?= $totalCommunityOutreaches ?></div>
+                            <div class="value"><?= isset($totalCommunityOutreaches) && !empty($totalStudentsSupervised) ? $totalStudentsSupervised : 0 ?></div>
                             
                         </div>
                         <div class="card stat-card" style="width: 300px;">
                             <h3> total number of beneficiaries</h3>
-                            <div class="value"><?= $totalBeneficiaries ?></div>
+                            <div class="value"><?= isset($totalBeneficiaries) && !empty($totalStudentsSupervised) ? $totalStudentsSupervised : 0 ?></div>
                             
                         </div>
                     </div>
