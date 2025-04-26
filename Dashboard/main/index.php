@@ -89,19 +89,23 @@ $communityServiceByDept = $pdo->query("
     GROUP BY d.department_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
+// Get distinct years from community service activities for the filter
+$years = $pdo->query("
+    SELECT DISTINCT YEAR(activity_date) as year 
+    FROM community_service_activities 
+    ORDER BY year DESC
+")->fetchAll(PDO::FETCH_COLUMN);
+
 // Get community service logs for the table
 $communityServiceLogs = $pdo->query("
     SELECT 
         cs.activity_id,
         CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
-        s.staff_id,
         cs.activity_name,
         cs.location,
         cs.activity_date,
         cs.beneficiaries,
-        cs.points_earned,
-        cs.verification_status,
-        cs.proof_document_path
+        cs.verification_status
     FROM community_service_activities cs
     JOIN staff s ON cs.staff_id = s.staff_id
     ORDER BY cs.activity_date DESC
@@ -148,15 +152,12 @@ foreach ($communityServiceByDept as $service) {
     <title>MUST Employee Performance Dashboard</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../components/fontawesome/css/all.min.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="../components/datatables/css/dataTables.bootstrap5.min.css">
-    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"> -->
     <!-- Custom CSS -->
     <style>
         :root {
@@ -167,8 +168,6 @@ foreach ($communityServiceByDept as $service) {
             --must-light-green: #E5F2E9;
             --must-light-blue: #E6F0FA;
         }
-
-        /* [Previous CSS styles remain unchanged...] */
 
         body {
             font-family: 'Poppins', sans-serif;
@@ -243,7 +242,6 @@ foreach ($communityServiceByDept as $service) {
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            
             height: 400px;
             width: 100%;
         }
@@ -373,6 +371,7 @@ foreach ($communityServiceByDept as $service) {
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
+        
         .large-card {
             background-color: white;
             border-radius: var(--border-radius);
@@ -381,7 +380,6 @@ foreach ($communityServiceByDept as $service) {
             height: auto;
             margin-bottom: 20px;
         }
-
 
         /* Community Service Table Styles */
         #communityServiceTable {
@@ -402,15 +400,13 @@ foreach ($communityServiceByDept as $service) {
             margin-bottom: 10px;
         }
 
-        /* Responsive Table */
         @media (max-width: 768px) {
             #communityServiceTable td:nth-child(1)::before { content: "Staff: "; font-weight: bold; }
             #communityServiceTable td:nth-child(2)::before { content: "Activity: "; font-weight: bold; }
             #communityServiceTable td:nth-child(3)::before { content: "Location: "; font-weight: bold; }
             #communityServiceTable td:nth-child(4)::before { content: "Date: "; font-weight: bold; }
             #communityServiceTable td:nth-child(5)::before { content: "Beneficiaries: "; font-weight: bold; }
-            #communityServiceTable td:nth-child(6)::before { content: "Points: "; font-weight: bold; }
-            #communityServiceTable td:nth-child(7)::before { content: "Verified?: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(6)::before { content: "Verified?: "; font-weight: bold; }
             
             #communityServiceTable td {
                 display: block;
@@ -489,24 +485,17 @@ foreach ($communityServiceByDept as $service) {
                 </div>
             </div>
 
-            <!-- [Previous sections remain unchanged...] -->
-
-
-                        <!-- Academic Performance Section -->
-                        <div class="card section-card">
+            <!-- Academic Performance Section -->
+            <div class="card section-card">
                 <div class="card-body">
                     <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
 
                     <div class="large-card">
-                        <div class="large-card">
-                            <div class="large-card">
-                                <div class="section-title">
-                                    <h2>Faculty Overview</h2>
-                                </div>
-                                <div class="chart-container">
-                                    <canvas id="qualificationsChart"></canvas>
-                                </div>
-                            </div>
+                        <div class="section-title">
+                            <h2>Faculty Overview</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="qualificationsChart"></canvas>
                         </div>
                     </div>
 
@@ -516,7 +505,7 @@ foreach ($communityServiceByDept as $service) {
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-
+                                            <div class="metric-value"><?= $degreeStats['phd'] ?></div>
                                             <div class="metric-label">PhD Holders</div>
                                         </div>
                                         <i class="fas fa-user-graduate fa-3x text-muted opacity-25"></i>
@@ -553,7 +542,6 @@ foreach ($communityServiceByDept as $service) {
                     </div>
                 </div>
             </div>
-
 
             <!-- Research and Publications Section -->
             <div class="card section-card">
@@ -726,146 +714,137 @@ foreach ($communityServiceByDept as $service) {
                 </div>
             </div>
 
-
-
-
             <!-- Community Service Section -->
             <div class="card section-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
-                                <button class="btn btn-must-primary" id="exportCommunityService">
-                                    <i class="fas fa-file-csv me-1"></i>Export to CSV
-                                </button>
-                            </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
+                        <button class="btn btn-must-primary" id="exportCommunityService">
+                            <i class="fas fa-file-csv me-1"></i>Export to CSV
+                        </button>
+                    </div>
 
-                            <!-- Community Service Log Table -->
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="communityServiceTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Staff</th>
-                                            <th>Activity</th>
-                                            <th>Location</th>
-                                            <th>Date</th>
-                                            <th>Beneficiaries</th>
-                                            <th>Points</th>
-                                            <th>Verified?</th>
-                                            <th>Document</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($communityServiceLogs as $log): ?>
-                                        <tr>
-                                            <td>
-                                                <?= $log['staff_name'] ?> 
-                                                <span class="badge bg-primary"><?= $log['staff_id'] ?></span>
-                                                <?= $log['verification_status'] === 'verified' ? '<i class="fas fa-check-circle text-success"></i>' : 
-                                                ($log['verification_status'] === 'pending' ? '<i class="fas fa-clock text-warning"></i>' : 
-                                                '<i class="fas fa-times-circle text-danger"></i>') ?>
-                                            </td>
-                                            <td><?= $log['activity_name'] ?></td>
-                                            <td><?= $log['location'] ?></td>
-                                            <td><?= date('d/m/Y', strtotime($log['activity_date'])) ?></td>
-                                            <td><?= $log['beneficiaries'] ?? 'N/A' ?></td>
-                                            <td><?= $log['points_earned'] ?></td>
-                                            <td>
-                                                <?php if ($log['verification_status'] === 'verified'): ?>
-                                                    <span class="badge bg-success">✅ Verified</span>
-                                                <?php elseif ($log['verification_status'] === 'pending'): ?>
-                                                    <span class="badge bg-warning text-dark">⚠️ Pending</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-danger">❌ Rejected</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <?php if ($log['proof_document_path']): ?>
-                                                    <a href="<?= $log['proof_document_path'] ?>" class="btn btn-sm btn-outline-primary" target="_blank">
-                                                        <i class="fas fa-file-pdf"></i> View
-                                                    </a>
-                                                <?php else: ?>
-                                                    <span class="text-muted">None</span>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- Community Service Log Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="communityServiceTable">
+                            <thead>
+                                <tr>
+                                    <th>Staff</th>
+                                    <th>Activity</th>
+                                    <th>Location</th>
+                                    <th>Date</th>
+                                    <th>Beneficiaries</th>
+                                    <th>Verified?</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($communityServiceLogs as $log): ?>
+                                <tr>
+                                    <td>
+                                        <?= $log['staff_name'] ?>
+                                        <?= $log['verification_status'] === 'verified' ? '<i class="fas fa-check-circle text-success"></i>' : 
+                                        ($log['verification_status'] === 'pending' ? '<i class="fas fa-clock text-warning"></i>' : 
+                                        '<i class="fas fa-times-circle text-danger"></i>') ?>
+                                    </td>
+                                    <td><?= $log['activity_name'] ?></td>
+                                    <td><?= $log['location'] ?></td>
+                                    <td><?= date('d/m/Y', strtotime($log['activity_date'])) ?></td>
+                                    <td><?= $log['beneficiaries'] ?? 'N/A' ?></td>
+                                    <td>
+                                        <?php if ($log['verification_status'] === 'verified'): ?>
+                                            <span class="badge bg-success">✅ Verified</span>
+                                        <?php elseif ($log['verification_status'] === 'pending'): ?>
+                                            <span class="badge bg-warning text-dark">⚠️ Pending</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger">❌ Rejected</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <a href="generate_community_report.php?id=<?= $log['activity_id'] ?>" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-file-pdf"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
 
-                            <!-- Filter Row -->
-                            <div class="row mt-3">
-                                <div class="col-md-4">
-                                    <select class="form-select" id="filterStaff">
-                                        <option value="">Filter by Staff</option>
-                                        <?php 
-                                        $staffList = $pdo->query("SELECT staff_id, CONCAT(first_name, ' ', last_name) AS name FROM staff ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
-                                        foreach ($staffList as $staff): 
-                                        ?>
-                                        <option value="<?= $staff['staff_id'] ?>"><?= $staff['name'] ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <select class="form-select" id="filterYear">
-                                        <option value="">Filter by Year</option>
-                                        <?php foreach ($years as $year): ?>
-                                        <option value="<?= $year ?>"><?= $year ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <select class="form-select" id="filterVerification">
-                                        <option value="">Filter by Verification</option>
-                                        <option value="verified">Verified</option>
-                                        <option value="pending">Pending</option>
-                                        <option value="rejected">Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <!-- Filter Row -->
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <select class="form-select" id="filterStaff">
+                                <option value="">Filter by Staff</option>
+                                <?php 
+                                $staffList = $pdo->query("SELECT staff_id, CONCAT(first_name, ' ', last_name) AS name FROM staff ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+                                foreach ($staffList as $staff): 
+                                ?>
+                                <option value="<?= $staff['staff_id'] ?>"><?= $staff['name'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="filterYear">
+                                <option value="">Filter by Year</option>
+                                <option value="<?= date('Y') ?>">Current Year (<?= date('Y') ?>)</option>
+                                <option value="<?= date('Y')-1 ?>">Last Year (<?= date('Y')-1 ?>)</option>
+                                <option value="<?= date('Y')-2 ?>">Previous Year (<?= date('Y')-2 ?>)</option>
+                                <?php foreach ($years as $year): ?>
+                                <option value="<?= $year ?>"><?= $year ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="filterVerification">
+                                <option value="">Filter by Verification</option>
+                                <option value="verified">Verified</option>
+                                <option value="pending">Pending</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
 
-                            <!-- Community Service Metrics -->
-                            <div class="row mt-4">
-                                <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <div class="metric-value"><?= $communityServiceCount ?></div>
-                                                    <div class="metric-label">Employees Engaged</div>
-                                                </div>
-                                                <i class="fas fa-users fa-3x text-muted opacity-25"></i>
-                                            </div>
+                    <!-- Community Service Metrics -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value"><?= $communityServiceCount ?></div>
+                                            <div class="metric-label">Employees Engaged</div>
                                         </div>
+                                        <i class="fas fa-users fa-3x text-muted opacity-25"></i>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <div class="metric-value"><?= $communityServiceCount ?></div>
-                                                    <div class="metric-label">Community Projects</div>
-                                                </div>
-                                                <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
-                                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="metric-value"><?= $communityServiceCount ?></div>
+                                            <div class="metric-label">Community Projects</div>
                                         </div>
+                                        <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card metric-card">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <?php 
-                                                    $totalBeneficiaries = array_sum(array_column($communityServiceLogs, 'beneficiaries'));
-                                                    ?>
-                                                    <div class="metric-value"><?= $totalBeneficiaries ?></div>
-                                                    <div class="metric-label">Total Beneficiaries</div>
-                                                </div>
-                                                <i class="fas fa-users fa-3x text-muted opacity-25"></i>
-                                            </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card metric-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <?php 
+                                            $totalBeneficiaries = array_sum(array_column($communityServiceLogs, 'beneficiaries'));
+                                            ?>
+                                            <div class="metric-value"><?= $totalBeneficiaries ?></div>
+                                            <div class="metric-label">Total Beneficiaries</div>
                                         </div>
+                                        <i class="fas fa-users fa-3x text-muted opacity-25"></i>
                                     </div>
                                 </div>
                             </div>
@@ -873,15 +852,16 @@ foreach ($communityServiceByDept as $service) {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <footer class="py-4 mt-5">
-                <div class="container text-center">
-                    <img src="https://via.placeholder.com/150x50?text=MUST+Logo" alt="MUST Logo" class="mb-3">
-                    <p class="mb-1">© 2023 Mbarara University of Science and Technology</p>
-                    <p class="mb-0">Human Resource Management System | <small>Data updated hourly | For official use only</small></p>
-                </div>
-            </footer>
-
+    <footer class="py-4 mt-5">
+        <div class="container text-center">
+            <img src="https://via.placeholder.com/150x50?text=MUST+Logo" alt="MUST Logo" class="mb-3">
+            <p class="mb-1">© 2023 Mbarara University of Science and Technology</p>
+            <p class="mb-0">Human Resource Management System | <small>Data updated hourly | For official use only</small></p>
+        </div>
+    </footer>
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -907,9 +887,6 @@ foreach ($communityServiceByDept as $service) {
         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
-
-        // [Previous chart initializations remain unchanged...]
-
 
         // Academic Qualifications Chart
         const qualificationsCtx = document.getElementById('qualificationsChart').getContext('2d');
@@ -1135,7 +1112,6 @@ foreach ($communityServiceByDept as $service) {
             }
         });
 
-
         // Community Service Table Functionality
         $(document).ready(function() {
             // Initialize DataTable with year extraction for filtering
@@ -1146,6 +1122,7 @@ foreach ($communityServiceByDept as $service) {
                 columnDefs: [
                     {
                         targets: 3, // Date column
+                        type: 'date-eu', // Add date sorting for European format (dd/mm/yyyy)
                         render: function(data, type, row) {
                             if (type === 'filter') {
                                 // Extract year for filtering
@@ -1166,7 +1143,7 @@ foreach ($communityServiceByDept as $service) {
                 
                 table.column(0).search(staff, false, false);
                 table.column(3).search(year, false, false);
-                table.column(6).search(verification, false, false);
+                table.column(5).search(verification, false, false); // Changed from 6 to 5 as verification is now column 5
                 
                 table.draw();
             });
@@ -1177,15 +1154,15 @@ foreach ($communityServiceByDept as $service) {
                 let csvContent = "data:text/csv;charset=utf-8,";
                 
                 // Add headers
-                csvContent += "Staff,Staff ID,Activity,Location,Date,Beneficiaries,Points,Verified?,Document\r\n";
+                csvContent += "Staff,Activity,Location,Date,Beneficiaries,Verified?,Document\r\n";
                 
                 // Add data
                 data.each(function(row) {
-                    const docLink = row[7].includes('href') ? 
-                        row[7].match(/href="([^"]*)"/)[1] : 
+                    const docLink = row[6].includes('href') ? 
+                        row[6].match(/href="([^"]*)"/)[1] : 
                         'No document';
                     
-                    csvContent += `"${row[0]}","${row[0].match(/DR-\d+/)[0]}","${row[1]}","${row[2]}","${row[3]}","${row[4]}","${row[5]}","${row[6]}","${docLink}"\r\n`;
+                    csvContent += `"${row[0]}","${row[1]}","${row[2]}","${row[3]}","${row[4]}","${row[5]}","${docLink}"\r\n`;
                 });
                 
                 // Download
@@ -1197,9 +1174,10 @@ foreach ($communityServiceByDept as $service) {
                 link.click();
                 document.body.removeChild(link);
             });
-        });
 
-        // [Previous chart initializations remain unchanged...]
+            // Set current year as default filter
+            $('#filterYear').val(new Date().getFullYear()).trigger('change');
+        });
     </script>
 </body>
 </html>
