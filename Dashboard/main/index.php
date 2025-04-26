@@ -1,155 +1,113 @@
 ﻿<?php
 session_start();
-if (!isset($_SESSION['user_role'])) {
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']))  {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
 
-require_once 'head/approve/config.php'; // Use conn instead of pdo
-// require_once 'head/approve/pdo.php'; 
+// Database connection
+require_once 'head/approve/pdo.php';
 
-function countRecords($conn, $table)
-{
-    $result = $conn->query("SELECT COUNT(*) AS count FROM $table");
-    $row = $result->fetch_assoc();
-    return $row['count'];
+// Function to count records in a table
+function countRecords($pdo, $table) {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM $table");
+    return $stmt->fetchColumn();
 }
 
-function countRecordsWhere($conn, $table, $condition)
-{
-    $result = $conn->query("SELECT COUNT(*) AS count FROM $table WHERE $condition");
-    $row = $result->fetch_assoc();
-    return $row['count'];
+// Function to count records with conditions
+function countRecordsWhere($pdo, $table, $condition) {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM $table WHERE $condition");
+    return $stmt->fetchColumn();
 }
 
-$totalStaff = countRecords($conn, 'staff');
-$mastersCount = countRecordsWhere($conn, 'degrees', "degree_classification LIKE '%Master%' OR degree_name LIKE '%Mast%' OR degree_name LIKE '%MSc%'");
-$phdHolders = countRecordsWhere($conn, 'degrees', "degree_classification LIKE '%PhD%'");
+// Get counts for dashboard metrics
+$totalStaff = countRecords($pdo, 'staff');
+$phdHolders = countRecordsWhere($pdo, 'degrees', "degree_name LIKE '%PhD%'");
+$publicationsCount = countRecords($pdo, 'publications');
+$grantsCount = countRecords($pdo, 'grants');
+$innovationsCount = countRecords($pdo, 'innovations');
+$communityServiceCount = countRecords($pdo, 'community_service_activities');
 
-//not yet used
-$publicationsCount = countRecords($conn, 'publications');
-//not used yet
-$grantsCount = countRecords($conn, 'grants');
-$innovationsCount = countRecords($conn, 'innovations');
-// Not used yet
-$communityServiceCount = countRecords($conn, 'communityservice');
-
-// Sum of beneficiaries (assuming there's a 'beneficiaries' column in communityservice table)
-$beneficiariesSum = 0;
-$beneficiariesQuery = $conn->query("SELECT SUM(beneficiaries) as total FROM communityservice");
-if ($beneficiariesResult = $beneficiariesQuery->fetch_assoc()) {
-    $beneficiariesSum = $beneficiariesResult['total'] ?? 0;
-}
-
-// Sum of grants 
-$grantsCount = 0;
-$grantsCountQuery = $conn->query("SELECT SUM(grant_amount) as total FROM grants");
-if ($grantsCountResult = $grantsCountQuery->fetch_assoc()) {
-    $grantsCount = $grantsCountResult['total'] ?? 0;
-}
-
-// Function to format grant amounts
-function formatGrants($amount)
-{
-    if ($amount >= 1_000_000_000) {
-        // Billions (remove extra zeros and add 'B')
-        return round($amount / 1_000_000_000, 1) . 'B';
-    } elseif ($amount >= 1_000_000) {
-        // Millions (remove extra zeros and add 'M')
-        return round($amount / 1_000_000, 1) . 'M';
-    } else {
-        // Less than a million, show full amount with thousands separator
-        return number_format($amount);
-    }
-}
-
-// Count of DISTINCT project types (using the 'description' column as project type)
-$projectTypesCount = 0;
-$projectTypesQuery = $conn->query("SELECT COUNT(DISTINCT description) as count FROM communityservice WHERE description IS NOT NULL AND description != ''");
-if ($projectTypesResult = $projectTypesQuery->fetch_assoc()) {
-    $projectTypesCount = (int)$projectTypesResult['count'] ?? 0;
-}
-
-// Count of DISTINCT staff members involved in community service
-$distinctStaffCount = 0;
-$staffCountQuery = $conn->query("SELECT COUNT(DISTINCT staff_id) as count FROM communityservice WHERE staff_id IS NOT NULL");
-if ($staffCountResult = $staffCountQuery->fetch_assoc()) {
-    $distinctStaffCount = (int)$staffCountResult['count'] ?? 0;
-}
-
-// Count of DISTINCT staff members involved in community service
-$publicationsCount = 0;
-$publicationsCountQuery = $conn->query("SELECT COUNT(DISTINCT publication_type) as count FROM publications WHERE staff_id IS NOT NULL");
-if ($publicationsCountResult = $publicationsCountQuery->fetch_assoc()) {
-    $publicationsCount = (int)$publicationsCountResult['count'] ?? 0;
-}
-
-$degreeStatsResult = $conn->query("
+// Get degree distribution data
+$degreeStats = $pdo->query("
     SELECT 
         SUM(CASE WHEN degree_classification = 'First Class' THEN 1 ELSE 0 END) as first_class,
         SUM(CASE WHEN degree_classification = 'Second Class Upper' THEN 1 ELSE 0 END) as second_upper,
         SUM(CASE WHEN degree_classification = 'Second Class Lower' THEN 1 ELSE 0 END) as second_lower,
-        SUM(CASE WHEN degree_classification LIKE '%PhD%' THEN 1 ELSE 0 END) as phd,
-        SUM(CASE WHEN degree_classification LIKE '%Master%' THEN 1 ELSE 0 END) as masters
+        SUM(CASE WHEN degree_name LIKE '%PhD%' THEN 1 ELSE 0 END) as phd,
+        SUM(CASE WHEN degree_name LIKE '%Master%' THEN 1 ELSE 0 END) as masters
     FROM degrees
-");
-$degreeStats = $degreeStatsResult->fetch_assoc();
+")->fetch(PDO::FETCH_ASSOC);
 
-$publicationTypes = [];
-$pubResult = $conn->query("
-    SELECT publication_type, COUNT(*) as count
+// Get publication types data
+$publicationTypes = $pdo->query("
+    SELECT 
+        publication_type,
+        COUNT(*) as count
     FROM publications
     GROUP BY publication_type
-");
-while ($row = $pubResult->fetch_assoc()) {
-    $publicationTypes[] = $row;
-}
+")->fetchAll(PDO::FETCH_ASSOC);
 
-$grantsByDept = [];
-$grantResult = $conn->query("
-    SELECT d.department_name, COUNT(g.grant_id) as grant_count
+// Get grants data by department
+$grantsByDept = $pdo->query("
+    SELECT 
+        d.department_name,
+        COUNT(g.grant_id) as grant_count
     FROM grants g
     JOIN staff s ON g.staff_id = s.staff_id
     JOIN departments d ON s.department_id = d.department_id
     GROUP BY d.department_name
-");
-while ($row = $grantResult->fetch_assoc()) {
-    $grantsByDept[] = $row;
-}
+")->fetchAll(PDO::FETCH_ASSOC);
 
-$supervisionStats = [];
-$supervisionResult = $conn->query("
-    SELECT student_level, COUNT(*) as count
+// Get supervision data
+$supervisionStats = $pdo->query("
+    SELECT 
+        student_level,
+        COUNT(*) as count
     FROM supervision
     GROUP BY student_level
-");
-while ($row = $supervisionResult->fetch_assoc()) {
-    $supervisionStats[] = $row;
-}
+")->fetchAll(PDO::FETCH_ASSOC);
 
-$innovationTypes = [];
-$innovationResult = $conn->query("
-    SELECT innovation_type, COUNT(*) as count
+// Get innovation types
+$innovationTypes = $pdo->query("
+    SELECT 
+        innovation_type,
+        COUNT(*) as count
     FROM innovations
     GROUP BY innovation_type
-");
-while ($row = $innovationResult->fetch_assoc()) {
-    $innovationTypes[] = $row;
-}
+")->fetchAll(PDO::FETCH_ASSOC);
 
-$communityServiceByDept = [];
-$communityResult = $conn->query("
-    SELECT d.department_name, COUNT(cs.community_service_id) as service_count
-    FROM communityservice cs
+// Get community service data by department
+$communityServiceByDept = $pdo->query("
+    SELECT 
+        d.department_name,
+        COUNT(cs.activity_id) as service_count
+    FROM community_service_activities cs
     JOIN staff s ON cs.staff_id = s.staff_id
     JOIN departments d ON s.department_id = d.department_id
     GROUP BY d.department_name
-");
-while ($row = $communityResult->fetch_assoc()) {
-    $communityServiceByDept[] = $row;
-}
+")->fetchAll(PDO::FETCH_ASSOC);
 
-// Charts
+// Get community service logs for the table
+$communityServiceLogs = $pdo->query("
+    SELECT 
+        cs.activity_id,
+        CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
+        s.staff_id,
+        cs.activity_name,
+        cs.location,
+        cs.activity_date,
+        cs.beneficiaries,
+        cs.points_earned,
+        cs.verification_status,
+        cs.proof_document_path
+    FROM community_service_activities cs
+    JOIN staff s ON cs.staff_id = s.staff_id
+    ORDER BY cs.activity_date DESC
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Prepare data for charts
 $publicationTypesData = [];
 foreach ($publicationTypes as $type) {
     $publicationTypesData[$type['publication_type']] = $type['count'];
@@ -160,14 +118,13 @@ foreach ($grantsByDept as $grant) {
     $grantsData[$grant['department_name']] = $grant['grant_count'];
 }
 
-$supervisionData = ['PhD' => 0, 'Masters' => 0, 'First Class' => 0];
+$supervisionData = [
+    'PhD' => 0,
+    'Masters' => 0
+];
 foreach ($supervisionStats as $stat) {
     if ($stat['student_level'] === 'PhD') {
         $supervisionData['PhD'] = $stat['count'];
-    } else if ($stat['student_level'] === 'First Class') {
-        $supervisionData['First Class'] = $stat['count'];
-    } else if ($stat['student_level'] === 'Second Class') {
-        $supervisionData['Second Class'] = $stat['count'];
     } else {
         $supervisionData['Masters'] = $stat['count'];
     }
@@ -182,292 +139,293 @@ $communityServiceData = [];
 foreach ($communityServiceByDept as $service) {
     $communityServiceData[$service['department_name']] = $service['service_count'];
 }
-
-// Faculty performance
-$facultyPerformance = [];
-$facultyResult = $conn->query("
-    SELECT 
-        f.faculty_name,
-        COUNT(DISTINCT p.publication_id) as publications,
-        COUNT(DISTINCT g.grant_id) as grants,
-        IFNULL(AVG(pm.metric_value), 0) as avg_performance,
-        COUNT(DISTINCT s.staff_id) as staff_count
-    FROM faculties f
-    LEFT JOIN departments d ON f.faculty_id = d.faculty_id
-    LEFT JOIN staff s ON d.department_id = s.department_id
-    LEFT JOIN publications p ON s.staff_id = p.staff_id
-    LEFT JOIN grants g ON s.staff_id = g.staff_id
-    LEFT JOIN performance_metrics pm ON s.staff_id = pm.staff_id
-    GROUP BY f.faculty_id
-    ORDER BY publications DESC, grants DESC
-");
-while ($row = $facultyResult->fetch_assoc()) {
-    $facultyPerformance[] = $row;
-}
-$topResearchFaculty = $facultyPerformance[0] ?? null;
-
-$teachingResult = $conn->query("
-    SELECT f.faculty_name
-    FROM faculties f
-    JOIN departments d ON f.faculty_id = d.faculty_id
-    JOIN staff s ON d.department_id = s.department_id
-    JOIN performance_metrics pm ON s.staff_id = pm.staff_id
-    WHERE pm.metric_name LIKE '%Student%Satisfaction%'
-    GROUP BY f.faculty_id
-    ORDER BY AVG(pm.metric_value) DESC
-    LIMIT 1
-");
-$topTeachingFaculty = $teachingResult->fetch_assoc()['faculty_name'] ?? null;
-
-$growthResult = $conn->query("
-    SELECT f.faculty_name
-    FROM faculties f
-    JOIN departments d ON f.faculty_id = d.faculty_id
-    JOIN staff s ON d.department_id = s.department_id
-    LEFT JOIN publications p ON s.staff_id = p.staff_id
-    LEFT JOIN grants g ON s.staff_id = g.staff_id
-    GROUP BY f.faculty_id
-    ORDER BY (COUNT(DISTINCT p.publication_id) + COUNT(DISTINCT g.grant_id)) / COUNT(DISTINCT s.staff_id) DESC
-    LIMIT 1
-");
-$growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUST Employee Performance Dashboard</title>
-<!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- Custom CSS -->
-<style>
-    :root {
-        --must-blue: rgb(16, 19, 111);
-        --must-green: rgb(17, 123, 21);
-        --must-yellow: rgb(251, 250, 249);
-        --must-light: #f8f9fa;
-        --must-light-green: #E5F2E9;
-        --must-light-blue: #E6F0FA;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUST Employee Performance Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../components/fontawesome/css/all.min.css">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="../components/datatables/css/dataTables.bootstrap5.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"> -->
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --must-blue: rgb(16, 19, 111);
+            --must-green: rgb(17, 123, 21);
+            --must-yellow: rgb(251, 250, 249);
+            --must-light: #f8f9fa;
+            --must-light-green: #E5F2E9;
+            --must-light-blue: #E6F0FA;
+        }
 
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f8f9fa;
-        color: #333;
-    }
+        /* [Previous CSS styles remain unchanged...] */
 
-    .dashboard-header {
-        background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
-        color: white;
-        padding: 25px 0;
-        margin-bottom: 30px;
-        border-bottom: 5px solid var(--must-yellow);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
 
-    .section-card {
-        border-radius: 10px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
-        border-top: 4px solid var(--must-yellow);
-        background-color: white;
-        transition: transform 0.3s, box-shadow 0.3s;
-    }
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            border-bottom: 5px solid var(--must-yellow);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
-    .section-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    }
+        .section-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border-top: 4px solid var(--must-yellow);
+            background-color: white;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
 
-    .section-title {
-        color: #000;
-        border-bottom: 2px solid var(--must-yellow);
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
 
-    .metric-card {
-        border-left: 4px solid var(--must-blue);
-        transition: all 0.3s ease;
-        background-color: white;
-        border-radius: 8px;
-        overflow: hidden;
-    }
+        .section-title {
+            color: var(--must-green);
+            border-bottom: 2px solid var(--must-yellow);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    .metric-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid var(--must-yellow);
-    }
+        .metric-card {
+            border-left: 4px solid var(--must-blue);
+            transition: all 0.3s ease;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-    .metric-value {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: var(--must-blue);
-        line-height: 1;
-    }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--must-yellow);
+        }
 
-    .metric-label {
-        color: var(--must-green);
-        font-weight: 500;
-        font-size: 0.95rem;
-    }
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--must-blue);
+            line-height: 1;
+        }
 
-    .chart-container {
-        position: relative;
-        margin-bottom: 20px;
-        background-color: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        .metric-label {
+            color: var(--must-green);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
 
-        height: 400px;
-        width: 100%;
-    }
+        .chart-container {
+            position: relative;
+            margin-bottom: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            
+            height: 400px;
+            width: 100%;
+        }
 
-    .progress {
-        height: 25px;
-        border-radius: 5px;
-        background-color: #e9ecef;
-    }
+        .progress {
+            height: 25px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
 
-    .progress-bar {
-        background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
-    }
+        .progress-bar {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+        }
 
-    .badge-must {
-        background-color: var(--must-yellow);
-        color: #000;
-        font-weight: 500;
-    }
+        .badge-must {
+            background-color: var(--must-yellow);
+            color: #000;
+            font-weight: 500;
+        }
 
-    .nav-pills .nav-link.active {
-        background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
-        color: white;
-        font-weight: 500;
-    }
+        .nav-pills .nav-link.active {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            font-weight: 500;
+        }
 
-    .nav-pills .nav-link {
-        color: var(--must-blue);
-        font-weight: 500;
-        border: 1px solid #dee2e6;
-        margin-right: 5px;
-    }
+        .nav-pills .nav-link {
+            color: var(--must-blue);
+            font-weight: 500;
+            border: 1px solid #dee2e6;
+            margin-right: 5px;
+        }
 
-    .nav-pills .nav-link:hover {
-        background-color: var(--must-light-green);
-    }
+        .nav-pills .nav-link:hover {
+            background-color: var(--must-light-green);
+        }
 
-    .table thead {
-        background-color: var(--must-green);
-        color: white;
-    }
+        .table thead {
+            background-color: var(--must-green);
+            color: white;
+        }
 
-    .table-hover tbody tr:hover {
-        background-color: var(--must-light-green);
-    }
+        .table-hover tbody tr:hover {
+            background-color: var(--must-light-green);
+        }
 
-    footer {
-        background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
-        color: white;
-        border-top: 3px solid var(--must-yellow);
-    }
+        footer {
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            border-top: 3px solid var(--must-yellow);
+        }
 
-    .impact-high {
-        background-color: rgba(0, 104, 55, 0.1);
-        color: var(--must-green);
-        font-weight: 500;
-    }
+        .impact-high {
+            background-color: rgba(0, 104, 55, 0.1);
+            color: var(--must-green);
+            font-weight: 500;
+        }
 
-    .impact-medium {
-        background-color: rgba(255, 215, 0, 0.1);
-        color: #b38f00;
-        font-weight: 500;
-    }
+        .impact-medium {
+            background-color: rgba(255, 215, 0, 0.1);
+            color: #b38f00;
+            font-weight: 500;
+        }
 
-    .impact-low {
-        background-color: rgba(0, 91, 170, 0.1);
-        color: var(--must-blue);
-        font-weight: 500;
-    }
+        .impact-low {
+            background-color: rgba(0, 91, 170, 0.1);
+            color: var(--must-blue);
+            font-weight: 500;
+        }
 
-    .bg-must-green {
-        background-color: var(--must-green);
-    }
+        .bg-must-green {
+            background-color: var(--must-green);
+        }
 
-    .bg-must-blue {
-        background-color: var(--must-blue);
-    }
+        .bg-must-blue {
+            background-color: var(--must-blue);
+        }
 
-    .bg-must-yellow {
-        background-color: var(--must-yellow);
-    }
+        .bg-must-yellow {
+            background-color: var(--must-yellow);
+        }
 
-    .text-must-green {
-        color: var(--must-green);
-    }
+        .text-must-green {
+            color: var(--must-green);
+        }
 
-    .text-must-blue {
-        color: var(--must-blue);
-    }
+        .text-must-blue {
+            color: var(--must-blue);
+        }
 
-    .text-must-yellow {
-        color: var(--must-yellow);
-    }
+        .text-must-yellow {
+            color: var(--must-yellow);
+        }
 
-    .btn-must-primary {
-        background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
-        color: white;
-        border: none;
-        font-weight: 500;
-    }
+        .btn-must-primary {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            border: none;
+            font-weight: 500;
+        }
 
-    .btn-must-primary:hover {
-        background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 80%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
+        .btn-must-primary:hover {
+            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 80%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
 
-    .floating-action-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
+        .floating-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
 
-    .floating-action-btn:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
+        .floating-action-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .large-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            height: auto;
+            margin-bottom: 20px;
+        }
 
-    .large-card {
-        background-color: white;
-        border-radius: var(--border-radius);
-        padding: 2px;
-        box-shadow: var(--box-shadow);
-        height: auto;
-        margin-bottom: 20px;
-    }
-</style>
+
+        /* Community Service Table Styles */
+        #communityServiceTable {
+            font-size: 0.9rem;
+        }
+
+        #communityServiceTable th {
+            white-space: nowrap;
+        }
+
+        #communityServiceTable .badge {
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+        /* Filter Controls */
+        #filterStaff, #filterDate, #filterVerification {
+            margin-bottom: 10px;
+        }
+
+        /* Responsive Table */
+        @media (max-width: 768px) {
+            #communityServiceTable td:nth-child(1)::before { content: "Staff: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(2)::before { content: "Activity: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(3)::before { content: "Location: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(4)::before { content: "Date: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(5)::before { content: "Beneficiaries: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(6)::before { content: "Points: "; font-weight: bold; }
+            #communityServiceTable td:nth-child(7)::before { content: "Verified?: "; font-weight: bold; }
+            
+            #communityServiceTable td {
+                display: block;
+                border-bottom: 1px solid #eee;
+            }
+            
+            #communityServiceTable td:last-child {
+                border-bottom: 2px solid #dee2e6;
+            }
+            
+            #communityServiceTable thead {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -476,7 +434,7 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
 
     <!-- Sidebar -->
     <?php include 'bars/side_bar.php'; ?>
-
+    
     <!-- Dashboard Header -->
     <header class="dashboard-header mt-5" style="width: 80%; margin-left: 20%;">
         <div class="container">
@@ -524,20 +482,27 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                 <div class="col-md-3">
                     <div class="card metric-card h-100">
                         <div class="card-body text-center">
-                            <div class="metric-value"><?= formatGrants($grantsCount) ?></div>
-                            <div class="metric-label">Total Grants (UGX)</div>
+                            <div class="metric-value"><?= $grantsCount ?></div>
+                            <div class="metric-label">Active Grants</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Academic Performance Section -->
-            <div class="card .">
+            <!-- [Previous sections remain unchanged...] -->
+
+
+                        <!-- Academic Performance Section -->
+                        <div class="card section-card">
                 <div class="card-body">
                     <h2 class="section-title"><i class="fas fa-graduation-cap me-2 text-must-blue"></i>Academic Performance</h2>
+
                     <div class="large-card">
                         <div class="large-card">
                             <div class="large-card">
+                                <div class="section-title">
+                                    <h2>Faculty Overview</h2>
+                                </div>
                                 <div class="chart-container">
                                     <canvas id="qualificationsChart"></canvas>
                                 </div>
@@ -546,12 +511,12 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                     </div>
 
                     <div class="row mt-4">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="card metric-card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value"><?= $phdHolders ?></div>
+
                                             <div class="metric-label">PhD Holders</div>
                                         </div>
                                         <i class="fas fa-user-graduate fa-3x text-muted opacity-25"></i>
@@ -559,12 +524,12 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="card metric-card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value"><?= $mastersCount ?></div>
+                                            <div class="metric-value"><?= $degreeStats['masters'] ?></div>
                                             <div class="metric-label">Master's Degrees</div>
                                         </div>
                                         <i class="fas fa-user-tie fa-3x text-muted opacity-25"></i>
@@ -572,37 +537,23 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="card metric-card">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <div class="metric-value"><?= isset($degreeStats['first_class']) ? $degreeStats['first_class'] : 0 ?></div>
-                                            <div class="metric-label">1st Class Degrees</div>
+                                            <div class="metric-value"><?= $degreeStats['first_class'] ?></div>
+                                            <div class="metric-label">First Class Degrees</div>
                                         </div>
                                         <i class="fas fa-award fa-3x text-muted opacity-25"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-md-3">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value"><?= isset($degreeStats['second_upper']) ? $degreeStats['second_upper'] : 0 ?></div>
-                                            <div class="metric-label">2nd Class Upper Degrees</div>
-                                        </div>
-                                        <i class="fas fa-award fa-3x text-muted opacity-25"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
+
 
             <!-- Research and Publications Section -->
             <div class="card section-card">
@@ -648,6 +599,7 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                                     </div>
                                 </div>
                             </div>
+
                             <div class="row mt-4">
                                 <div class="col-md-3">
                                     <div class="card metric-card h-100">
@@ -722,7 +674,6 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
@@ -775,56 +726,146 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                 </div>
             </div>
 
+
+
+
             <!-- Community Service Section -->
             <div class="card section-card">
-                <div class="card-body">
-                    <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h5 class="text-must-green"><i class="fas fa-chart-bar me-1"></i>Community Service Participation</h5>
-                            <div class="chart-container">
-                                <canvas id="communityServiceChart"></canvas>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h2 class="section-title"><i class="fas fa-hands-helping me-2 text-must-blue"></i>Community Service</h2>
+                                <button class="btn btn-must-primary" id="exportCommunityService">
+                                    <i class="fas fa-file-csv me-1"></i>Export to CSV
+                                </button>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="row mt-4">
-                        <div class="col-md-4">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value"><?= $distinctStaffCount ?></div>
-                                            <div class="metric-label">Employees Engaged</div>
-                                        </div>
-                                        <i class="fas fa-users fa-3x text-muted opacity-25"></i>
-                                    </div>
+                            <!-- Community Service Log Table -->
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="communityServiceTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Staff</th>
+                                            <th>Activity</th>
+                                            <th>Location</th>
+                                            <th>Date</th>
+                                            <th>Beneficiaries</th>
+                                            <th>Points</th>
+                                            <th>Verified?</th>
+                                            <th>Document</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($communityServiceLogs as $log): ?>
+                                        <tr>
+                                            <td>
+                                                <?= $log['staff_name'] ?> 
+                                                <span class="badge bg-primary"><?= $log['staff_id'] ?></span>
+                                                <?= $log['verification_status'] === 'verified' ? '<i class="fas fa-check-circle text-success"></i>' : 
+                                                ($log['verification_status'] === 'pending' ? '<i class="fas fa-clock text-warning"></i>' : 
+                                                '<i class="fas fa-times-circle text-danger"></i>') ?>
+                                            </td>
+                                            <td><?= $log['activity_name'] ?></td>
+                                            <td><?= $log['location'] ?></td>
+                                            <td><?= date('d/m/Y', strtotime($log['activity_date'])) ?></td>
+                                            <td><?= $log['beneficiaries'] ?? 'N/A' ?></td>
+                                            <td><?= $log['points_earned'] ?></td>
+                                            <td>
+                                                <?php if ($log['verification_status'] === 'verified'): ?>
+                                                    <span class="badge bg-success">✅ Verified</span>
+                                                <?php elseif ($log['verification_status'] === 'pending'): ?>
+                                                    <span class="badge bg-warning text-dark">⚠️ Pending</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger">❌ Rejected</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($log['proof_document_path']): ?>
+                                                    <a href="<?= $log['proof_document_path'] ?>" class="btn btn-sm btn-outline-primary" target="_blank">
+                                                        <i class="fas fa-file-pdf"></i> View
+                                                    </a>
+                                                <?php else: ?>
+                                                    <span class="text-muted">None</span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Filter Row -->
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <select class="form-select" id="filterStaff">
+                                        <option value="">Filter by Staff</option>
+                                        <?php 
+                                        $staffList = $pdo->query("SELECT staff_id, CONCAT(first_name, ' ', last_name) AS name FROM staff ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+                                        foreach ($staffList as $staff): 
+                                        ?>
+                                        <option value="<?= $staff['staff_id'] ?>"><?= $staff['name'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select" id="filterYear">
+                                        <option value="">Filter by Year</option>
+                                        <?php foreach ($years as $year): ?>
+                                        <option value="<?= $year ?>"><?= $year ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select" id="filterVerification">
+                                        <option value="">Filter by Verification</option>
+                                        <option value="verified">Verified</option>
+                                        <option value="pending">Pending</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value"><?= $projectTypesCount ?></div>
-                                            <div class="metric-label">Community Projects</div>
+
+                            <!-- Community Service Metrics -->
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="metric-value"><?= $communityServiceCount ?></div>
+                                                    <div class="metric-label">Employees Engaged</div>
+                                                </div>
+                                                <i class="fas fa-users fa-3x text-muted opacity-25"></i>
+                                            </div>
                                         </div>
-                                        <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card metric-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="metric-value"><?= $beneficiariesSum  ?></div>
-                                            <div class="metric-label">Total Beneficiaries</div>
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="metric-value"><?= $communityServiceCount ?></div>
+                                                    <div class="metric-label">Community Projects</div>
+                                                </div>
+                                                <i class="fas fa-project-diagram fa-3x text-muted opacity-25"></i>
+                                            </div>
                                         </div>
-                                        <i class="fas fa-clock fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card metric-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <?php 
+                                                    $totalBeneficiaries = array_sum(array_column($communityServiceLogs, 'beneficiaries'));
+                                                    ?>
+                                                    <div class="metric-value"><?= $totalBeneficiaries ?></div>
+                                                    <div class="metric-label">Total Beneficiaries</div>
+                                                </div>
+                                                <i class="fas fa-users fa-3x text-muted opacity-25"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -833,110 +874,24 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                 </div>
             </div>
 
-            <!-- Key Insights and Action Items -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card highlight-yellow">
-                        <div class="card-header " style="font-weight: bold; font-size: 20px;">Key Performance Insights</div>
-                        <div class="card-body">
-                            <?php if ($topResearchFaculty || $topTeachingFaculty || $growthFaculty): ?>
-
-                                <?php if ($topResearchFaculty): ?>
-                                    <div class="alert alert-info">
-                                        <strong>Faculty of <?= htmlspecialchars($topResearchFaculty['faculty_name']) ?>:</strong>
-                                        Leads with <b><?= $topResearchFaculty['publications'] ?></b> publication(s) and <b><?= $topResearchFaculty['grants'] ?></b> grant(s).
-                                        Consider sharing best practices with other faculties.
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($topTeachingFaculty): ?>
-                                    <div class="alert alert-warning">
-                                        <strong>Faculty of <?= htmlspecialchars($topTeachingFaculty) ?>:</strong>
-                                        Highest student satisfaction (<?= round($facultyPerformance[array_search($topTeachingFaculty, array_column($facultyPerformance, 'faculty_name'))]['avg_performance'] ?? 0) ?>/100)
-                                        but lower research output. Encourage research-teaching balance.
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($growthFaculty): ?>
-                                    <div class="alert alert-success">
-                                        <strong>Faculty of <?= htmlspecialchars($growthFaculty) ?>:</strong>
-                                        Strong growth in both research and teaching. Model for interdisciplinary collaboration.
-                                    </div>
-                                <?php endif; ?>
-
-                            <?php else: ?>
-                                <div class="alert alert-secondary text-center">
-                                    No data available for analysis at the moment.
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card highlight-blue">
-                        <div class="card-header" style="font-weight: bold; font-size: 18px;">Strategic Action Items</div>
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush">
-                                <?php if ($topTeachingFaculty): ?>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        Organize research methodology workshop for <?= htmlspecialchars($topTeachingFaculty) ?> faculty
-                                        <span class="badge bg-must-green rounded-pill">High Priority</span>
-                                    </li>
-                                <?php endif; ?>
-
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Develop interdisciplinary research grants program
-                                    <span class="badge bg-must-green rounded-pill">High Priority</span>
-                                </li>
-
-                                <?php
-                                // Find faculty with lowest performance (excluding those with 0 staff)
-                                $lowestPerforming = null;
-                                $minPerformance = PHP_FLOAT_MAX;
-
-                                foreach ($facultyPerformance as $faculty) {
-                                    if ($faculty['staff_count'] > 0 && $faculty['avg_performance'] < $minPerformance) {
-                                        $minPerformance = $faculty['avg_performance'];
-                                        $lowestPerforming = $faculty;
-                                    }
-                                }
-                                ?>
-
-                                <?php if ($lowestPerforming): ?>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        Review teaching loads in <?= htmlspecialchars($lowestPerforming['faculty_name']) ?>
-                                        <span class="badge bg-warning rounded-pill">Medium Priority</span>
-                                    </li>
-                                <?php endif; ?>
-
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Plan community engagement fair for all faculties
-                                    <span class="badge bg-primary rounded-pill">Low Priority</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <footer class="py-4 mt-5" style="margin-left: 250px;"> <!-- Match sidebar width -->
-        <div class="container">
-            <div class="d-flex align-items-center">
-                <img src="logo/mustlogo.png" alt="MUST Logo" style="width: 80px;" class="me-3">
-                <div>
-                    <p class="mb-1">© 2025 Mbarara University of Science and Technology</p>
+            <footer class="py-4 mt-5">
+                <div class="container text-center">
+                    <img src="https://via.placeholder.com/150x50?text=MUST+Logo" alt="MUST Logo" class="mb-3">
+                    <p class="mb-1">© 2023 Mbarara University of Science and Technology</p>
                     <p class="mb-0">Human Resource Management System | <small>Data updated hourly | For official use only</small></p>
                 </div>
-            </div>
-        </div>
-    </footer>
+            </footer>
+
+
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
     <!-- Custom JS -->
     <script>
         // Set current date
@@ -952,6 +907,9 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
+
+        // [Previous chart initializations remain unchanged...]
+
 
         // Academic Qualifications Chart
         const qualificationsCtx = document.getElementById('qualificationsChart').getContext('2d');
@@ -992,42 +950,8 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                             }
                         }
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 20,
-                        ticks: {
-                            stepSize: 2, // Shows ticks at 0, 2, 4, ..., 20
-                            precision: 0
-                        },
-                        title: {
-                            display: true,
-                            text: 'Academic Performance',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Student Level',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
                 }
             }
-
         });
 
         // Publications Chart
@@ -1171,57 +1095,9 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 20,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw}`;
-                            }
-                        }
-                    }
-                },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 20,
-                        ticks: {
-                            stepSize: 2, // Shows ticks at 0, 2, 4, ..., 20
-                            precision: 0
-                        },
-                        title: {
-                            display: true,
-                            text: 'Number of Supervisions',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Student Level',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
+                        beginAtZero: true
                     }
                 }
             }
@@ -1234,25 +1110,13 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
             data: {
                 labels: <?= json_encode(array_keys($innovationData)) ?>,
                 datasets: [{
-                    label: 'Innovation Types',
                     data: <?= json_encode(array_values($innovationData)) ?>,
                     backgroundColor: [
-                        '#003366', // Dark blue
-                        '#6699CC', // Medium blue
-                        '#FF9900', // Orange
-                        '#CCCCCC', // Light gray
-                        '#999999', // Medium gray
-                        '#666666' // Dark gray
+                        '#003366',
+                        '#6699CC',
+                        '#FF9900',
+                        '#CCCCCC'
                     ],
-                    borderColor: [
-                        '#001a33', // Darker blue
-                        '#336699', // Darker medium blue
-                        '#cc7a00', // Darker orange
-                        '#aaaaaa', // Darker gray
-                        '#777777', // Darker medium gray
-                        '#444444' // Darker dark gray
-                    ],
-                    borderWidth: 1,
                     borderRadius: {
                         topLeft: 5,
                         topRight: 5,
@@ -1266,165 +1130,76 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: {
-                            generateLabels: function(chart) {
-                                const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                                return original.map(label => {
-                                    return {
-                                        ...label,
-                                        text: `${label.text} (${chart.data.datasets[0].data[label.index]})`
-                                    };
-                                });
-                            },
-                            boxWidth: 20,
-                            padding: 20,
-                            font: {
-                                size: 12,
-                                weight: 'bold'
-                            },
-                            color: '#333'
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw}`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 5,
-                        ticks: {
-                            stepSize: 0.5,
-                            precision: 1, // Shows one decimal place
-                            callback: function(value) {
-                                // Show all ticks (0, 0.5, 1, 1.5, etc.)
-                                return value % 1 === 0 ? value : value.toFixed(1);
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Number of Innovations',
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)',
-                            lineWidth: 1
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Innovation Types',
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
                     }
                 }
             }
         });
 
-        // Community Service Chart with mixed colors
-        const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
-        const communityChart = new Chart(communityCtx, {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode(array_keys($communityServiceData)) ?>,
-                datasets: [{
-                    label: 'Participants',
-                    data: <?= json_encode(array_values($communityServiceData)) ?>,
-                    backgroundColor: [
-                        '#006837', // MUST Green
-                        '#FFD700', // MUST Yellow
-                        '#005BAA', // MUST Blue
-                        '#17B612', // Vibrant Green
-                        '#FFC72C', // Bright Yellow
-                        '#1A73E8', // Google Blue
-                        '#4CAF50', // Material Green
-                        '#FFEB3B', // Material Yellow
-                        '#2196F3' // Material Blue
-                    ],
-                    borderRadius: {
-                        topLeft: 5,
-                        topRight: 5,
-                        bottomLeft: 0,
-                        bottomRight: 0
-                    },
-                    borderColor: '#fff',
-                    borderWidth: 1,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
+
+        // Community Service Table Functionality
+        $(document).ready(function() {
+            // Initialize DataTable with year extraction for filtering
+            const table = $('#communityServiceTable').DataTable({
+                dom: '<"top"f>rt<"bottom"lip><"clear">',
+                pageLength: 10,
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 20,
-                            font: {
-                                size: 12
+                columnDefs: [
+                    {
+                        targets: 3, // Date column
+                        render: function(data, type, row) {
+                            if (type === 'filter') {
+                                // Extract year for filtering
+                                const dateParts = data.split('/');
+                                return dateParts[2]; // Returns the year part
                             }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw}`;
-                            }
+                            return data;
                         }
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 20,
-                        ticks: {
-                            stepSize: 2,
-                            precision: 0
-                        },
-                        title: {
-                            display: true,
-                            text: 'Number of Participants',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Department',
-                            font: {
-                                weight: 'bold'
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
+                ]
+            });
+
+            // Filter functionality
+            $('#filterStaff, #filterYear, #filterVerification').change(function() {
+                const staff = $('#filterStaff').val();
+                const year = $('#filterYear').val();
+                const verification = $('#filterVerification').val();
+                
+                table.column(0).search(staff, false, false);
+                table.column(3).search(year, false, false);
+                table.column(6).search(verification, false, false);
+                
+                table.draw();
+            });
+
+            // Export to CSV
+            $('#exportCommunityService').click(function() {
+                const data = table.rows({ search: 'applied' }).data();
+                let csvContent = "data:text/csv;charset=utf-8,";
+                
+                // Add headers
+                csvContent += "Staff,Staff ID,Activity,Location,Date,Beneficiaries,Points,Verified?,Document\r\n";
+                
+                // Add data
+                data.each(function(row) {
+                    const docLink = row[7].includes('href') ? 
+                        row[7].match(/href="([^"]*)"/)[1] : 
+                        'No document';
+                    
+                    csvContent += `"${row[0]}","${row[0].match(/DR-\d+/)[0]}","${row[1]}","${row[2]}","${row[3]}","${row[4]}","${row[5]}","${row[6]}","${docLink}"\r\n`;
+                });
+                
+                // Download
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "community_service_activities.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
         });
+
+        // [Previous chart initializations remain unchanged...]
     </script>
 </body>
-
 </html>

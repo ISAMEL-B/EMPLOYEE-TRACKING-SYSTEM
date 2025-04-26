@@ -578,11 +578,11 @@
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h1 class="display-5 fw-bold">Faculty of <?= htmlspecialchars($faculty_name) ?></h1>
+                            <h1 class="display-5 fw-bold" style="font-size: 50px; "> <?= htmlspecialchars($faculty_name) ?></h1>
                         </div>
-                        <div class="col-md-4 text-md-end">
+                        <!-- <div class="col-md-4 text-md-end">
                             <i class="fas fa-trophy fa-4x opacity-75"></i>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -693,33 +693,6 @@
             <!-- Publications Tab Content -->
             <div class="tab-content" id="publications">
                 <div class="main-content">
-                <!-- status cards -->
-                <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
-                    <div class="card stat-card" style="width: 300px;">
-                        <h3>Total peer reviewed publications</h3>
-                        <div class="value">34</div>
-                        
-                    </div>
-                    <!-- <div class="card stat-card" style="width: 300px;">
-                        <h3>Total number of citations</h3>
-                        <div class="value">72</div>
-                        
-                    </div> -->
-                    <div class="card stat-card" style="width: 300px;">
-                        <h3>Total peer reviewed publications uploaded to must repository</h3>
-                        <div class="value">72</div>
-                        
-                    </div>
-                    <!-- <div class="card stat-card" style="width: 300px;"> i have added something -->
-                </div>
-                    <!-- <div class="large-card">
-                        <div class="section-title">
-                            <h2>Publications vs Citations</h2>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="pubCitationChart"></canvas>
-                        </div>
-                    </div> -->
                     <div class="large-card">
                         <div class="section-title">
                             <h2>Publication Types By Department</h2>
@@ -761,17 +734,17 @@
                     <div class="summary-cards"style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
                         <div class="card stat-card" style="width: 300px;">
                             <h3>Total student supervised for community placements</h3>
-                            <div class="value"><?= $totalStudentsSupervised?></div>
+                            <div class="value"><?= isset($totalStudentsSupervised) && !empty($totalStudentsSupervised) ? $totalStudentsSupervised : 0 ?></div>
                             
                         </div>
                         <div class="card stat-card" style="width: 300px;">
                             <h3>other community outreaches</h3>
-                            <div class="value"><?= $totalCommunityOutreaches ?></div>
+                            <div class="value"><?= isset($totalCommunityOutreaches) && !empty($totalStudentsSupervised) ? $totalStudentsSupervised : 0 ?></div>
                             
                         </div>
                         <div class="card stat-card" style="width: 300px;">
                             <h3> total number of beneficiaries</h3>
-                            <div class="value"><?= $totalBeneficiaries ?></div>
+                            <div class="value"><?= isset($totalBeneficiaries) && !empty($totalStudentsSupervised) ? $totalStudentsSupervised : 0 ?></div>
                             
                         </div>
                     </div>
