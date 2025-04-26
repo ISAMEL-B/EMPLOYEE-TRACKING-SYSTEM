@@ -1,8 +1,8 @@
 <?php
-error_reporting(E_ALL); // Report all PHP errors
-ini_set('display_errors', 1); // Display errors on the page
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-include __DIR__ .'/config.php'; // Include the database configuration file
+include __DIR__ . '/config.php';
 
 // Enum for Publication Types
 abstract class PublicationType {
@@ -13,9 +13,9 @@ abstract class PublicationType {
 
 // Enum for Author Roles
 abstract class AuthorRole {
-    const FIRST_AUTHOR = 'first-author';
-    const CORRESPONDING_AUTHOR = 'corresponding-author';
-    const CO_AUTHOR = 'co-author';
+    const FIRST_AUTHOR = 'first author';
+    const CORRESPONDING_AUTHOR = 'corresponding author';
+    const CO_AUTHOR = 'co author';
 }
 
 class PublicationScore {
@@ -31,10 +31,17 @@ class PublicationScore {
         'total_publications' => 0
     ];
 
-    // Constructor to initialize with DB connection and staff ID
     public function __construct($conn, $staff_id) {
         $this->conn = $conn;
         $this->staff_id = $staff_id;
+    }
+
+    private function normalize_role($role) {
+        if (!isset($role) || $role === null) {
+            return '';
+        }
+        // Normalize: lowercase, trim, replace hyphens with spaces
+        return str_replace('-', ' ', strtolower(trim($role)));
     }
 
     public function get_score_details() {
@@ -45,9 +52,8 @@ class PublicationScore {
 
         while ($row = $result->fetch_assoc()) {
             $pub_type = strtolower(trim($row['publication_type']));
-            $author_role = strtolower(trim($row['role']));
+            $author_role = $this->normalize_role($row['role']);
 
-            // Count every publication towards total
             $this->breakdown['total_publications'] += 1;
 
             if ($pub_type == PublicationType::JOURNAL_ARTICLE) {

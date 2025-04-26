@@ -15,11 +15,14 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     exit();
 }
 
-//get department score
-include '../../scoring_calculator/department score/department_score.php';
+
 
 //get count of employees in a department
 include '../../scoring_calculator/department score/department_employees.php';
+
+
+//get department score
+include '../../scoring_calculator/department score/department_score.php';
 
 
 $department_id = $_GET['id'] ?? null;
@@ -300,16 +303,16 @@ $community_service_scores = [
 
 // top performers
 // Query to get top 5 performers in the department
-$topPerformers = [];
+// $topPerformers = [];
 try {
     $performerQuery = $conn->prepare("
-                    SELECT s.staff_id, s.first_name, s.last_name, s.performance_score, r.role_name
-                    FROM staff s
-                    JOIN roles r ON s.role_id = r.role_id
-                    WHERE s.department_id = ?
-                    ORDER BY s.performance_score DESC
-                    LIMIT 5
-                ");
+        SELECT s.staff_id, s.first_name, s.last_name, r.role_name
+        FROM staff s
+        JOIN roles r ON s.role_id = r.role_id
+        WHERE s.department_id = ?
+        ORDER BY s.staff_id ASC
+        LIMIT 15  -- Fetch more than 5 because later we'll filter by actual total_score
+    ");
 
     if ($performerQuery) {
         $performerQuery->bind_param("i", $department_id);
@@ -317,18 +320,33 @@ try {
         $performerResult = $performerQuery->get_result();
 
         while ($performer = $performerResult->fetch_assoc()) {
+            $staff_id = $performer['staff_id'];
+
+            // Get the REAL performance score
+            $individual_data = get_individual_performance_breakdown($conn, $staff_id);
+            $total_score = $individual_data['total_score'] ?? 0;
+
             $topPerformers[] = [
-                'staff_id' => $performer['staff_id'], // THIS WAS MISSING
+                'staff_id' => $staff_id,
                 'first_name' => $performer['first_name'] ?? '',
                 'last_name' => $performer['last_name'] ?? '',
-                'score' => $performer['performance_score'] ?? 0,
+                'score' => $total_score,
                 'role' => $performer['role_name'] ?? ''
             ];
         }
+
+        // Now sort $topPerformers by 'score' descending
+        usort($topPerformers, function($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
+
+        // Limit to top 5
+        $topPerformers = array_slice($topPerformers, 0, 5);
     }
 } catch (Exception $e) {
     error_log("Top performers query error: " . $e->getMessage());
 }
+
 
 //trends
 $deptTrends_years = ['2021', '2022', '2023', '2024'];

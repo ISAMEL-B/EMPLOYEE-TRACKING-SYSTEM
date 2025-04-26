@@ -263,7 +263,7 @@
                     <div class="overview-card">
                         <i class="fas fa-graduation-cap"></i>
                         <h3><?= count($achievements['degrees']) ?></h3>
-                        <p>Qualifications</p>
+                        <p>Academic Qualifications</p>
                     </div>
                     <div class="overview-card">
                         <i class="fas fa-money-bill-wave"></i>
@@ -303,8 +303,9 @@
                                         <?php foreach ($achievements['publications'] as $pub): ?>
                                             <div class="timeline-item mb-3">
                                                 <h6 class="mb-1"><?= htmlspecialchars($pub['publication_type']) ?></h6>
-                                                <p class="text-muted small mb-1">Role: <?= htmlspecialchars($pub['role']) ?></p>
-                                            </div>
+                                                <?php if (isset($pub['role']) && $pub['role'] !== null && trim($pub['role']) !== ''): ?>
+                                                    <p class="text-muted small mb-1">Role: <?= htmlspecialchars($pub['role']) ?></p>
+                                                <?php endif; ?>                                            </div>
                                         <?php endforeach; ?>
                                     </div>
                                 <?php else: ?>
