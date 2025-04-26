@@ -243,6 +243,7 @@
                     <?php endif; ?>
                     <div class="profile-info">
                         <h1><?= htmlspecialchars($staff_details['first_name']) ?> <?= htmlspecialchars($staff_details['last_name']) ?></h1>
+                        <p><?= htmlspecialchars($staff_details['scholar_type']). ' scholar'?></p>
                         <p><?= htmlspecialchars($staff_details['role_name']) ?></p>
                         <p><?= htmlspecialchars($staff_details['department_name']) ?></p>
                         <p>Years at current rank: <?= htmlspecialchars($staff_details['years_of_experience'] ?? '0') ?> • Years of service: <?= htmlspecialchars($staff_details['years_of_service'] ?? '0') ?></p>
