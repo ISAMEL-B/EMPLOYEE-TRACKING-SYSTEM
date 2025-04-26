@@ -352,20 +352,12 @@
                                             <thead>
                                                 <tr>
                                                     <th>Amount</th>
-                                                    <th>Year Awarded</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php foreach ($achievements['grants'] as $grant): ?>
                                                     <tr>
                                                         <td>UGX <?= number_format($grant['grant_amount'], 2) ?></td>
-                                                        <td>
-                                                            <?php if (!empty($grant['year_awarded'])): ?>
-                                                                <?= htmlspecialchars($grant['year_awarded']) ?>
-                                                            <?php else: ?>
-                                                                <span class="text-muted">N/A</span>
-                                                            <?php endif; ?>
-                                                        </td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             </tbody>

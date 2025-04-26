@@ -331,7 +331,7 @@ try {
 }
 
 //trends
-$deptTrends_years = ['2019', '2020', '2021', '2022', '2023'];
+$deptTrends_years = ['2021', '2022', '2023', '2024'];
 $deptTrends_publications = [];
 $deptTrends_grants = [];
 $deptTrends_innovations = [];
