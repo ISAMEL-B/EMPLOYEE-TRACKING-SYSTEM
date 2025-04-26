@@ -1,4 +1,4 @@
-staff_id,first_name,last_name,scholar_type,role_name,department_name,years_of_experience,performance_score
+staff_id,first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
 1,John,Doe,Full_Time,Professor,Computer Science,10,85
 2,Jane,Smith,Part_Time,Assistant Professor,Mathematics,5,90
 3,Michael,Johnson,Full_Time,Lecturer,Physics,3,80
