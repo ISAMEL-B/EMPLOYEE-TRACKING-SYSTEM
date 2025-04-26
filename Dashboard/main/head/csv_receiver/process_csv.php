@@ -31,7 +31,7 @@ $expected_columns = [
     'academicactivities' => 2, // staff_id, activity_type
     'service' => 2,         // staff_id, service_type
     'communityservice' => 3, // staff_id, description, beneficiaries
-    'professionalbodies' => 2, // staff_id, body_name
+    'professionalbodies' => 2, // staff_id, beneficiaries
     'degrees' => 3          // staff_id, degree_name, degree_classification
 ];
 
@@ -69,7 +69,6 @@ $full_column_names = [
     'degrees' => ['degree_id', 'staff_id', 'degree_name', 'degree_classification']
 ];
 
-// Foreign key relationships - maps column names to lookup tables and columns
 $foreign_keys = [
     'staff' => [
         'role_id' => ['table' => 'roles', 'lookup_column' => 'role_name', 'id_column' => 'role_id'],
@@ -78,10 +77,34 @@ $foreign_keys = [
     'departments' => [
         'faculty_id' => ['table' => 'faculties', 'lookup_column' => 'faculty_name', 'id_column' => 'faculty_id']
     ],
+    // Add mappings for ALL tables that reference staff
     'publications' => [
         'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
     ],
-    // Add similar mappings for other tables as needed
+    'grants' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'supervision' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'innovations' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'academicactivities' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'service' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'communityservice' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'professionalbodies' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ],
+    'degrees' => [
+        'staff_id' => ['table' => 'staff', 'lookup_column' => ['first_name', 'last_name'], 'id_column' => 'staff_id']
+    ]
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

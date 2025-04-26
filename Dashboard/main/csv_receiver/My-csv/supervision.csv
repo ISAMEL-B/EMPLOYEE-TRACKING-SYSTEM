@@ -1,4 +1,4 @@
-supervision_id,staff_name,student_level
+supervision_id,staff_id,student_level
 1,Byaruhanga Isamel,PhD
 2,Akanyoreka Smith,Masters
 3,Michael Johnson,PhD
@@ -14,8 +14,5 @@ supervision_id,staff_name,student_level
 13,Grace Achan,Masters
 14,Michael Mwangi,Undergraduate
 15,Linda Namatovu,PhD
-16,Akanjuna Joel,Masters
-17,Akambamu Mathias,Undergraduate
 18,Mugabi Praise,PhD
-19,Mukama Martin,Masters
 20,Byaruhanga Isamel,Undergraduate

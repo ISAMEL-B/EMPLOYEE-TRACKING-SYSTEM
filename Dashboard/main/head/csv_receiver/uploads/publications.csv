@@ -1,11 +1,21 @@
-publication_id,staff_name,publication_type,role
-1,John Doe,Journal Article,Author
-2,Akanyoreka Smith,Conference Paper,Co-Author
-3,Michael Johnson,Journal Article,Author
-4,Emily Davidson,Conference Paper,Co-Author
-5,David Wilson,Journal Article,Author
-6,Sarah Connor,Conference Paper,Co-Author
-7,Robert Brown,Journal Article,Author
-8,Alice Williams,Conference Paper,Co-Author
-9,James Anderson,Journal Article,Author
-10,Linda Taylor,Conference Paper,Co-Author
+staff_id,publication_type,role
+Byaruhanga Isamel,Journal Article,Author
+Akanyoreka Smith,Conference Paper,Co-Author
+Akanyoreka Smith,Journal Article,Co-Author
+Michael Johnson,Conference Paper,Co-Author
+Emily Davidson,Journal Article,Author
+David Wilson,Conference Paper,Co-Author
+Alice Williams,Journal Article,Author
+Linda Taylor,Conference Paper,Co-Author
+Mugabi Praise,Journal Article,Author
+Maria Nabwire,Conference Paper,Co-Author
+Peter Okello,Journal Article,Author
+Sarah Kamani,Conference Paper,Co-Author
+David Tumusiime,Journal Article,Author
+Grace Achan,Conference Paper,Co-Author
+Michael Mwangi,Journal Article,Author
+Linda Namatovu,Conference Paper,Co-Author
+Akanjuna Joel,Journal Article,Author
+Akambamu Mathias,Conference Paper,Co-Author
+Mugabi Praise,Journal Article,Author
+Maria Nabwire,Conference Paper,Co-Author

@@ -1,4 +1,4 @@
-staff_name,degree_name,degree_classification
+staff_id,degree_name,degree_classification
 Byaruhanga Isamel,Bachelor of Science in Software Engineering,First Class
 Akanyoreka Smith,Bachelor of Science in Information Technology,Second Class Upper
 Michael Johnson,Bachelor of Science in Computer Science,Masters
@@ -14,8 +14,5 @@ David Tumusiime,Bachelor of Science in Biology,PhD
 Grace Achan,Bachelor of Agricultural Science,First Class
 Michael Mwangi,Bachelor of Computer Engineering,Second Class Upper
 Linda Namatovu,Bachelor of Development Studies,Masters
-Akanjuna Joel,Bachelor of Laws,PhD
-Akambamu Mathias,Bachelor of Pharmacy,First Class
 Mugabi Praise,Bachelor of Accounting,Second Class Upper
-Mukama Martin,Bachelor of Economics,Masters
 Byaruhanga Isamel,Master of Science in Computer Science,PhD

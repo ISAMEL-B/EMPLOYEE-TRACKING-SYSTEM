@@ -1,4 +1,21 @@
-innovation_id,staff_id,innovation_type
-1,1,Patent
-2,2,Utility Model
-3,3,Copyrigh
+staff_id,innovation_type
+Byaruhanga Isamel,Patent
+Akanyoreka Smith,Utility Model
+Michael Johnson,Copyright
+Emily Davidson,Product
+David Wilson,Trademark
+Alice Williams,Patent
+Linda Taylor,Utility Model
+Mugabi Praise,Copyright
+Maria Nabwire,Product
+Peter Okello,Trademark
+Sarah Kamani,Patent
+David Tumusiime,Utility Model
+Grace Achan,Copyright
+Michael Mwangi,Product
+Linda Namatovu,Trademark
+Akanjuna Joel,Patent
+Akambamu Mathias,Utility Model
+Mugabi Praise,Copyright
+Mukama Martin,Product
+Byaruhanga Isamel,Trademark

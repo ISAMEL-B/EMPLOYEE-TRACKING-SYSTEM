@@ -61,7 +61,7 @@
                         <div class="card-value"><?php echo count($staff_list); ?></div>
                         <p class="card-description">Active employees</p>
                         <div class="card-footer">
-                            <i class="fas fa-arrow-up"></i> 12% from last year
+                            <i class="fas fa-arrow-up"></i> Annual Performance
                         </div>
                     </div>
                 </div>
@@ -99,7 +99,7 @@
                                                 ?></div>
                         <p class="card-description">Pending reviews</p>
                         <div class="card-footer">
-                            <i class="fas fa-exclamation-circle"></i> 3 overdue
+                            <i class="fas fa-exclamation-circle"></i> Waiting for Approval
                         </div>
                     </div>
                 </div>
@@ -168,11 +168,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($top_performing_staff as $staff):
+                            <?php 
+                            $staff_id_counter = 1;
+                            foreach ($top_performing_staff as $staff):
                                 $isPromotionCandidate = $staff['performance_score'] >= 80 && $staff['years_of_experience'] >= 3;
                             ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($staff['staff_id']); ?></td>
+                                    <td><?php echo $staff_id_counter++; ?></td>
                                     <td><?php echo htmlspecialchars($staff['first_name'] . ' ' . $staff['last_name']); ?></td>
                                     <td><?php echo htmlspecialchars($staff['department_name']); ?></td>
                                     <td><?php echo htmlspecialchars($staff['role_name']); ?></td>
@@ -223,7 +225,7 @@
                     </div>
                     <div>
                         <h3 class="ai-title">HR Decision Support Assistant</h3>
-                        <p class="ai-subtitle">Powered by AI - Provides data-driven recommendations</p>
+                        <p class="ai-subtitle">Provides data-driven recommendations</p>
                     </div>
                     <button class="clear-chat-btn" onclick="clearChat()">
                         <i class="fas fa-trash-alt"></i> Clear Chat
