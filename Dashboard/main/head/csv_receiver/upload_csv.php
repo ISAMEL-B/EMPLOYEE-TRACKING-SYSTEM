@@ -25,7 +25,7 @@ if (!isset($_SESSION['staff_id'])) {
       width: 80%;
       max-width: 600px;
     }
-       
+
     .close-btn {
       position: absolute;
       top: 10px;
@@ -34,13 +34,14 @@ if (!isset($_SESSION['staff_id'])) {
       cursor: pointer;
       color: #6c757d;
     }
-    
+
     .close-btn:hover {
       color: #343a40;
     }
-    
+
     /* Modal styles */
     .modal {
+      margin-left: 30%;
       display: none;
       position: fixed;
       z-index: 1000;
@@ -48,25 +49,31 @@ if (!isset($_SESSION['staff_id'])) {
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
-    }
-    
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
+      background-color: rgba(0, 0, 0, 0.5);
+      overflow: auto;
+      /* Allow scrolling if modal itself becomes too tall */
       padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 600px;
-      border-radius: 5px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      /* Optional padding around modal content */
     }
-    
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      max-height: 90vh;
+      /* Important: limit the height */
+      overflow-y: auto;
+      /* Make content inside scrollable if needed */
+    }
+
     .modal-buttons {
       margin-top: 20px;
       text-align: right;
     }
-    
+
     .modal-buttons button {
       margin-left: 10px;
       padding: 8px 16px;
@@ -75,25 +82,25 @@ if (!isset($_SESSION['staff_id'])) {
       cursor: pointer;
       font-weight: 500;
     }
-    
+
     .proceed-btn {
       background-color: #4CAF50;
       color: white;
     }
-    
+
     .proceed-btn:hover {
       background-color: #45a049;
     }
-    
+
     .cancel-btn {
       background-color: #f44336;
       color: white;
     }
-    
+
     .cancel-btn:hover {
       background-color: #d32f2f;
     }
-    
+
     /* Table styles */
     .column-mismatch-table {
       width: 100%;
@@ -101,32 +108,33 @@ if (!isset($_SESSION['staff_id'])) {
       margin: 10px 0;
       font-size: 14px;
     }
-    
-    .column-mismatch-table th, .column-mismatch-table td {
+
+    .column-mismatch-table th,
+    .column-mismatch-table td {
       border: 1px solid #ddd;
       padding: 8px;
       text-align: left;
     }
-    
+
     .column-mismatch-table th {
       background-color: #f2f2f2;
       font-weight: 600;
     }
-    
+
     .match {
       background-color: #e6ffe6;
     }
-    
+
     .mismatch {
       background-color: #ffe6e6;
     }
-    
+
     .id-column {
       background-color: #f0f0f0;
       font-style: italic;
       color: #6c757d;
     }
-    
+
     /* Content styles */
     .content {
       max-width: 800px;
@@ -134,23 +142,23 @@ if (!isset($_SESSION['staff_id'])) {
       padding: 20px;
       background-color: white;
       border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    
+
     /* Form styles */
     #uploadForm {
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
-    
-    #uploadForm select, 
+
+    #uploadForm select,
     #uploadForm input[type="file"] {
       padding: 8px;
       border: 1px solid #ced4da;
       border-radius: 4px;
     }
-    
+
     #uploadForm input[type="submit"] {
       padding: 10px 15px;
       background-color: #007bff;
@@ -160,41 +168,41 @@ if (!isset($_SESSION['staff_id'])) {
       cursor: pointer;
       font-size: 16px;
     }
-    
+
     #uploadForm input[type="submit"]:hover {
       background-color: #0069d9;
     }
-    
+
     .error {
       color: #dc3545;
       font-size: 14px;
       margin-top: -10px;
     }
-    
+
     .format-info {
       background-color: #f8f9fa;
       padding: 15px;
       border-radius: 5px;
       border: 1px solid #e9ecef;
     }
-    
+
     .format-info ul {
       margin: 10px 0 0 20px;
       padding: 0;
     }
-    
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .content {
         margin: 10px;
         padding: 15px;
       }
-      
+
       .modal-content {
         width: 90%;
         margin: 20% auto;
       }
-      
+
       .alert-container {
         width: 90%;
       }
@@ -210,14 +218,18 @@ if (!isset($_SESSION['staff_id'])) {
   ?>
 
   <div class="content">
-    <form id="uploadForm" action="../csv_receiver/process_csv.php" method="POST" enctype="multipart/form-data">
+    <form id="uploadForm" action="process_csv.php" method="POST" enctype="multipart/form-data">
       <h2>Upload CSV File</h2>
 
       <?php
       if (isset($_SESSION['notification'])) {
-        echo '<div class="alert-container"><div class="alert">' . 
-             htmlspecialchars($_SESSION['notification']) .
-             '<span class="close-btn" onclick="closeAlert()">&times;</span></div></div>';
+        $notification = is_array($_SESSION['notification'])
+          ? implode('<br>', array_map('htmlspecialchars', $_SESSION['notification']))
+          : htmlspecialchars($_SESSION['notification']);
+
+        echo '<div class="alert-container"><div class="alert">' .
+          $notification .
+          '<span class="close-btn" onclick="closeAlert()">&times;</span></div></div>';
         unset($_SESSION['notification']);
       }
 
@@ -325,7 +337,7 @@ if (!isset($_SESSION['staff_id'])) {
       'faculties': ['faculty_name (string)'],
       'departments': ['department_name (string)', 'faculty_id (integer) or faculty_name (string)'],
       'staff': ['first_name (string)', 'last_name (string)', 'scholar_type (string)',
-        'role_id (integer) or role_name (string)', 'department_id (integer) or department_name (string)', 
+        'role_id (integer) or role_name (string)', 'department_id (integer) or department_name (string)',
         'years_of_experience (integer)', 'performance_score (integer)'
       ],
       'publications': ['staff_id (integer)', 'publication_type (string)', 'role (string)'],
@@ -403,29 +415,29 @@ if (!isset($_SESSION['staff_id'])) {
     function showColumnMismatchModal(table, expected, received, requiredColumns, actualColumns, hasIdColumn) {
       const modal = document.getElementById('columnMismatchModal');
       const details = document.getElementById('mismatchDetails');
-      
+
       // Adjust expected count if CSV includes ID column
       const adjustedExpected = hasIdColumn ? expected + 1 : expected;
-      
+
       let html = `
         <p>The CSV file you uploaded for table "${table}" doesn't match the expected structure.</p>
         <p><strong>Expected columns:</strong></p>
         <ul>
           <li style="font-style: italic; color: #666;">ID column is optional (will be auto-generated)</li>
       `;
-      
+
       requiredColumns.forEach(col => {
         html += `<li>${col}</li>`;
       });
-      
+
       html += `</ul>`;
-      
+
       if (received < adjustedExpected) {
         html += `<p class="warning"><strong>Warning:</strong> Your file has fewer columns than expected. Some data might be missing.</p>`;
       } else if (received > adjustedExpected) {
         html += `<p class="warning"><strong>Note:</strong> Your file has more columns than expected. Only the first ${adjustedExpected} columns will be used.</p>`;
       }
-      
+
       // Add comparison table
       html += `
         <p><strong>Column Comparison:</strong></p>
@@ -437,16 +449,16 @@ if (!isset($_SESSION['staff_id'])) {
             <th>Status</th>
           </tr>
       `;
-      
+
       // Check if first column is an ID column
       const isFirstColumnId = actualColumns.length > 0 && actualColumns[0].toLowerCase().includes('id');
-      
+
       for (let i = 0; i < Math.max(adjustedExpected, received); i++) {
         // Determine expected column (accounting for optional ID)
         let expectedCol = '';
         let expectedColIndex = i;
         let isIdColumn = false;
-        
+
         if (hasIdColumn && i === 0) {
           expectedCol = 'id (auto)';
           isIdColumn = true;
@@ -456,11 +468,11 @@ if (!isset($_SESSION['staff_id'])) {
             expectedCol = requiredColumns[expectedColIndex];
           }
         }
-        
+
         const actualCol = i < received ? actualColumns[i] : '';
         let statusClass = '';
         let statusText = '';
-        
+
         if (isIdColumn) {
           statusClass = 'id-column';
           statusText = 'Optional ID';
@@ -477,7 +489,7 @@ if (!isset($_SESSION['staff_id'])) {
           statusClass = '';
           statusText = 'Extra';
         }
-        
+
         html += `
           <tr>
             <td>${i + 1}</td>
@@ -487,9 +499,9 @@ if (!isset($_SESSION['staff_id'])) {
           </tr>
         `;
       }
-      
+
       html += `</table>`;
-      
+
       details.innerHTML = html;
       modal.style.display = 'block';
     }

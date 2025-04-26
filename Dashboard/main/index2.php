@@ -55,6 +55,57 @@ function get_faculty_performance_data($conn, $faculty_id) {
     
     return $performance_data;
 }
+
+//Top teaching for insites on the downer cards
+// Faculty performance
+$facultyPerformance = [];
+$facultyResult = $conn->query("
+    SELECT 
+        f.faculty_name,
+        COUNT(DISTINCT p.publication_id) as publications,
+        COUNT(DISTINCT g.grant_id) as grants,
+        IFNULL(AVG(pm.metric_value), 0) as avg_performance,
+        COUNT(DISTINCT s.staff_id) as staff_count
+    FROM faculties f
+    LEFT JOIN departments d ON f.faculty_id = d.faculty_id
+    LEFT JOIN staff s ON d.department_id = s.department_id
+    LEFT JOIN publications p ON s.staff_id = p.staff_id
+    LEFT JOIN grants g ON s.staff_id = g.staff_id
+    LEFT JOIN performance_metrics pm ON s.staff_id = pm.staff_id
+    GROUP BY f.faculty_id
+    ORDER BY publications DESC, grants DESC
+");
+while ($row = $facultyResult->fetch_assoc()) {
+    $facultyPerformance[] = $row;
+}
+$topResearchFaculty = $facultyPerformance[0] ?? null;
+
+$teachingResult = $conn->query("
+    SELECT f.faculty_name
+    FROM faculties f
+    JOIN departments d ON f.faculty_id = d.faculty_id
+    JOIN staff s ON d.department_id = s.department_id
+    JOIN performance_metrics pm ON s.staff_id = pm.staff_id
+    WHERE pm.metric_name LIKE '%Student%Satisfaction%'
+    GROUP BY f.faculty_id
+    ORDER BY AVG(pm.metric_value) DESC
+    LIMIT 1
+");
+$topTeachingFaculty = $teachingResult->fetch_assoc()['faculty_name'] ?? null;
+
+$growthResult = $conn->query("
+    SELECT f.faculty_name
+    FROM faculties f
+    JOIN departments d ON f.faculty_id = d.faculty_id
+    JOIN staff s ON d.department_id = s.department_id
+    LEFT JOIN publications p ON s.staff_id = p.staff_id
+    LEFT JOIN grants g ON s.staff_id = g.staff_id
+    GROUP BY f.faculty_id
+    ORDER BY (COUNT(DISTINCT p.publication_id) + COUNT(DISTINCT g.grant_id)) / COUNT(DISTINCT s.staff_id) DESC
+    LIMIT 1
+");
+$growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
+
 ?>
 
 <!DOCTYPE html>
@@ -234,6 +285,84 @@ function get_faculty_performance_data($conn, $faculty_id) {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <!-- Key Insights and Action Items -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card highlight-yellow">
+                        <div class="card-header " style="font-weight: bold; font-size: 20px;">Key Performance Insights</div>
+                        <div class="card-body">
+                            <?php if ($topResearchFaculty): ?>
+                                <div class="alert alert-info">
+                                    <strong>Faculty of <?= htmlspecialchars($topResearchFaculty['faculty_name']) ?>:</strong>
+                                    Leads with <b><?= $topResearchFaculty['publications'] ?></b> publication(s) and <b><?= $topResearchFaculty['grants'] ?></b> grant(s).
+                                    Consider sharing best practices with other faculties.
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($topTeachingFaculty): ?>
+                                <div class="alert alert-warning">
+                                    <strong>Faculty of <?= htmlspecialchars($topTeachingFaculty) ?>:</strong>
+                                    Highest student satisfaction (<?= round($facultyPerformance[array_search($topTeachingFaculty, array_column($facultyPerformance, 'faculty_name'))]['avg_performance'] ?? 0) ?>/100)
+                                    but lower research output. Encourage research-teaching balance.
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($growthFaculty): ?>
+                                <div class="alert alert-success">
+                                    <strong>Faculty of <?= htmlspecialchars($growthFaculty) ?>:</strong>
+                                    Strong growth in both research and teaching. Model for interdisciplinary collaboration.
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card highlight-blue">
+                        <div class="card-header" style="font-weight: bold; font-size: 18px;">Strategic Action Items</div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <?php if ($topTeachingFaculty): ?>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Organize research methodology workshop for <?= htmlspecialchars($topTeachingFaculty) ?> faculty
+                                        <span class="badge bg-must-green rounded-pill">High Priority</span>
+                                    </li>
+                                <?php endif; ?>
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Develop interdisciplinary research grants program
+                                    <span class="badge bg-must-green rounded-pill">High Priority</span>
+                                </li>
+
+                                <?php
+                                // Find faculty with lowest performance (excluding those with 0 staff)
+                                $lowestPerforming = null;
+                                $minPerformance = PHP_FLOAT_MAX;
+
+                                foreach ($facultyPerformance as $faculty) {
+                                    if ($faculty['staff_count'] > 0 && $faculty['avg_performance'] < $minPerformance) {
+                                        $minPerformance = $faculty['avg_performance'];
+                                        $lowestPerforming = $faculty;
+                                    }
+                                }
+                                ?>
+
+                                <?php if ($lowestPerforming): ?>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Review teaching loads in <?= htmlspecialchars($lowestPerforming['faculty_name']) ?>
+                                        <span class="badge bg-warning rounded-pill">Medium Priority</span>
+                                    </li>
+                                <?php endif; ?>
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Plan community engagement fair for all faculties
+                                    <span class="badge bg-primary rounded-pill">Low Priority</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

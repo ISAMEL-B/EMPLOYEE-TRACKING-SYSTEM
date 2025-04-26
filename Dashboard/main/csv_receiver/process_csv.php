@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 fclose($handle);
-                header('Location: ../head/upload_csv.php');
+                header('Location: ../head/csv_receiver/upload_csv.php');
                 exit;
             }
 
@@ -372,4 +372,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-header('Location: ../head/upload_csv.php');
+header('Location: ../head/csv_receiver/upload_csv.php');
