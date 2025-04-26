@@ -330,6 +330,46 @@ try {
     error_log("Top performers query error: " . $e->getMessage());
 }
 
+//trends
+$deptTrends_years = ['2019', '2020', '2021', '2022', '2023'];
+$deptTrends_publications = [];
+$deptTrends_grants = [];
+$deptTrends_innovations = [];
+
+foreach ($deptTrends_years as $year) {
+    // Publications
+    $deptTrends_pub_sql = "
+        SELECT COUNT(*) as total FROM publications p
+        JOIN staff s ON p.staff_id = s.staff_id
+        WHERE s.department_id = $department_id AND YEAR(p.publication_date) = $year
+    ";
+    $deptTrends_pub_result = $conn->query($deptTrends_pub_sql);
+    $deptTrends_publications[] = (int) $deptTrends_pub_result->fetch_assoc()['total'];
+
+    // Grants
+    $deptTrends_grant_sql = "
+         SELECT IFNULL(COUNT(grant_amount), 0) as total FROM grants g
+    JOIN staff s ON g.staff_id = s.staff_id
+    WHERE s.department_id = $department_id AND YEAR(g.grant_year) = $year
+    ";
+    $deptTrends_grant_result = $conn->query($deptTrends_grant_sql);
+    $deptTrends_grants[] = (int) $deptTrends_grant_result->fetch_assoc()['total'];
+
+    // Innovations
+    $deptTrends_inv_sql = "
+        SELECT COUNT(*) as total FROM innovations i
+        JOIN staff s ON i.staff_id = s.staff_id
+        WHERE s.department_id = $department_id AND YEAR(i.innovation_date) = $year
+    ";
+    $deptTrends_inv_result = $conn->query($deptTrends_inv_sql);
+    $deptTrends_innovations[] = (int) $deptTrends_inv_result->fetch_assoc()['total'];
+}
+
+// Encode for JavaScript
+$deptTrends_labels_json = json_encode($deptTrends_years);
+$deptTrends_pubs_json = json_encode($deptTrends_publications);
+$deptTrends_grants_json = json_encode($deptTrends_grants);
+$deptTrends_innovs_json = json_encode($deptTrends_innovations);
 
 
 ?>
@@ -499,44 +539,42 @@ try {
 
                 <div class="tab-pane fade" id="publications" role="tabpanel" aria-labelledby="publications-tab">
                     <div class="row mb-4">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="stat-card">
                                 <div class="stat-value"><?= $dept_data['Journal Articles (First Author)']; ?></div>
                                 <div class="stat-label" style="font-size: 15px; font-weight: bold;">First Author Peer reviewed Publications</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="stat-card">
                                 <div class="stat-value"><?= $dept_data['Journal Articles (Co-author)'] ?></div>
                                 <div class="stat-label" style="font-size: 15px; font-weight: bold;">Co-Authored Publications in Peer reviewed Publications</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="stat-card">
                                 <div class="stat-value"><?= $total_peer_reviewed ?></div>
                                 <div class="stat-label" style="font-size: 15px; font-weight: bold;">Total Number of Peer-Reviewed Publications</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <!-- <div class="col-md-3">
                             <div class="stat-card">
                                 <div class="stat-value"><?= $totalCitations ?></div>
-                                <div class="stat-label" style="font-size: 15px; font-weight: bold;">
-                                    Total Citations (<?= $currentYear ?>)
-                                </div>
+                                
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-8">
+                        <!-- <div class="col-lg-8">
                             <div class="chart-container">
                                 <h3 class="chart-title">Citations vs Publications</h3>
                                 <div class="chart-wrapper">
                                     <canvas id="citationsChart"></canvas>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
+                        </div> -->
+                        <div class="col-lg-8">
                             <div class="chart-container">
                                 <h3 class="chart-title">Publication Types</h3>
                                 <div class="chart-wrapper">
@@ -843,30 +881,31 @@ try {
             }
         })
 
-        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
-        const trendsChart = new Chart(trendsCtx, {
+        const deptTrendsCtx = document.getElementById('trendsChart').getContext('2d');
+        const deptTrendsChart = new Chart(deptTrendsCtx, {
             type: 'line',
             data: {
-                labels: ['2019', '2020', '2021', '2022', '2023'],
-                datasets: [{
+                labels: <?php echo $deptTrends_labels_json; ?>,
+                datasets: [
+                    {
                         label: 'Publications',
-                        data: [25, 50, 70, 100, 200],
+                        data: <?php echo $deptTrends_pubs_json; ?>,
                         borderColor: '#3498db',
                         backgroundColor: 'rgba(52, 152, 219, 0.1)',
                         fill: true,
                         tension: 0.3
                     },
                     {
-                        label: 'Research Grants (M UGX)',
-                        data: [300, 350, 450, 600, 800],
+                        label: 'Research Grants (UGX)',
+                        data: <?php echo $deptTrends_grants_json; ?>,
                         borderColor: '#2ecc71',
                         backgroundColor: 'rgba(46, 204, 113, 0.1)',
                         fill: true,
                         tension: 0.3
                     },
                     {
-                        label: 'innovations',
-                        data: [62, 80, 100, 190, 250],
+                        label: 'Innovations',
+                        data: <?php echo $deptTrends_innovs_json; ?>,
                         borderColor: '#e74c3c',
                         backgroundColor: 'rgba(231, 76, 60, 0.1)',
                         fill: true,
@@ -879,7 +918,7 @@ try {
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        beginAtZero: false
+                        beginAtZero: true
                     }
                 }
             }

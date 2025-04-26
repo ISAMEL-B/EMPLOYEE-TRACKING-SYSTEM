@@ -38,7 +38,7 @@ function get_total_citations($conn, $staff_id) {
 }
 
 // Usage
-// $staff_id = 2;
-// $total_citations = get_total_citations($conn, $staff_id);
-// echo "Total Citations: " . $total_citations;
+$staff_id = 24;
+$total_citations = get_total_citations($conn, $staff_id);
+echo "Total Citations: " . $total_citations;
 ?>

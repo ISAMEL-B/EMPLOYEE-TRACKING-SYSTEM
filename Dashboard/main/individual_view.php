@@ -3,8 +3,14 @@
 
     //include the total score of the individual
     include '../../scoring_calculator/individual score/total_individual_score.php';
+    // include '../../scoring_calculator/total_score2.php';
     //include citations
-    include '../../scoring_calculator/individual score/total_citations.php'
+    include '../../scoring_calculator/individual score/total_citations.php';
+
+    $staff_id = isset($_POST['staff_id']) ? (int) $_POST['staff_id'] : null;    
+    
+    $individual_data = get_individual_performance_breakdown($conn, $staff_id);// get individual_data
+    echo $individual_data['total_score'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -242,7 +248,7 @@
                         <p>Years at current rank: <?= htmlspecialchars($staff_details['years_of_experience'] ?? '0') ?> • Years of service: <?= htmlspecialchars($staff_details['years_of_service'] ?? '0') ?></p>
                     </div>
                     <div class="score-card">
-                        <div class="score"><?= htmlspecialchars($staff_details['performance_score'] ?? '0') ?></div>
+                        <div class="score"><?= $individual_data['total_score']; ?></div>
                         <div class="label">Total Score</div>
                     </div>
                 </div>
@@ -272,7 +278,7 @@
                 </div>
 
                 <!-- Publications vs Citations Chart -->
-                <div class="publications-chart-container">
+                <!-- <div class="publications-chart-container">
                     <div class="card-header">
                         <h2>Publications vs Citations</h2>
                         <span class="badge badge-must"><?= count($achievements['publications']) ?> publications</span>
@@ -280,7 +286,7 @@
                     <div class="chart-container">
                         <canvas id="publicationsChart"></canvas>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Detailed Achievements -->
                 <div class="row">
@@ -572,7 +578,7 @@
         
 <?php
 // data to draw citations and publications chart
-$individual_data = get_individual_performance_breakdown($conn, $staff_id);
+
 $publication_count = $individual_data['total_publications'];
 
 // Get total citations
