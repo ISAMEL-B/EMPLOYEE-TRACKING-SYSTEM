@@ -146,7 +146,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$staff_id = 4;
+$staff_id = 1;
 $staff_name = get_staff_name($conn, $staff_id);
 
 $scholar = new Scholar($conn, $staff_id);

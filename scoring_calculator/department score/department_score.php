@@ -4,18 +4,20 @@ ini_set('display_errors', 1);
 
 ini_set('display_errors', 1);
 
+include __DIR__ .'/../individual score/total_individual_score.php';
+
 // Include database connection and required classes
-include __DIR__ .'/../config.php'; 
-include __DIR__ .'/../academic_score.php';
-include __DIR__ .'/../grants_score.php';
-include __DIR__ .'/../innovation_score.php';
-include __DIR__ .'/../publication_score.php';
-include __DIR__ .'/../post_graduate_supervision_score.php';
-include __DIR__ .'/../membership_to_professional_bodies_score.php';
-include __DIR__ .'/../community_service_score.php';
-include __DIR__ .'/../other_academic_activities_score.php';
-include __DIR__ .'/../teaching_experience_score.php';
-include __DIR__ .'/../service_to_university_score.php';
+// include __DIR__ .'/../config.php'; 
+// include __DIR__ .'/../academic_score.php';
+// include __DIR__ .'/../grants_score.php';
+// include __DIR__ .'/../innovation_score.php';
+// include __DIR__ .'/../publication_score.php';
+// include __DIR__ .'/../post_graduate_supervision_score.php';
+// include __DIR__ .'/../membership_to_professional_bodies_score.php';
+// include __DIR__ .'/../community_service_score.php';
+// include __DIR__ .'/../other_academic_activities_score.php';
+// include __DIR__ .'/../teaching_experience_score.php';
+// include __DIR__ .'/../service_to_university_score.php';
 
 function get_department_performance($conn, $department_id) {
     $department_data = [
