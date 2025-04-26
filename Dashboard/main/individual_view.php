@@ -243,6 +243,7 @@
                     <?php endif; ?>
                     <div class="profile-info">
                         <h1><?= htmlspecialchars($staff_details['first_name']) ?> <?= htmlspecialchars($staff_details['last_name']) ?></h1>
+                        <p><?= htmlspecialchars($staff_details['scholar_type']). ' scholar'?></p>
                         <p><?= htmlspecialchars($staff_details['role_name']) ?></p>
                         <p><?= htmlspecialchars($staff_details['department_name']) ?></p>
                         <p>Years at current rank: <?= htmlspecialchars($staff_details['years_of_experience'] ?? '0') ?> • Years of service: <?= htmlspecialchars($staff_details['years_of_service'] ?? '0') ?></p>
@@ -263,7 +264,7 @@
                     <div class="overview-card">
                         <i class="fas fa-graduation-cap"></i>
                         <h3><?= count($achievements['degrees']) ?></h3>
-                        <p>Qualifications</p>
+                        <p>Academic Qualifications</p>
                     </div>
                     <div class="overview-card">
                         <i class="fas fa-money-bill-wave"></i>
@@ -303,8 +304,9 @@
                                         <?php foreach ($achievements['publications'] as $pub): ?>
                                             <div class="timeline-item mb-3">
                                                 <h6 class="mb-1"><?= htmlspecialchars($pub['publication_type']) ?></h6>
-                                                <p class="text-muted small mb-1">Role: <?= htmlspecialchars($pub['role']) ?></p>
-                                            </div>
+                                                <?php if (isset($pub['role']) && $pub['role'] !== null && trim($pub['role']) !== ''): ?>
+                                                    <p class="text-muted small mb-1">Role: <?= htmlspecialchars($pub['role']) ?></p>
+                                                <?php endif; ?>                                            </div>
                                         <?php endforeach; ?>
                                     </div>
                                 <?php else: ?>
@@ -352,20 +354,12 @@
                                             <thead>
                                                 <tr>
                                                     <th>Amount</th>
-                                                    <th>Year Awarded</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php foreach ($achievements['grants'] as $grant): ?>
                                                     <tr>
                                                         <td>UGX <?= number_format($grant['grant_amount'], 2) ?></td>
-                                                        <td>
-                                                            <?php if (!empty($grant['year_awarded'])): ?>
-                                                                <?= htmlspecialchars($grant['year_awarded']) ?>
-                                                            <?php else: ?>
-                                                                <span class="text-muted">N/A</span>
-                                                            <?php endif; ?>
-                                                        </td>
                                                     </tr>
                                                 <?php endforeach; ?>
                                             </tbody>
