@@ -410,11 +410,11 @@ $deptTrends_innovs_json = json_encode($deptTrends_innovations);
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-md-8">
-                            <h1 class="display-5 fw-bold">Department of <?= htmlspecialchars($dept_name) ?></h1>
+                            <h1 class="display-5 fw-bold" style="font-size: 50px; "><?= htmlspecialchars($dept_name) ?></h1>
                         </div>
-                        <div class="col-md-4 text-md-end">
+                        <!-- <div class="col-md-4 text-md-end">
                             <i class="fas fa-trophy fa-4x opacity-75"></i>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -794,9 +794,7 @@ $deptTrends_innovs_json = json_encode($deptTrends_innovations);
                             <div class="no-performers">No performance data available</div>
                         <?php endif; ?>
 
-                        <div class="text-end mt-2">
-                            <a href="individual_view.php?staff_id=<?= $staff_id ?? 0 ?>" class="text-primary">View Full Ranking →</a>
-                        </div>
+                       
                     </div>
                 </div>
             </div>

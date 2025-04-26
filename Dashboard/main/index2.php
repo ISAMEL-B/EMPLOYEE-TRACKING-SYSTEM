@@ -295,7 +295,7 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                         <div class="card-body">
                             <?php if ($topResearchFaculty): ?>
                                 <div class="alert alert-info">
-                                    <strong>Faculty of <?= htmlspecialchars($topResearchFaculty['faculty_name']) ?>:</strong>
+                                    <strong> <?= htmlspecialchars($topResearchFaculty['faculty_name']) ?>:</strong>
                                     Leads with <b><?= $topResearchFaculty['publications'] ?></b> publication(s) and <b><?= $topResearchFaculty['grants'] ?></b> grant(s).
                                     Consider sharing best practices with other faculties.
                                 </div>
@@ -303,7 +303,7 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
 
                             <?php if ($topTeachingFaculty): ?>
                                 <div class="alert alert-warning">
-                                    <strong>Faculty of <?= htmlspecialchars($topTeachingFaculty) ?>:</strong>
+                                    <strong> <?= htmlspecialchars($topTeachingFaculty) ?>:</strong>
                                     Highest student satisfaction (<?= round($facultyPerformance[array_search($topTeachingFaculty, array_column($facultyPerformance, 'faculty_name'))]['avg_performance'] ?? 0) ?>/100)
                                     but lower research output. Encourage research-teaching balance.
                                 </div>
@@ -311,7 +311,7 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
 
                             <?php if ($growthFaculty): ?>
                                 <div class="alert alert-success">
-                                    <strong>Faculty of <?= htmlspecialchars($growthFaculty) ?>:</strong>
+                                    <strong> <?= htmlspecialchars($growthFaculty) ?>:</strong>
                                     Strong growth in both research and teaching. Model for interdisciplinary collaboration.
                                 </div>
                             <?php endif; ?>
