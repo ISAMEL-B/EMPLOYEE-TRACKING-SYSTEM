@@ -7,7 +7,7 @@
     //include citations
     include '../../scoring_calculator/individual score/total_citations.php';
 
-    $staff_id = isset($_POST['staff_id']) ? (int) $_POST['staff_id'] : null;    
+    $staff_id = isset($_POST['staff_id']) ? (int) $_POST['staff_id'] : (isset($_GET['staff_id']) ? (int) $_GET['staff_id'] : null);
     
     $individual_data = get_individual_performance_breakdown($conn, $staff_id);// get individual_data
     echo $individual_data['total_score'];
@@ -506,6 +506,14 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
+                            <!-- optimize the table to fetch efficiently -->
+                        <?php
+                            // Preload all performance data for staff
+                            $all_performance_data = [];
+                            foreach ($top_performing_staff as $staff) {
+                                $all_performance_data[$staff['staff_id']] = get_individual_performance_breakdown($conn, $staff['staff_id']);
+                            }
+                        ?>
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -527,16 +535,7 @@
                                             </td>
                                             <td><?= htmlspecialchars($staff['department_name']) ?></td>
                                             <td>
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-success"
-                                                        role="progressbar"
-                                                        style="width: <?= min(100, $staff['performance_score']) ?>%"
-                                                        aria-valuenow="<?= $staff['performance_score'] ?>"
-                                                        aria-valuemin="0"
-                                                        aria-valuemax="100">
-                                                        <?= round($staff['performance_score'], 1) ?>
-                                                    </div>
-                                                </div>
+                                                <?= isset($all_performance_data[$staff['staff_id']]['total_score']) ? round($all_performance_data[$staff['staff_id']]['total_score'], 1) : 0 ?>
                                             </td>
                                             <td><?= $staff['publication_count'] ?? 0 ?></td>
                                             <td><?= $staff['grant_count'] ?? 0 ?></td>
