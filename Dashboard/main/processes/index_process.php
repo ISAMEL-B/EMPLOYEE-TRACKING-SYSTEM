@@ -105,16 +105,61 @@ while ($row = $pubResult->fetch_assoc()) {
     $publicationTypes[] = $row;
 }
 
-$grantsByDept = [];
+// Query to get grants by faculty (through staff and department relationships)
+$grantsByFaculty = [];
 $grantResult = $conn->query("
-    SELECT d.department_name, COUNT(g.grant_id) as grant_count
+    SELECT 
+        f.faculty_name,
+        COUNT(g.grant_id) AS grant_count,
+        SUM(g.grant_amount) AS total_amount
     FROM grants g
     JOIN staff s ON g.staff_id = s.staff_id
     JOIN departments d ON s.department_id = d.department_id
+    JOIN faculties f ON d.faculty_id = f.faculty_id
+    GROUP BY f.faculty_name
+    ORDER BY total_amount DESC
+");
+
+while ($row = $grantResult->fetch_assoc()) {
+    $grantsByFaculty[] = $row;
+}
+
+$supervisionStats = [];
+$supervisionResult = $conn->query("
+    SELECT student_level, COUNT(*) AS count
+    FROM supervision
+    GROUP BY student_level
+");
+while ($row = $supervisionResult->fetch_assoc()) {
+    $supervisionStats[] = $row;
+}
+
+$innovationTypes = [];
+$innovationResult = $conn->query("
+    SELECT innovation_type, COUNT(*) AS count
+    FROM innovations
+    GROUP BY innovation_type
+");
+while ($row = $innovationResult->fetch_assoc()) {
+    $innovationTypes[] = $row;
+}
+
+$communityServiceByDept = [];
+$communityResult = $conn->query("
+    SELECT d.department_name, COUNT(cs.community_service_id) AS service_count
+    FROM communityservice cs
+    JOIN staff s ON cs.staff_id = s.staff_id
+    JOIN departments d ON s.department_id = d.department_id
     GROUP BY d.department_name
 ");
-while ($row = $grantResult->fetch_assoc()) {
-    $grantsByDept[] = $row;
+while ($row = $communityResult->fetch_assoc()) {
+    $communityServiceByDept[] = $row;
+}
+
+// Charts data preparation (assuming $publicationTypes and $grantsByDept are defined elsewhere)
+$publicationTypesData = [];
+foreach ($publicationTypes as $type) {
+    $publicationTypesData[$type['publication_type']] = $type['count'];
 }
 
 $supervisionStats = [];
@@ -156,8 +201,8 @@ foreach ($publicationTypes as $type) {
 }
 
 $grantsData = [];
-foreach ($grantsByDept as $grant) {
-    $grantsData[$grant['department_name']] = $grant['grant_count'];
+foreach ($grantsByFaculty as $grant) {
+    $grantsData[$grant['faculty_name']] = $grant['grant_count'];
 }
 
 $supervisionData = ['PhD' => 0, 'Masters' => 0, 'First Class' => 0];

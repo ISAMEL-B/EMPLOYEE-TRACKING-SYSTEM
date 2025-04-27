@@ -3,7 +3,7 @@
     $dbuser = "root";
     $dbpass = "";
     $host = "localhost";
-    $db = "hrm_db";
+    $db = "hrm_db1";
 
     // Data Source Name (DSN)
     $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";

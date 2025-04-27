@@ -1,8 +1,9 @@
 ﻿<?php
-    include 'processes/index_process.php';
+include 'processes/index_process.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,304 +15,8 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <style>
-        :root {
-            --must-blue: rgb(16, 19, 111);
-            --must-green: rgb(17, 123, 21);
-            --must-yellow: rgb(251, 250, 249);
-            --must-light: #f8f9fa;
-            --must-light-green: #E5F2E9;
-            --must-light-blue: #E6F0FA;
-            --sidebar-width: 280px;
-            --header-height: 80px;
-            --transition-speed: 0.3s;
-        }
+    <link rel="stylesheet" href="styles/my_index.css">
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            overflow-x: hidden;
-            padding-top: var(--header-height);
-        }
-
-        /* Sidebar and Main Content Layout */
-        .main-wrapper {
-            display: flex;
-            min-height: calc(100vh - var(--header-height));
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            transition: margin-left var(--transition-speed);
-            /* margin-top: 20%; */
-        }
-
-        /* Dashboard Header */
-        .dashboard-header {
-            /* margin-top: 20%; */
-            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
-            color: white;
-            padding: 15px 0;
-            position: fixed;
-            top: 0;
-            left: var(--sidebar-width);
-            right: 0;
-            z-index: 100;
-            height: var(--header-height);
-            border-bottom: 4px solid var(--must-yellow);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .header-title h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0;
-        }
-
-        .header-title p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 0;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* Cards and Sections */
-        .section-card {
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-            border-top: 4px solid var(--must-yellow);
-            background-color: white;
-            transition: transform 0.3s, box-shadow 0.3s;
-            overflow: hidden;
-        }
-
-        .section-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        }
-
-        .section-title {
-            color: var(--must-blue);
-            border-bottom: 2px solid rgba(16, 19, 111, 0.1);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 1.25rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-title i {
-            margin-right: 10px;
-            font-size: 1.1em;
-        }
-
-        .metric-card {
-            border-left: 4px solid var(--must-blue);
-            transition: all 0.3s ease;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            height: 100%;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--must-green);
-        }
-
-        .metric-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--must-blue);
-            line-height: 1;
-            margin-bottom: 5px;
-        }
-
-        .metric-label {
-            color: var(--must-green);
-            font-weight: 500;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Charts */
-        .chart-container {
-            position: relative;
-            margin-bottom: 20px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            height: 350px;
-            width: 100%;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .chart-title {
-            color: var(--must-green);
-            font-weight: 500;
-            font-size: 1rem;
-            margin-bottom: 0;
-        }
-
-        /* Navigation Tabs */
-        .nav-pills .nav-link.active {
-            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
-            color: white;
-            font-weight: 500;
-            border-radius: 6px;
-        }
-
-        .nav-pills .nav-link {
-            color: var(--must-blue);
-            font-weight: 500;
-            border: 1px solid #dee2e6;
-            margin-right: 5px;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-        }
-
-        .nav-pills .nav-link:hover {
-            background-color: var(--must-light-green);
-        }
-
-        /* Tables */
-        .table thead {
-            background-color: var(--must-green);
-            color: white;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: var(--must-light-green);
-        }
-
-        /* Footer */
-        footer {
-            background: linear-gradient(135deg, var(--must-green) 0%, var(--must-blue) 100%);
-            color: white;
-            border-top: 3px solid var(--must-yellow);
-            padding: 20px 0;
-            margin-left: var(--sidebar-width);
-        }
-
-        /* Impact Indicators */
-        .impact-high {
-            background-color: rgba(0, 104, 55, 0.1);
-            color: var(--must-green);
-            font-weight: 500;
-        }
-
-        .impact-medium {
-            background-color: rgba(255, 215, 0, 0.1);
-            color: #b38f00;
-            font-weight: 500;
-        }
-
-        .impact-low {
-            background-color: rgba(0, 91, 170, 0.1);
-            color: var(--must-blue);
-            font-weight: 500;
-        }
-
-        /* Buttons */
-        .btn-must-primary {
-            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);
-            color: white;
-            border: none;
-            font-weight: 500;
-            border-radius: 6px;
-            padding: 8px 20px;
-            font-size: 0.85rem;
-        }
-
-        .btn-must-primary:hover {
-            background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 80%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Insights Cards */
-        .highlight-yellow {
-            border-top: 4px solid var(--must-yellow);
-        }
-
-        .highlight-blue {
-            border-top: 4px solid var(--must-blue);
-        }
-
-        .alert {
-            border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 15px;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 992px) {
-            .main-content {
-                margin-left: 0;
-                padding: 15px;
-            }
-            
-            .dashboard-header, footer {
-                left: 0;
-            }
-            
-            .header-title h1 {
-                font-size: 1.3rem;
-            }
-            
-            .metric-value {
-                font-size: 1.8rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .header-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .section-title {
-                font-size: 1.1rem;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -320,13 +25,19 @@
 
     <!-- Sidebar -->
     <?php include 'bars/side_bar.php'; ?>
+<?php
+// echo '<pre>';
+// print_r($grantsByFaculty);
+// echo '</pre>';
+// echo 'Total Faculties with Grants: ' . count($grantsByFaculty);
 
+?>
     <!-- Dashboard Header -->
     <header class="dashboard-header">
         <div class="container">
             <div class="header-content">
                 <div class="header-title">
-                    <h1><i class="fas fa-university me-2"></i>MUST Performance Dashboard</h1>
+                    <h1><i class="fas fa-university me-2"></i>MBARAR UNIVERSITY OF SCIENCE AND TECHNOLOGY</h1>
                     <p>Employee Performance Tracking System</p>
                 </div>
                 <div class="header-actions">
@@ -384,7 +95,7 @@
                 <div class="card section-card">
                     <div class="card-body">
                         <h2 class="section-title"><i class="fas fa-graduation-cap"></i>Academic Performance</h2>
-                        
+
                         <div class="row">
                             <div class="col-lg-8">
                                 <div class="chart-container">
@@ -543,7 +254,7 @@
                                     <div class="col-md-12">
                                         <div class="chart-container">
                                             <div class="chart-header">
-                                                <h5 class="chart-title"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Department</h5>
+                                                <h5 class="chart-title"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Faculty</h5>
                                             </div>
                                             <canvas id="grantsChart"></canvas>
                                         </div>
@@ -808,7 +519,12 @@
     <script>
         // Display current date
         const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        };
         document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
     </script>
     <!-- Custom JS -->
@@ -1007,17 +723,23 @@
         const grantsChart = new Chart(grantsCtx, {
             type: 'polarArea',
             data: {
-                labels: <?= json_encode(array_keys($grantsData)) ?>,
+                labels: <?= json_encode(array_keys($grantsData)) ?>, // faculty names
                 datasets: [{
-                    data: <?= json_encode(array_values($grantsData)) ?>,
+                    label: 'Number of Grants',
+                    data: <?= json_encode(array_values($grantsData)) ?>, // grant counts
                     backgroundColor: [
                         '#003366',
                         '#6699CC',
                         '#FF9900',
                         '#CCCCCC',
                         '#999999',
-                        '#666666'
+                        '#666666',
+                        '#FF6666',
+                        '#66CC66',
+                        '#FFCC66'
                     ],
+                    borderColor: '#fff',
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -1025,10 +747,25 @@
                 plugins: {
                     legend: {
                         position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} grants`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        ticks: {
+                            backdropColor: 'transparent'
+                        }
                     }
                 }
             }
         });
+
 
         // Supervision Chart
         const supervisionCtx = document.getElementById('supervisionChart').getContext('2d');
