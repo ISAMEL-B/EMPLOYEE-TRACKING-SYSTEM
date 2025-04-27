@@ -1,0 +1,11 @@
+staff_id,first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
+1,Kahindo,Smith,clinical,Professor,Department of Software Engineering,16,150
+2,Nakato,Johnson,non-clinical,Professor,Department of Software Engineering,14,120
+3,Kato,Williams,clinical,Associate Professor,Department of Software Engineering,17,110
+4,Turyahikayo,Brown,non-clinical,Associate Professor,Department of Software Engineering,15,100
+5,Byarugaba,Davis,clinical,Senior Lecturer,Department of Software Engineering,13,95
+6,Okwera,Wilson,non-clinical,Senior Lecturer,Department of Software Engineering,16,90
+7,Ndiho,Miller,clinical,Lecturer,Department of Software Engineering,14,80
+8,Kirwa,Moore,non-clinical,Lecturer,Department of Software Engineering,12,80
+9,Musinguzi,Taylor,clinical,Assistant Lecturer,Department of Software Engineering,10,100
+10,Mukisa,Anderson,non-clinical,Assistant Lecturer,Department of Software Engineering,18,115

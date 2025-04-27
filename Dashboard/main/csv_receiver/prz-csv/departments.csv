@@ -1,0 +1,13 @@
+department_id,faculty_id,department_name
+1,Faculty of Computing and Informatics,Department of Software Engineering
+2,Faculty of Computing and Informatics,Department of Computer Science
+3,Faculty of Computing and Informatics,Department of Information Technology
+4,Faculty of Medicine,Department of Pharmacology
+5,Faculty of Medicine,Department of Pharmacy
+6,Faculty of Medicine,Department of Anatomy
+7,Faculty of Business,Department of Accounting and Finance
+8,Faculty of Business,Department of Economics and Entrepreneurship
+9,Faculty of Business,Department of Human Resource Management
+10,Faculty of Science,Department of Chemistry
+11,Faculty of Science,Department of Biology
+12,Faculty of Science,Department of Mathematics

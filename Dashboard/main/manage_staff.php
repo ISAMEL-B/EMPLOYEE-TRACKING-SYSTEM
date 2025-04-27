@@ -1,4 +1,11 @@
 <?php
+
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
+
 include 'processes/manage_staff_process.php';
 ?>
 
