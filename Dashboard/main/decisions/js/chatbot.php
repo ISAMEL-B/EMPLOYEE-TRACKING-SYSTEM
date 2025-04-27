@@ -341,12 +341,12 @@
 
             let response = `<strong>Performance Metrics Overview:</strong><br><br>`;
             response += `• University-wide average: <?php echo round($avg_performance, 1); ?>%<br>`;
-            response += `• Highest performing department: Academic (91%)<br>`;
-            response += `• Lowest performing department: Administrative (78%)<br><br>`;
+            response += `• Highest performing department: Academic (81%)<br>`;
+            response += `• Lowest performing department: Community Service (68%)<br><br>`;
 
             if (input.includes('trend')) {
                 response += `Performance trends show a 3% improvement overall compared to last quarter.<br>`;
-                response += `The most improved department is Research (+5% from last quarter).`;
+                response += `The most improved department is Research.`;
             } else {
                 response += `Would you like me to analyze specific performance trends or comparisons?`;
             }

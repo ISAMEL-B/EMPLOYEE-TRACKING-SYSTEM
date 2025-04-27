@@ -1,0 +1,21 @@
+id,table_name,file_path,submitted_by_name,submitted_at,record_count,status,reviewed_by_name,reviewed_at
+33,staff,/uploads/staff_20230501.csv,Byaruhanga Isamel,2023-05-01 09:15:22,12,pending,Akanyoreka Smith,2025-04-10 04:07:31
+34,publications,/uploads/publications_20230502.csv,Akanyoreka Smith,2023-05-02 14:30:45,8,pending,Akanyoreka Smith,2025-04-09 23:00:02
+35,grants,/uploads/grants_20230503.csv,Michael Johnson,2023-05-03 11:20:33,5,pending,,,
+36,departments,/uploads/departments_20230504.csv,Byaruhanga Isamel,2023-05-04 16:45:12,3,approved,Akanyoreka Smith,2025-04-19 18:34:54
+37,staff,/uploads/staff_20230505.csv,Akanyoreka Smith,2023-05-05 10:05:18,7,rejected,Akanyoreka Smith,2025-04-10 04:48:06
+38,publications,/uploads/publications_20230506.csv,Michael Johnson,2023-05-06 13:25:09,6,approved,Akanyoreka Smith,2025-04-10 04:10:41,
+39,grants,/uploads/grants_20230507.csv,Byaruhanga Isamel,2023-05-07 15:40:27,4,approved,Akanyoreka Smith,2025-04-10 04:09:12
+40,degrees,/uploads/degrees_20230508.csv,Akanyoreka Smith,2023-05-08 08:50:14,9,approved,Akanyoreka Smith,2025-04-10 04:07:17
+41,staff,/uploads/staff_20230509.csv,Michael Johnson,2023-05-09 12:35:41,11,approved,Akanyoreka Smith,2025-04-10 04:07:01
+42,innovations,/uploads/innovations_20230510.csv,Byaruhanga Isamel,2023-05-10 17:10:53,5,approved,Akanyoreka Smith,2025-04-10 04:06:06
+43,communityservice,/uploads/community_20230511.csv,Akanyoreka Smith,2023-05-11 09:22:34,8,approved,Akanyoreka Smith,2025-04-11 10:15:22
+44,supervision,/uploads/supervision_20230512.csv,Michael Johnson,2023-05-12 14:33:45,6,approved,Akanyoreka Smith,2025-04-12 11:20:33
+45,academicactivities,/uploads/academic_20230513.csv,Byaruhanga Isamel,2023-05-13 16:44:56,7,approved,Akanyoreka Smith,2025-04-13 09:25:44
+46,performance,/uploads/performance_20230514.csv,Akanyoreka Smith,2023-05-14 10:55:17,5,approved,Akanyoreka Smith,2025-04-14 14:30:55
+47,professionalbodies,/uploads/professional_20230515.csv,Michael Johnson,2023-05-15 13:26:28,4,approved,Akanyoreka Smith,2025-04-15 16:35:06,
+48,service,/uploads/service_20230516.csv,Byaruhanga Isamel,2023-05-16 17:37:39,9,approved,Akanyoreka Smith,2025-04-16 18:40:17,
+49,staff,/uploads/staff_20230517.csv,Akanyoreka Smith,2023-05-17 08:48:50,12,rejected,Akanyoreka Smith,2025-04-17 19:45:28,
+50,publications,/uploads/publications_20230518.csv,Michael Johnson,2023-05-18 11:59:01,10,pending,,,
+51,grants,/uploads/grants_20230519.csv,Byaruhanga Isamel,2023-05-19 15:10:12,6,pending,,,
+52,departments,/uploads/departments_20230520.csv,Akanyoreka Smith,2023-05-20 18:21:23,4,approved,Akanyoreka Smith,2025-04-20 20:50:41,

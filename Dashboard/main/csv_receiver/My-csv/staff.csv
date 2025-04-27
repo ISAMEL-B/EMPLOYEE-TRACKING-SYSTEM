@@ -1,9 +1,3 @@
-staff_id,first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
-1,John,Doe,Full_Time,Professor,Computer Science,10,85
-2,Jane,Smith,Part_Time,Assistant Professor,Mathematics,5,90
-3,Michael,Johnson,Full_Time,Lecturer,Physics,3,80
-4,Emily,Davidson,Part_Time,Professor,Biology,15,88
-5,David,Wilson,Full_Time,Lecturer,Engineering,8,75
 first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
 Byaruhanga,Isamel,Non Clinical,Professor,Development Studies,5,85
 Akanyoreka,Smith,Non Clinical,Professor,Gender and Women Studies,19,150
@@ -20,3 +14,11 @@ David,Tumusiime,Lecturer,Associate Professor,Civil Engineering,6,88
 Grace,Achan,Research Fellow,Senior Lecturer,Electrical Engineering,4,73
 Michael,Mwangi,Senior Researcher,Assistant Lecturer,Mechanical Engineerings,9,90
 Linda,Namatovu,Lecturer,Associate Professor,Human Resource Management,5,82
+Peter,Otim,Lecturer,Professor,Civil Engineering,12,94
+Sarah,Kabuye,Lecturer,Associate Professor,Mathematics,7,68
+David,Mugisha,Lecturer,Professor,Mechanical Engineerings,15,85
+Alice,Nakimuli,Lecturer,Associate Professor,Mathematics,10,80
+Linda,Nakato,Lecturer,Professor,Mechanical Engineerings,12,75
+David,Nakato,Lecturer,Professor,Mathematics,12,70
+Alice,Nakato,Lecturer,Professor,Mechanical Engineerings,15,82
+Linda,Nakato,Lecturer,Professor,Mathematics,10,94

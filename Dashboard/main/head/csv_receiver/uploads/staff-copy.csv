@@ -1,0 +1,10 @@
+staff_id,first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
+,John,Doe,Non Clinical,1,1,5,85
+,Jane,Smith,Clinical,2,2,8,92
+,Robert,Johnson,Non Clinical,3,3,3,78
+,Sarah,Williams,Clinical,1,4,10,95
+,Michael,Brown,Non Clinical,2,5,2,70
+,Emily,Davis,Clinical,3,1,7,88
+,David,Wilson,Non Clinical,1,2,4,82
+,william,Taylor,Non Clinical,3,4,9,94
+,Elizabeth,Anderson,Clinical,1,5,1,68

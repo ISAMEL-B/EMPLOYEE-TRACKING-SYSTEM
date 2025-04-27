@@ -1,0 +1,11 @@
+first_name,last_name,scholar_type,role_id,department_id,years_of_experience,performance_score
+John,Doe,Non Clinical,Senior Lecturer,Computer Science,5,85
+Jane,Smith,Clinical,Professor,Medicine,8,92
+Robert,Johnson,Non Clinical,Associate Professor,Engineering,3,78
+Sarah,Williams,Clinical,Lecturer,Public Health,10,95
+Michael,Brown,Non Clinical,Assistant Lecturer,Business Administration,2,70
+Emily,Davis,Clinical,Professor,Nursing,7,88
+David,Wilson,Non Clinical,Senior Lecturer,Education,4,82
+Jennifer,Moore,Clinical,Associate Professor,Pharmacy,6,90
+William,Taylor,Non Clinical,Lecturer,Agriculture,9,94
+    Elizabeth,Anderson,Clinical,Assistant Lecturer,Law,1,68
