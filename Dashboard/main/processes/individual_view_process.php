@@ -144,3 +144,4 @@ if ($staff_id) {
 
 // Get current page for active menu highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
+?>

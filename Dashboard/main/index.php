@@ -25,13 +25,13 @@ include 'processes/index_process.php';
 
     <!-- Sidebar -->
     <?php include 'bars/side_bar.php'; ?>
-<?php
-// echo '<pre>';
-// print_r($grantsByFaculty);
-// echo '</pre>';
-// echo 'Total Faculties with Grants: ' . count($grantsByFaculty);
+    <?php
+    // echo '<pre>';
+    // print_r($grantsByFaculty);
+    // echo '</pre>';
+    // echo 'Total Faculties with Grants: ' . count($grantsByFaculty);
 
-?>
+    ?>
     <!-- Dashboard Header -->
     <header class="dashboard-header">
         <div class="container">
@@ -42,7 +42,7 @@ include 'processes/index_process.php';
                 </div>
                 <div class="header-actions">
                     <p class="mb-0"><i class="fas fa-calendar-alt me-1"></i><span id="current-date"></span></p>
-                    <button class="btn btn-must-primary"><i class="fas fa-download me-1"></i>Export Report</button>
+                    <button class="btn btn-must-primary">MAIN DASHBOARD</button>
                 </div>
             </div>
         </div>
@@ -214,35 +214,27 @@ include 'processes/index_process.php';
                                     </div>
                                 </div>
                                 <div class="row mt-3 g-3">
-                                    <div class="col-md-3 col-sm-6">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="card metric-card h-100">
+                                            <div class="card-body text-center">
+                                                <div class="metric-value"><?= isset($publicationTypesData['Book with ISBN']) ? $publicationTypesData['Book with ISBN'] : 0 ?></div>
+                                                <div class="metric-label">Book with ISBN</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-6">
                                         <div class="card metric-card h-100">
                                             <div class="card-body text-center">
                                                 <div class="metric-value"><?= isset($publicationTypesData['Journal Article']) ? $publicationTypesData['Journal Article'] : 0 ?></div>
-                                                <div class="metric-label">Journal Articles</div>
+                                                <div class="metric-label">Journal Article</div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-6">
+                                    <div class="col-md-4 col-sm-6">
                                         <div class="card metric-card h-100">
                                             <div class="card-body text-center">
-                                                <div class="metric-value"><?= isset($publicationTypesData['Conference Paper']) ? $publicationTypesData['Conference Paper'] : 0 ?></div>
-                                                <div class="metric-label">Conference Papers</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-sm-6">
-                                        <div class="card metric-card h-100">
-                                            <div class="card-body text-center">
-                                                <div class="metric-value">0</div>
+                                                <div class="metric-value"><?= isset($publicationTypesData['Book Chapter']) ? $publicationTypesData['Book Chapter'] : 0 ?></div>
                                                 <div class="metric-label">Book Chapters</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-sm-6">
-                                        <div class="card metric-card h-100">
-                                            <div class="card-body text-center">
-                                                <div class="metric-value">0</div>
-                                                <div class="metric-label">Books with ISBN</div>
                                             </div>
                                         </div>
                                     </div>
@@ -328,16 +320,16 @@ include 'processes/index_process.php';
                                     <div class="col-md-3 col-sm-6">
                                         <div class="card metric-card h-100">
                                             <div class="card-body text-center">
-                                                <div class="metric-value">0</div>
-                                                <div class="metric-label">Trademarks</div>
+                                                <div class="metric-value"><?= isset($innovationData['Utility Model']) ? $innovationData['Utility Model'] : 0 ?></div>
+                                                <div class="metric-label">Utility Models</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-6">
                                         <div class="card metric-card h-100">
                                             <div class="card-body text-center">
-                                                <div class="metric-value">0</div>
-                                                <div class="metric-label">Products</div>
+                                                <div class="metric-value"><?= isset($innovationData['Trademark']) ? $innovationData['Trademark'] : 0 ?></div>
+                                                <div class="metric-label">Trademarks</div>
                                             </div>
                                         </div>
                                     </div>
@@ -420,7 +412,7 @@ include 'processes/index_process.php';
                                         <div class="alert alert-info">
                                             <strong>Faculty of <?= htmlspecialchars($topResearchFaculty['faculty_name']) ?>:</strong>
                                             Leads with <b><?= $topResearchFaculty['publications'] ?></b> publication(s) and <b><?= $topResearchFaculty['grants'] ?></b> grant(s).
-                                            Consider sharing best practices with other faculties.
+
                                         </div>
                                     <?php endif; ?>
 
@@ -554,7 +546,7 @@ include 'processes/index_process.php';
                         <?= $degreeStats['phd'] ?>,
                         <?= $degreeStats['masters'] ?>,
                         <?= $degreeStats['first_class'] ?>,
-                        <?= $degreeStats['second_upper'] + $degreeStats['second_lower'] ?>
+                        <?= $degreeStats['second_upper'] ?>
                     ],
                     backgroundColor: [
                         '#006837', // MUST Green
@@ -568,79 +560,54 @@ include 'processes/index_process.php';
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            boxWidth: 20, // Adjust the size of the key box
-                            padding: 15, // Adjust the padding between key and label
-                            font: {
-                                weight: 'bold'
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.raw || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        min: 0,
-                        max: 20,
-                        ticks: {
-                            stepSize: 2, // Shows ticks at 0, 2, 4, ..., 20
-                            precision: 0
-                        },
                         title: {
                             display: true,
-                            text: 'Academic Performance',
+                            text: 'Number of Staff', // <<< Vertical caption
                             font: {
                                 weight: 'bold'
                             }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Student Level',
+                            text: 'Qualification Level',
                             font: {
                                 weight: 'bold'
                             }
-                        },
-                        grid: {
-                            display: false
                         }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
                     }
                 }
             }
         });
-
 
         // Publications Chart
         const publicationsCtx = document.getElementById('publicationsChart').getContext('2d');
         const publicationsChart = new Chart(publicationsCtx, {
             type: 'bar',
             data: {
-                labels: ['Journal Articles', 'Conference Papers'],
+                labels: ['Book with ISBN', 'Journal Articles', 'Book Chapter'],
                 datasets: [{
                     label: 'Publications',
                     data: [
-                        <?= isset($publicationTypesData['Journal Article']) ? $publicationTypesData['Journal Article'] : 0 ?>,
-                        <?= isset($publicationTypesData['Conference Paper']) ? $publicationTypesData['Conference Paper'] : 0 ?>
+                        <?= isset($publicationTypesData['Book with ISBN']) ? $publicationTypesData['Book with ISBN'] : 0 ?>,
+                        <?= isset($publicationTypesData['Book Chapter']) ? $publicationTypesData['Book Chapter'] : 0 ?>,
+                        <?= isset($publicationTypesData['Journal Article']) ? $publicationTypesData['Journal Article'] : 0 ?>
                     ],
-                    backgroundColor: '#003366',
+                    backgroundColor: [
+                        '#006837', // MUST Green
+                        '#005BAA', // MUST Blue
+                        '#6dbfb8', // MUST
+                    ]
                 }]
             },
             options: {
@@ -712,16 +679,20 @@ include 'processes/index_process.php';
                                 weight: 'bold',
                                 size: 16
                             }
+                        },
+                        ticks: {
+                            precision: 0
                         }
                     }
                 }
             }
         });
 
+
         // Grants Chart
         const grantsCtx = document.getElementById('grantsChart').getContext('2d');
         const grantsChart = new Chart(grantsCtx, {
-            type: 'polarArea',
+            type: 'bar',
             data: {
                 labels: <?= json_encode(array_keys($grantsData)) ?>, // faculty names
                 datasets: [{
@@ -757,14 +728,29 @@ include 'processes/index_process.php';
                     }
                 },
                 scales: {
-                    r: {
-                        ticks: {
-                            backdropColor: 'transparent'
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Grants', // <<< Vertical caption
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Faculty', // <<< Horizontal caption
+                            font: {
+                                weight: 'bold'
+                            }
                         }
                     }
                 }
             }
         });
+
 
 
         // Supervision Chart
@@ -779,7 +765,10 @@ include 'processes/index_process.php';
                         <?= $supervisionData['PhD'] ?>,
                         <?= $supervisionData['Masters'] ?>
                     ],
-                    backgroundColor: '#003366',
+                    backgroundColor: [
+                        '#005BAA', // MUST Blue
+                        '#006837', // MUST Green
+                    ],
                     borderRadius: {
                         topLeft: 5,
                         topRight: 5,
@@ -790,61 +779,36 @@ include 'processes/index_process.php';
             },
             options: {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            boxWidth: 12,
-                            padding: 20,
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw}`;
-                            }
-                        }
-                    }
-                },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        min: 0,
-                        max: 20,
-                        ticks: {
-                            stepSize: 2, // Shows ticks at 0, 2, 4, ..., 20
-                            precision: 0
-                        },
                         title: {
                             display: true,
-                            text: 'Number of Supervisions',
+                            text: 'Number of Supervisions', // <<< Vertical caption
                             font: {
                                 weight: 'bold'
                             }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Student Level',
+                            text: 'Degree Level', // <<< Horizontal caption
                             font: {
                                 weight: 'bold'
                             }
-                        },
-                        grid: {
-                            display: false
                         }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
                     }
                 }
             }
         });
+
 
         // Innovations Chart
         const innovationsCtx = document.getElementById('innovationsChart').getContext('2d');
@@ -860,7 +824,7 @@ include 'processes/index_process.php';
                         '#6699CC', // Medium blue
                         '#FF9900', // Orange
                         '#CCCCCC', // Light gray
-                        '#999999', // Medium gray
+                        '#8dc73f', // Medium gray
                         '#666666' // Dark gray
                     ],
                     borderColor: [
@@ -915,45 +879,27 @@ include 'processes/index_process.php';
                 scales: {
                     y: {
                         beginAtZero: true,
-                        min: 0,
-                        max: 5,
-                        ticks: {
-                            stepSize: 0.5,
-                            precision: 1, // Shows one decimal place
-                            callback: function(value) {
-                                // Show all ticks (0, 0.5, 1, 1.5, etc.)
-                                return value % 1 === 0 ? value : value.toFixed(1);
-                            }
-                        },
                         title: {
                             display: true,
-                            text: 'Number of Innovations',
+                            text: 'Number of Innovations', // <<< Vertical caption
                             font: {
-                                weight: 'bold',
-                                size: 14
+                                weight: 'bold'
                             }
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)',
-                            lineWidth: 1
                         }
                     },
                     x: {
                         title: {
                             display: true,
-                            text: 'Innovation Types',
+                            text: 'Innovation Type', // <<< Horizontal caption
                             font: {
-                                weight: 'bold',
-                                size: 14
+                                weight: 'bold'
                             }
-                        },
-                        grid: {
-                            display: false
                         }
                     }
                 }
             }
         });
+
 
         // Community Service Chart with mixed colors
         const communityCtx = document.getElementById('communityServiceChart').getContext('2d');
@@ -1011,10 +957,7 @@ include 'processes/index_process.php';
                 scales: {
                     y: {
                         beginAtZero: true,
-                        min: 0,
-                        max: 20,
                         ticks: {
-                            stepSize: 2,
                             precision: 0
                         },
                         title: {
@@ -1031,7 +974,7 @@ include 'processes/index_process.php';
                     x: {
                         title: {
                             display: true,
-                            text: 'Department',
+                            text: 'Faculty',
                             font: {
                                 weight: 'bold'
                             }

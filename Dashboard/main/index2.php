@@ -297,7 +297,6 @@ $growthFaculty = $growthResult->fetch_assoc()['faculty_name'] ?? null;
                                 <div class="alert alert-info">
                                     <strong> <?= htmlspecialchars($topResearchFaculty['faculty_name']) ?>:</strong>
                                     Leads with <b><?= $topResearchFaculty['publications'] ?></b> publication(s) and <b><?= $topResearchFaculty['grants'] ?></b> grant(s).
-                                    Consider sharing best practices with other faculties.
                                 </div>
                             <?php endif; ?>
 

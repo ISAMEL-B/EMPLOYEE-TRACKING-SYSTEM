@@ -77,9 +77,9 @@ if ($staffCountResult = $staffCountQuery->fetch_assoc()) {
     $distinctStaffCount = (int)$staffCountResult['count'] ?? 0;
 }
 
-// Count of DISTINCT staff members involved in community service
+// Count of ALL publications
 $publicationsCount = 0;
-$publicationsCountQuery = $conn->query("SELECT COUNT(DISTINCT publication_type) as count FROM publications WHERE staff_id IS NOT NULL");
+$publicationsCountQuery = $conn->query("SELECT COUNT(*) as count FROM publications WHERE staff_id IS NOT NULL");
 if ($publicationsCountResult = $publicationsCountQuery->fetch_assoc()) {
     $publicationsCount = (int)$publicationsCountResult['count'] ?? 0;
 }
@@ -87,8 +87,7 @@ if ($publicationsCountResult = $publicationsCountQuery->fetch_assoc()) {
 $degreeStatsResult = $conn->query("
     SELECT 
         SUM(CASE WHEN degree_classification = 'First Class' THEN 1 ELSE 0 END) as first_class,
-        SUM(CASE WHEN degree_classification = 'Second Class Upper' THEN 1 ELSE 0 END) as second_upper,
-        SUM(CASE WHEN degree_classification = 'Second Class Lower' THEN 1 ELSE 0 END) as second_lower,
+        SUM(CASE WHEN degree_classification = 'Second Upper' THEN 1 ELSE 0 END) as second_upper,
         SUM(CASE WHEN degree_classification LIKE '%PhD%' THEN 1 ELSE 0 END) as phd,
         SUM(CASE WHEN degree_classification LIKE '%Master%' THEN 1 ELSE 0 END) as masters
     FROM degrees
@@ -144,16 +143,18 @@ while ($row = $innovationResult->fetch_assoc()) {
     $innovationTypes[] = $row;
 }
 
-$communityServiceByDept = [];
+$communityServiceByFac = [];
 $communityResult = $conn->query("
-    SELECT d.department_name, COUNT(cs.community_service_id) AS service_count
+    SELECT f.faculty_name, COUNT(cs.community_service_id) AS service_count
     FROM communityservice cs
     JOIN staff s ON cs.staff_id = s.staff_id
     JOIN departments d ON s.department_id = d.department_id
-    GROUP BY d.department_name
+    JOIN faculties f ON d.faculty_id = f.faculty_id
+    GROUP BY f.faculty_name
 ");
+
 while ($row = $communityResult->fetch_assoc()) {
-    $communityServiceByDept[] = $row;
+    $communityServiceByFac[] = $row;
 }
 
 // Charts data preparation (assuming $publicationTypes and $grantsByDept are defined elsewhere)
@@ -182,16 +183,18 @@ while ($row = $innovationResult->fetch_assoc()) {
     $innovationTypes[] = $row;
 }
 
-$communityServiceByDept = [];
+$communityServiceByFac = [];
 $communityResult = $conn->query("
-    SELECT d.department_name, COUNT(cs.community_service_id) as service_count
+    SELECT f.faculty_name, COUNT(cs.community_service_id) AS service_count
     FROM communityservice cs
     JOIN staff s ON cs.staff_id = s.staff_id
     JOIN departments d ON s.department_id = d.department_id
-    GROUP BY d.department_name
+    JOIN faculties f ON d.faculty_id = f.faculty_id
+    GROUP BY f.faculty_name
 ");
+
 while ($row = $communityResult->fetch_assoc()) {
-    $communityServiceByDept[] = $row;
+    $communityServiceByFac[] = $row;
 }
 
 // Charts
@@ -202,7 +205,7 @@ foreach ($publicationTypes as $type) {
 
 $grantsData = [];
 foreach ($grantsByFaculty as $grant) {
-    $grantsData[$grant['faculty_name']] = $grant['grant_count'];
+    $grantsData[$grant['faculty_name']] = $grant['total_amount'];
 }
 
 $supervisionData = ['PhD' => 0, 'Masters' => 0, 'First Class' => 0];
@@ -224,8 +227,8 @@ foreach ($innovationTypes as $innovation) {
 }
 
 $communityServiceData = [];
-foreach ($communityServiceByDept as $service) {
-    $communityServiceData[$service['department_name']] = $service['service_count'];
+foreach ($communityServiceByFac as $service) {
+    $communityServiceData[$service['faculty_name']] = $service['service_count'];
 }
 
 // Faculty performance
