@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Signup</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link rel="stylesheet" href="src/fontawesome-5.15.4/css/all.min.css">
     <link rel="stylesheet" href="src/css/style.css">
     <style>

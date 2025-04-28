@@ -166,7 +166,10 @@ body {
     font-size: 1rem;
     margin-bottom: 0;
 }
-
+#publicationsChart, #publicationsTrendChart {
+    width: 90% !important;   /* Ensure it's 100% of its container's width */
+    height: 300px !important; /* Set a specific height, or let it adapt */
+}
 /* Navigation Tabs */
 .nav-pills .nav-link.active {
     background: linear-gradient(90deg, var(--must-green) 0%, var(--must-blue) 100%);

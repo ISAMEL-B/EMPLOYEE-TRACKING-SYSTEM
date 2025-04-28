@@ -9,7 +9,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>HRM ScoreCard</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <style>
         /* Navigation Bar Styles */
         .ets-nav-container {
@@ -241,11 +242,11 @@
 
         <div class="ets-nav-tabs" id="ets-nav-tab" role="tablist">
             <div class="role-indicator">
-                Welcome our <?php echo strtoupper(htmlspecialchars($_SESSION['user_role'] ?? 'guest'));  ?>
+                Logged In As <?php echo strtoupper(htmlspecialchars($_SESSION['user_role'] ?? 'guest'));  ?>
             </div>
             <?php if ($_SESSION['user_role'] !== 'hrm' && $_SESSION['user_role'] !== 'staff'): ?>
                 <a class="ets-nav-link <?= ($current_pag === 'upload_csv.php') ? 'active' : '' ?>"
-                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/upload_csv.php">
+                    href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/csv_receiver/upload_csv.php">
                     <i class="fas fa-home"></i> <span>Home</span>
                 </a>
                 <a class="ets-nav-link <?= ($current_pag === 'approve.php') ? 'active' : '' ?>"

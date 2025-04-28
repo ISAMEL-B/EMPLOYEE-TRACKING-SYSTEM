@@ -87,7 +87,7 @@ if (isset($_POST['login'])) {
                 header("Location: ../Dashboard/main/staff/for_staff_profile.php");
             } else {
                 // Redirect based on role to upload.php with role as a query parameter
-                header("Location: ../Dashboard/main/head/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
+                header("Location: ../Dashboard/main/head/csv_receiver/upload_csv.php?role=" . urlencode($_SESSION['user_role']));
             }
             exit();
         } else {

@@ -254,16 +254,13 @@
 
     ?>
 
-    
-            
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University - Faculty Performance Dashboard</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
@@ -287,7 +284,6 @@
         body {
             background-color: #f5f7fa;
             color: #333;
-            padding: 20px;
         }
 
         .dashboard {
@@ -352,7 +348,7 @@
         }
 
         .card.trend-down .value {
-            color: var(--accent-color);
+            color: blue;
         }
 
         .main-content {
@@ -539,7 +535,7 @@
             border-top-color: #2ecc71;
         }
         .summary-cards .stat-card:nth-child(3) {
-            border-top-color: #e74c3c;
+            border-top-color:rgb(123, 60, 231);
         }
         .summary-cards .stat-card:nth-child(4) {
             border-top-color: #f39c12;

@@ -94,6 +94,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - MUST HRM</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/components/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -245,10 +246,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="department-title">My Profile</h2>
                 <div>
-                    <a href="#" class="btn btn-must me-2">
+                    <!-- <a href="#" class="btn btn-must me-2">
                         <i class="fas fa-edit me-1"></i> Edit Profile
-                    </a>
-                    <a href="#" class="btn btn-outline-secondary">
+                    </a> -->
+                    <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/mailing/password_recovery.php" class="btn btn-outline-secondary">
                         <i class="fas fa-lock me-1"></i> Change Password
                     </a>
                 </div>

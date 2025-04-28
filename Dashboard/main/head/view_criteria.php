@@ -2,11 +2,11 @@
 session_start();
 require_once 'approve/config.php';
 
-// Check authentication
-// if (!isset($_SESSION['staff_id']) || $_SESSION['user_role'] !== 'hrm') {
-//     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-//     exit();
-// }
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role'])) {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
 
 // Handle form submissions
 $message = '';
@@ -70,6 +70,7 @@ $categories = array_keys($criteria);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Criteria Management - MUST HRM</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../../components/bootstrap/css/bootstrap.min.css">
     <style>

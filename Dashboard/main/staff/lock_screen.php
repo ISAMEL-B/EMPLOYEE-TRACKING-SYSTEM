@@ -69,6 +69,7 @@ if (empty($profile_picture)) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST ETS - Screen Locked</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../../components/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="lock_style.css">

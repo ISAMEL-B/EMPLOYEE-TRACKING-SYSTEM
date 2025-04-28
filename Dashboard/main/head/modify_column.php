@@ -1,5 +1,10 @@
 <?php session_start(); 
 $current_pag = basename($_SERVER['PHP_SELF']);
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role'])) {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +13,7 @@ $current_pag = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modify Columns</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../modify/style_modify_columns.css">
@@ -27,19 +33,7 @@ $current_pag = basename($_SERVER['PHP_SELF']);
 
             <?php
             // Database connection details
-            $servername = "localhost";
-            $username = "root";
-            $password = "";
-            $dbname = "hrm_db";
-
-            // Create connection
-            $conn = new mysqli($servername, $username, $password, $dbname);
-
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
+            include 'approve/config.php';
             // Determine user role
             $userRole = isset($_SESSION['user_role']) ? $_SESSION['user_role'] : '';
 

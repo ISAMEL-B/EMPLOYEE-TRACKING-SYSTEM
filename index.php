@@ -12,6 +12,7 @@ include 'Dashboard/main/head/approve/config.php'; // Your database connection fi
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST HRM Scorecard System</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link rel="stylesheet" href="Dashboard/components/src/fontawesome/css/all.min.css">
@@ -202,10 +203,10 @@ include 'Dashboard/main/head/approve/config.php'; // Your database connection fi
                 <div class="login-panel sticky-top" style="top: 20px;">
                     <h3 class="fw-bold mb-4 text-center">Access Your home Page</h3>
 
-                    <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php if (isset($_SESSION['staff_id'])): ?>
                         <div class="alert alert-success">
                             <?php if ($_SESSION['user_role'] === 'hrm'): ?>
-                                You are already logged in.<a href="Dashboard/main/index.php" class="alert-link">Click here to Continue<i class="fas fa-hand-point-left"></i>
+                                You are already logged in.<a href="Dashboard/main/index.php" class="alert-link">Click here to Continue <i class="fas fa-hand-point-left"></i>
                                 </a>
                             <?php else: ?>
                                 <a href="Dashboard/main/upload_csv.php" class="alert-link">Click here to Continue</a>

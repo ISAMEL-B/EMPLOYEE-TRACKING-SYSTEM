@@ -3,7 +3,7 @@ session_start();
 require_once 'config.php';
 
 // Check if user is logged in and has permission
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['staff_id'])) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
     exit;
 }

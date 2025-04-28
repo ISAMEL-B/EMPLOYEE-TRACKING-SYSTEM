@@ -1,4 +1,7 @@
 <?php
+
+
+
 include "processes/re_registration_process.php";
 ?>
 <!DOCTYPE html>
@@ -8,6 +11,7 @@ include "processes/re_registration_process.php";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $is_hrm ? 'Employee Profile Management' : 'Complete Your Profile' ?> - MUST HRM</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">

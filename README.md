@@ -1,51 +1,131 @@
-# Table of Contents
+# HRM System Documentation
 
-## System Overview
+## Overview
 
-## Installation Guide
+This Human Resource Management (HRM) system is designed for Mbarara University of Science and Technology (MUST) to manage academic staff performance, qualifications, research activities, and community engagement.
 
-## User Manual
+## Database Schema
 
-## Login Process
+### Core Tables
 
-## Dashboard Navigation
+1. **faculties** - Stores university faculties
+2. **departments** - Organizational units within faculties
+3. **roles** - Academic staff positions (Professor, Lecturer, etc.)
+4. **staff** - Main staff information with authentication
 
-## Score Management
+### Academic Profile
 
-## Performance Visualization
+5. **degrees** - Academic qualifications of staff
+6. **publications** - Research publications
+7. **grants** - Research funding grants
+8. **supervision** - Student supervision records
+9. **innovations** - Intellectual property and innovations
 
-## Suggestions System
+### Service & Engagement
 
-## Role-Based Access
+10. **service** - Administrative service roles
+11. **communityservice** - Community engagement activities
+12. **professionalbodies** - Professional organization memberships
+13. **academicactivities** - Academic participation records
 
-## Technical Specifications
+### Performance Management
 
-## roubleshooting
+14. **criteria** - Performance evaluation criteria
+15. **performance_metrics** - Staff performance measurements
 
-## Contact SupportMUST HRM Expert Scorecard System
+### System Management
 
-##### STARTING POINT
+16. **verification_documents** - Supporting documents for activities
+17. **password_change_log** - Security audit trail
+18. **csv_approvals** - Bulk data import management
 
-System Overview
-The MUST HRM Expert Scorecard System is a comprehensive performance tracking solution designed to align employee performance with Mbarara University of Science and Technology's (MUST) vision, mission, and strategic objectives. The system provides:
+## Key Features
 
-Real-time performance tracking at individual, departmental, and institutional levels
+### Staff Management
 
-Automated score calculations based on predefined criteria
+- Comprehensive staff profiles with academic and professional details
+- Role-based access control (Admin, HRM, HOD, Dean, Staff)
+- Performance tracking and scoring
 
-Data visualization tools for performance analysis
+### Research Tracking
 
+- Publication records with authorship roles
+- Grant management with amount tracking
+- Innovation and intellectual property registry
 
-Role-specific dashboards for all university staff
+### Academic Administration
 
-Installation Guide
-Prerequisites
-Web server (Apache/Nginx)
+- Student supervision tracking
+- Department and faculty structure
+- Community engagement documentation
 
-PHP 7.4+
+### Data Management
 
-MySQL 5.7+
+- Bulk CSV import/approval system
+- Document verification workflow
+- Secure authentication system
 
+## Installation
 
+1. Create MySQL database: `CREATE DATABASE hrm_db;`
+2. Import schema: `mysql -u username -p hrm_db < schema.sql`
+3. Configure connection in application settings
 
+## Usage Guidelines
 
+### For Staff
+
+- Maintain updated profile information
+- Submit documentation for research activities
+- Track community engagement hours
+
+### For Administrators
+
+- Monitor performance metrics
+- Verify submitted documentation
+- Generate reports on staff activities
+
+## API Endpoints
+
+`/api/staff` - Staff management  
+`/api/research` - Research activities  
+`/api/performance` - Performance metrics  
+`/api/auth` - Authentication system
+
+## Security
+
+- Password hashing with bcrypt
+- Role-based access control
+- Activity verification workflow
+- Password change auditing
+
+## Reporting
+
+System supports generation of:
+
+- Individual staff performance reports
+- Departmental activity summaries
+- Research output analytics
+- Community engagement metrics
+
+## Maintenance
+
+Regularly:
+
+1. Backup database
+2. Review verification queue
+3. Update performance criteria as needed
+4. Audit user accounts
+
+## Support
+
+Contact HRM Helpdesk:
+
+- Email: isamelk@must.ac.ug
+- Phone: +256757094854
+
+---
+
+**Version**: 2.1  
+**Last Updated**: April 2025  
+**System Owner**: MUST Human Resources Department

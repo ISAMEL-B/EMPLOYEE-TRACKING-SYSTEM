@@ -15,8 +15,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     exit();
 }
 
-
-
 //get count of employees in a department
 include '../../scoring_calculator/department score/department_employees.php';
 
@@ -400,6 +398,7 @@ $deptTrends_innovs_json = json_encode($deptTrends_innovations);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>University Employee Tracking - Department Dashboard</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -407,8 +406,6 @@ $deptTrends_innovs_json = json_encode($deptTrends_innovations);
     <link rel="stylesheet" href="styles/department_styles.css">
     <link rel="stylesheet" href="styles/individual_style.css">
 
-    <!-- <link rel="stylesheet" href="styles/individual_style.css">
-<link rel="stylesheet" href="styles/individual_style.css"> -->
 </head>
 
 <body>
@@ -423,7 +420,7 @@ $deptTrends_innovs_json = json_encode($deptTrends_innovations);
     ?>
 
     <div class="content-wrapper">
-        <div class="container-fluid py-4">
+        <div class="container-fluid">
             <div class="explorer-header">
                 <div class="container">
                     <div class="row align-items-center">

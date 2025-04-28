@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST HRM Decision Support System</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"> -->
     <!-- local files -->
     <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
@@ -30,14 +31,14 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <h1>HR Decision Support Dashboard</h1>
+                <h1>HRM Decision Support Dashboard</h1>
                 <div class="header-actions">
-                    <button class="header-btn">
+                    <!-- <button class="header-btn">
                         <i class="fas fa-plus"></i> New Staff
                     </button>
                     <button class="header-btn">
                         <i class="fas fa-file-export"></i> Export
-                    </button>
+                    </button> -->
                 </div>
                 <div class="user-info">
                     <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['first_name'] ?? 'H', 0, 1)) . strtoupper(substr($_SESSION['last_name'] ?? 'R', 0, 1)); ?></div>
@@ -59,7 +60,7 @@
                     </div>
                     <div class="card-body">
                         <div class="card-value"><?php echo count($staff_list); ?></div>
-                        <p class="card-description">Active employees</p>
+                        <p class="card-description">MUST employees</p>
                         <div class="card-footer">
                             <i class="fas fa-arrow-up"></i> Annual Performance
                         </div>
@@ -127,7 +128,7 @@
             <!-- Data Visualization Section -->
             <div class="data-section">
                 <div class="chart-container">
-                    <h3>Performance Metrics</h3>
+                    <h3>Performance Trend</h3>
                     <div id="performance-chart" style="height: 300px;">
                         <canvas id="performanceCanvas"></canvas>
                     </div>

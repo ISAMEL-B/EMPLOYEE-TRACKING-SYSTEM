@@ -114,6 +114,7 @@ foreach ($departmentPerformance as $dept) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST HRM - Department Analytics Dashboard</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
     <script src="../components/Chart.js/dist/Chart.min.js"></script>

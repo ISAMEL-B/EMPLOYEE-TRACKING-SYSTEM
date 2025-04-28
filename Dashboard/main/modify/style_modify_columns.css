@@ -9,21 +9,6 @@ body {
   min-height: 100vh;
   transition: margin-left 0.3s;
 }
-
-/* Role Indicator */
-.role-indicator {
-  position: fixed;
-  top: 60px;
-  right: 20px;
-  background-color: #4caf50;
-  color: white;
-  padding: 8px 15px;
-  border-radius: 4px;
-  font-size: 14px;
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
  /* Responsive additions */
  @media (max-width: 768px) {
   .hamburger {

@@ -8,6 +8,7 @@ include 'processes/index_process.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUST Employee Performance Dashboard</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -16,7 +17,6 @@ include 'processes/index_process.php';
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles/my_index.css">
-
 </head>
 
 <body>
@@ -201,7 +201,7 @@ include 'processes/index_process.php';
                                             <div class="chart-header">
                                                 <h5 class="chart-title"><i class="fas fa-chart-bar me-1"></i>Publication Types</h5>
                                             </div>
-                                            <canvas id="publicationsChart"></canvas>
+                                            <canvas id="publicationsChart" width="800" height="400"></canvas>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -209,7 +209,7 @@ include 'processes/index_process.php';
                                             <div class="chart-header">
                                                 <h5 class="chart-title"><i class="fas fa-chart-line me-1"></i>Publication Trends</h5>
                                             </div>
-                                            <canvas id="publicationsTrendChart"></canvas>
+                                            <canvas id="publicationsTrendChart" width="800" height="400"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -243,12 +243,35 @@ include 'processes/index_process.php';
 
                             <div class="tab-pane fade" id="grants" role="tabpanel">
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-8">
                                         <div class="chart-container">
                                             <div class="chart-header">
-                                                <h5 class="chart-title"><i class="fas fa-chart-pie me-1"></i>Grant Awards by Faculty</h5>
+                                                <h5 class="chart-title"><i class="fas fa-chart-pie me-1"></i>Grants by Faculty</h5>
                                             </div>
                                             <canvas id="grantsChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+                                            <?php foreach ($grantsByFaculty as $grantData): ?>
+                                                <?php if ($grantData['grant_count'] > 0): ?>
+                                                    <div class="col">
+                                                        <div class="card metric-card h-100">
+                                                            <div class="card-body">
+                                                                <div class="d-flex flex-column justify-content-between h-100">
+                                                                    <i class="fas fa-university mt-2 text-muted opacity-25 align-self-end"></i>
+                                                                    <div>
+                                                                        <div class="metric-label" style="font-weight: bold;"><?= $grantData['faculty_name'] ?></div>
+                                                                        <div class="metric-amount">
+                                                                            <b><?= number_format($grantData['total_amount'], 2) ?></b> <i>UGX</i>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endforeach; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -710,7 +733,20 @@ include 'processes/index_process.php';
                         '#FFCC66'
                     ],
                     borderColor: '#fff',
-                    borderWidth: 1
+                    borderWidth: 1,
+                    borderRadius: 10, // Adds rounded corners to the bars
+                    hoverBackgroundColor: [
+                        '#005B88',
+                        '#88AADD',
+                        '#FFB300',
+                        '#DDDDDD',
+                        '#BBBBBB',
+                        '#777777',
+                        '#FF7777',
+                        '#66DD77',
+                        '#FFDD77'
+                    ], // Changes the bar color on hover
+                    hoverBorderWidth: 2, // Increases border width on hover
                 }]
             },
             options: {
@@ -732,7 +768,7 @@ include 'processes/index_process.php';
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Number of Grants', // <<< Vertical caption
+                            text: 'Number of Grants', // Vertical caption
                             font: {
                                 weight: 'bold'
                             }
@@ -741,7 +777,7 @@ include 'processes/index_process.php';
                     x: {
                         title: {
                             display: true,
-                            text: 'Faculty', // <<< Horizontal caption
+                            text: 'Faculty', // Horizontal caption
                             font: {
                                 weight: 'bold'
                             }
@@ -750,6 +786,7 @@ include 'processes/index_process.php';
                 }
             }
         });
+
 
 
 

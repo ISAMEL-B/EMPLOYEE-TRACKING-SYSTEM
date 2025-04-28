@@ -1,12 +1,6 @@
 <?php  
-
-// Check if user is NOT logged in OR not HRM
-// if (!isset($_SESSION['staff_role']) && $_SESSION['user_role'] !== 'hrm') {
-//     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-//     exit();
-// }
     include 'processes/individual_view_process.php';
-
+    
     //include the total score of the individual
     include '../../scoring_calculator/individual score/total_individual_score.php';
     // include '../../scoring_calculator/total_score2.php';
@@ -25,6 +19,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Achievement Explorer - MUST HRM</title>
+    <link rel="icon" type="image/png" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png">
     <link rel="stylesheet" href="../components/src/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../components/bootstrap/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">

@@ -1,7 +1,11 @@
 <?php
 session_start();
 require_once 'head/approve/config.php'; // Database connection
-
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
 // Get current page for active menu highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
 
@@ -16,12 +20,6 @@ header("X-XSS-Protection: 1; mode=block");
 
 // Get current user ID from session
 $user_id = $_SESSION['staff_id'] ?? null;
-
-// Check user authorization
-// if (!isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'hrm') {
-//     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
-//     exit();
-// }
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {

@@ -1,7 +1,11 @@
 <?php
 session_start();
 require_once 'head/approve/config.php'; // Database connection
-
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
+    header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
+    exit();
+}
 // Fetch all staff for dropdown
 $staff_query = $conn->query("SELECT s.staff_id, s.first_name, s.last_name, d.department_name
                            FROM staff s

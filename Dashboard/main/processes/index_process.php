@@ -1,6 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_role'])) {
+// Check if user is NOT logged in OR not HRM
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
@@ -122,6 +123,7 @@ $grantResult = $conn->query("
 while ($row = $grantResult->fetch_assoc()) {
     $grantsByFaculty[] = $row;
 }
+
 
 $supervisionStats = [];
 $supervisionResult = $conn->query("

@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'hrm') {
     exit();
 }
 
-
 // Initialize variables
 $user_id = null;
 $user_data = [];
