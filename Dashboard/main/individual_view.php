@@ -5,12 +5,12 @@
     include '../../scoring_calculator/individual score/total_individual_score.php';
     // include '../../scoring_calculator/total_score2.php';
     //include citations
-    include '../../scoring_calculator/individual score/total_citations.php';
+    // include '../../scoring_calculator/individual score/total_citations.php';
 
     $staff_id = isset($_POST['staff_id']) ? (int) $_POST['staff_id'] : (isset($_GET['staff_id']) ? (int) $_GET['staff_id'] : null);
     
     $individual_data = get_individual_performance_breakdown($conn, $staff_id);// get individual_data
-    echo $individual_data['total_score'];
+    // echo $individual_data['total_score'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -576,15 +576,15 @@
 $publication_count = $individual_data['total_publications'];
 
 // Get total citations
-$citation_count = get_total_citations($conn, $staff_id);
+// $citation_count = get_total_citations($conn, $staff_id);
 
-$datafor2025 = [
-    $publication_count,
-    $citation_count
-];
+// $datafor2025 = [
+//     $publication_count,
+//     $citation_count
+// ];
 
-echo $publication_count;
-echo $citation_count;
+// echo $publication_count;
+// echo $citation_count;
 
     
 ?>

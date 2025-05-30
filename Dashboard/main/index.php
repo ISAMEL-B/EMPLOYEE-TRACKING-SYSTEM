@@ -37,7 +37,7 @@ include 'processes/index_process.php';
         <div class="container">
             <div class="header-content">
                 <div class="header-title">
-                    <h1><i class="fas fa-university me-2"></i>MBARAR UNIVERSITY OF SCIENCE AND TECHNOLOGY</h1>
+                    <h1><i class="fas fa-university me-2"></i>MBARARA UNIVERSITY OF SCIENCE AND TECHNOLOGY</h1>
                     <p>Employee Performance Tracking System</p>
                 </div>
                 <div class="header-actions">

@@ -571,7 +571,7 @@ foreach ($menu_structure as $parent => $data) {
                         <?php endif; ?>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/registration/logout.php" class="d-light <?= ($current_pag == 'logout.php') ? 'active-submenu' : '' ?>"><i class="fas fa-sign-in-alt"></i> Log Out</a></li>
                         <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/lock_screen.php" class="d-light <?= ($current_pag == 'lock_screen.php') ? 'active-submenu' : '' ?>"><i class="fas fa-lock"></i> Lockscreen</a></li>
-                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/mailing/password_recovery.php" class="d-light <?= ($current_pag == 'password_recovvery.php') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Recover password</a></li>
+                        <li><a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/mailing/password_recovery.php" class="d-light <?= ($current_pag == 'password_recovvery.php') ? 'active-submenu' : '' ?>"><i class="fas fa-key"></i> Change password</a></li>
                     </ul>
                 </li>
             </ul>
