@@ -40,7 +40,7 @@ try {
         echo json_encode(['success' => false, 'message' => 'Invalid table name']);
         exit;
     }
-
+    
     switch ($action) {
         case 'approve':
             // Approve single record
