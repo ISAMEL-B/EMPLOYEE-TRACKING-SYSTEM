@@ -1,7 +1,7 @@
 <?php 
 session_start();
 // Get the current page filename
-$current_page = basename($_SERVER['PHP_SELF']);
+$current_pag = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!DOCTYPE html>
@@ -12,291 +12,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Appraisal Form</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-    :root {
-        --primary-green: #2e7d32;
-        --light-green: #81c784;
-        --primary-yellow: #ffd600;
-        --light-yellow: #fff176;
-        --primary-blue: #1976d2;
-        --light-blue: #64b5f6;
-    }
-
-    body {
-        background-color: #f5f5f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .progress-container {
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        margin-bottom: 30px;
-    }
-
-    .progress {
-        height: 20px;
-        margin-bottom: 20px;
-    }
-
-    .progress-bar {
-        background-color: var(--primary-green);
-        transition: width 0.5s ease;
-    }
-
-    .form-section {
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        margin-bottom: 30px;
-        display: none;
-    }
-
-    .form-section.active {
-        display: block;
-        animation: fadeIn 0.5s ease;
-    }
-
-    .form-header {
-        color: var(--primary-blue);
-        border-bottom: 2px solid var(--light-blue);
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-
-    .btn-primary {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-
-    .btn-primary:hover {
-        background-color: #1565c0;
-        border-color: #1565c0;
-    }
-
-    .btn-success {
-        background-color: var(--primary-green);
-        border-color: var(--primary-green);
-    }
-
-    .btn-success:hover {
-        background-color: #1b5e20;
-        border-color: #1b5e20;
-    }
-
-    .btn-warning {
-        background-color: var(--primary-yellow);
-        border-color: var(--primary-yellow);
-        color: #000;
-    }
-
-    .btn-warning:hover {
-        background-color: #ffc107;
-        border-color: #ffc107;
-        color: #000;
-    }
-
-    .progress-step {
-        text-align: center;
-        position: relative;
-        padding-top: 30px;
-        cursor: pointer;
-    }
-
-    .progress-step.completed .step-number {
-        background-color: var(--primary-green);
-        color: white;
-    }
-
-    .progress-step.active .step-number {
-        background-color: var(--primary-blue);
-        color: white;
-    }
-
-    .progress-step.pending .step-number {
-        background-color: var(--primary-yellow);
-        color: black;
-    }
-
-    .step-number {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #e0e0e0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        position: absolute;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .step-label {
-        margin-top: 10px;
-        font-size: 0.9rem;
-        color: #616161;
-    }
-
-    .progress-step.completed .step-label {
-        color: var(--primary-green);
-        font-weight: bold;
-    }
-
-    .progress-step.active .step-label {
-        color: var(--primary-blue);
-        font-weight: bold;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .nav-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 30px;
-    }
-
-    .form-control:focus {
-        border-color: var(--light-blue);
-        box-shadow: 0 0 0 0.25rem rgba(25, 118, 210, 0.25);
-    }
-
-    .form-check-input:checked {
-        background-color: var(--primary-green);
-        border-color: var(--primary-green);
-    }
-
-    .form-check-input:focus {
-        box-shadow: 0 0 0 0.25rem rgba(25, 118, 210, 0.25);
-    }
-
-    .section-counter {
-        color: var(--primary-blue);
-        font-weight: bold;
-    }
-
-    /* Error and validation styles */
-    .alert-danger {
-        margin-bottom: 20px;
-        animation: fadeIn 0.3s ease;
-        position: relative;
-    }
-
-    .alert-close {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        font-size: 1.2rem;
-        cursor: pointer;
-        color: #721c24;
-    }
-
-    .is-invalid {
-        border-color: #dc3545 !important;
-        animation: shake 0.5s ease;
-    }
-
-    .invalid-feedback {
-        color: #dc3545;
-        display: none;
-        margin-top: 0.25rem;
-        font-size: 0.875em;
-    }
-
-    .is-invalid~.invalid-feedback {
-        display: block;
-    }
-
-    @keyframes shake {
-
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-
-        20%,
-        60% {
-            transform: translateX(-5px);
-        }
-
-        40%,
-        80% {
-            transform: translateX(5px);
-        }
-    }
-
-    /* Progress step connector lines */
-    .progress-step:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        top: 20px;
-        left: calc(50% + 20px);
-        width: calc(100% - 40px);
-        height: 2px;
-        background-color: #ddd;
-        z-index: -1;
-    }
-
-    .progress-step.completed:not(:last-child)::after {
-        background-color: var(--primary-green);
-    }
-    </style>
-    <style>
-    /* Main container with spaces for sidebar and navbar */
-    .main-wrapper {
-        display: grid;
-        grid-template-columns: var(--sidebar-width) 1fr;
-        grid-template-rows: var(--navbar-height) 1fr;
-        min-height: 100vh;
-    }
-
-    /* Empty sidebar space */
-    .sidebar-space {
-        grid-column: 1;
-        grid-row: 1 / span 2;
-        background-color: transparent;
-    }
-
-    /* Empty navbar space */
-    .navbar-space {
-        grid-column: 2;
-        grid-row: 1;
-        background-color: transparent;
-    }
-
-    /* Content area */
-    .content-area {
-        grid-column: 2;
-        grid-row: 2;
-        padding: 20px;
-        overflow-y: auto;
-    }
-
-    /* Form container */
-    .container.py-5 {
-        max-width: 1200px;
-        margin: 0 auto;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        padding: 30px;
-    }
-    </style>
+    <link rel="stylesheet" href="style/style.css">
 </head>
 
 <body>
@@ -310,453 +26,462 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php include '../../bars/side_bar.php';
 
         ?>
-    <div class="content-area">
-        <div class="container py-5 ">
-            <h1 class="text-center mb-4" style="color: var(--primary-green);">Staff Appraisal Form</h1>
+        <div class="content-area">
+            <div class="container py-5 ">
+                <h1 class="text-center mb-4" style="color: var(--primary-green);">Staff Appraisal Form</h1>
 
-            <!-- Progress Container -->
-            <div class="progress-container">
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0"
-                        aria-valuemax="100"></div>
+                <!-- Progress Container -->
+                <div class="progress-container">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <div class="row text-center">
+                        <div class="col progress-step active" data-step="1" onclick="goToStep(1)">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Biodata</div>
+                        </div>
+                        <div class="col progress-step" data-step="2" onclick="goToStep(2)">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Degrees</div>
+                        </div>
+                        <div class="col progress-step" data-step="3" onclick="goToStep(3)">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Publications</div>
+                        </div>
+                        <div class="col progress-step" data-step="4" onclick="goToStep(4)">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Grants</div>
+                        </div>
+                        <div class="col progress-step" data-step="5" onclick="goToStep(5)">
+                            <div class="step-number">5</div>
+                            <div class="step-label">Activities</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="row text-center">
-                    <div class="col progress-step active" data-step="1" onclick="goToStep(1)">
-                        <div class="step-number">1</div>
-                        <div class="step-label">Biodata</div>
-                    </div>
-                    <div class="col progress-step" data-step="2" onclick="goToStep(2)">
-                        <div class="step-number">2</div>
-                        <div class="step-label">Degrees</div>
-                    </div>
-                    <div class="col progress-step" data-step="3" onclick="goToStep(3)">
-                        <div class="step-number">3</div>
-                        <div class="step-label">Publications</div>
-                    </div>
-                    <div class="col progress-step" data-step="4" onclick="goToStep(4)">
-                        <div class="step-number">4</div>
-                        <div class="step-label">Grants</div>
-                    </div>
-                    <div class="col progress-step" data-step="5" onclick="goToStep(5)">
-                        <div class="step-number">5</div>
-                        <div class="step-label">Activities</div>
-                    </div>
-                </div>
-            </div>
+                <!-- Form Sections -->
+                <!-- Section 1: Biodata -->
+                <div class="form-section active" id="section-1">
+                    <h2 class="form-header">1. Personal Biodata <span class="section-counter">(Step 1 of 5)</span></h2>
 
-            <!-- Form Sections -->
-            <!-- Section 1: Biodata -->
-            <div class="form-section active" id="section-1">
-                <h2 class="form-header">1. Personal Biodata <span class="section-counter">(Step 1 of 5)</span></h2>
-
-                <form id="biodata-form">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" name="first_name" required>
-                            <div class="invalid-feedback">Please provide your first name.</div>
+                    <form id="biodata-form">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                <div class="invalid-feedback">Please provide your first name.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                <div class="invalid-feedback">Please provide your last name.</div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" name="last_name" required>
-                            <div class="invalid-feedback">Please provide your last name.</div>
-                        </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                            <div class="invalid-feedback">Please provide a valid email address.</div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">Please provide a valid email address.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone_number" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+                                <div class="invalid-feedback">Please provide your phone number.</div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="phone_number" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
-                            <div class="invalid-feedback">Please provide your phone number.</div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="employee_id" class="form-label">Employee ID</label>
+                                <input type="text" class="form-control" id="employee_id" name="employee_id" required>
+                                <div class="invalid-feedback">Please provide your employee ID.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="scholar_type" class="form-label">Scholar Type</label>
+                                <select class="form-select" id="scholar_type" name="scholar_type" required>
+                                    <option value="" selected disabled>Select scholar type</option>
+                                    <option value="Professor">Professor</option>
+                                    <option value="Associate Professor">Associate Professor</option>
+                                    <option value="Assistant Professor">Assistant Professor</option>
+                                    <option value="Lecturer">Lecturer</option>
+                                    <option value="Researcher">Researcher</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your scholar type.</div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="employee_id" class="form-label">Employee ID</label>
-                            <input type="text" class="form-control" id="employee_id" name="employee_id" required>
-                            <div class="invalid-feedback">Please provide your employee ID.</div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="department_id" class="form-label">Department</label>
+                                <select class="form-select" id="department_id" name="department_id" required>
+                                    <option value="" selected disabled>Select department</option>
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                                <div class="invalid-feedback">Please select your department.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="years_of_experience" class="form-label">Years of Experience</label>
+                                <input type="number" class="form-control" id="years_of_experience"
+                                    name="years_of_experience" min="0" required>
+                                <div class="invalid-feedback">Please provide your years of experience.</div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="scholar_type" class="form-label">Scholar Type</label>
-                            <select class="form-select" id="scholar_type" name="scholar_type" required>
-                                <option value="" selected disabled>Select scholar type</option>
-                                <option value="Professor">Professor</option>
-                                <option value="Associate Professor">Associate Professor</option>
-                                <option value="Assistant Professor">Assistant Professor</option>
-                                <option value="Lecturer">Lecturer</option>
-                                <option value="Researcher">Researcher</option>
-                            </select>
-                            <div class="invalid-feedback">Please select your scholar type.</div>
+
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Profile Photo</label>
+                            <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
                         </div>
-                    </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="department_id" class="form-label">Department</label>
-                            <select class="form-select" id="department_id" name="department_id" required>
-                                <option value="" selected disabled>Select department</option>
-                                <!-- Options will be populated dynamically -->
-                            </select>
-                            <div class="invalid-feedback">Please select your department.</div>
+                        <div class="nav-buttons">
+                            <button type="button" class="btn btn-secondary" disabled>Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
+                                Continue</button>
                         </div>
-                        <div class="col-md-6">
-                            <label for="years_of_experience" class="form-label">Years of Experience</label>
-                            <input type="number" class="form-control" id="years_of_experience"
-                                name="years_of_experience" min="0" required>
-                            <div class="invalid-feedback">Please provide your years of experience.</div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="photo" class="form-label">Profile Photo</label>
-                        <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
-                    </div>
-
-                    <div class="nav-buttons">
-                        <button type="button" class="btn btn-secondary" disabled>Previous</button>
-                        <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
-                            Continue</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Section 2: Degrees -->
-            <div class="form-section" id="section-2">
-                <h2 class="form-header">2. Academic Degrees <span class="section-counter">(Step 2 of 5)</span></h2>
-
-                <div class="alert alert-info mb-4">
-                    Please add all your academic degrees, starting with the highest.
+                    </form>
                 </div>
 
-                <form id="degrees-form">
-                    <div id="degrees-container">
-                        <!-- Degree entries will be added here -->
-                        <div class="degree-entry mb-4 p-3 border rounded">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="degree_name_1" class="form-label">Degree Name</label>
-                                    <input type="text" class="form-control degree-name" id="degree_name_1"
-                                        name="degrees[0][degree_name]" required>
-                                    <div class="invalid-feedback">Please provide the degree name.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="degree_classification_1" class="form-label">Classification</label>
-                                    <select class="form-select degree-classification" id="degree_classification_1"
-                                        name="degrees[0][degree_classification]" required>
-                                        <option value="" selected disabled>Select classification</option>
-                                        <option value="First Class">First Class</option>
-                                        <option value="Second Class Upper">Second Class Upper</option>
-                                        <option value="Second Class Lower">Second Class Lower</option>
-                                        <option value="Third Class">Third Class</option>
-                                        <option value="Pass">Pass</option>
-                                        <option value="Distinction">Distinction</option>
-                                        <option value="Merit">Merit</option>
-                                        <option value="N/A">Not Applicable</option>
-                                    </select>
-                                    <div class="invalid-feedback">Please select the degree classification.</div>
-                                </div>
-                            </div>
+                <!-- Section 2: Degrees -->
+                <div class="form-section" id="section-2">
+                    <h2 class="form-header">2. Academic Degrees <span class="section-counter">(Step 2 of 5)</span></h2>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="institution_1" class="form-label">Institution</label>
-                                    <input type="text" class="form-control institution" id="institution_1"
-                                        name="degrees[0][institution]" required>
-                                    <div class="invalid-feedback">Please provide the institution name.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="year_obtained_1" class="form-label">Year Obtained</label>
-                                    <input type="number" class="form-control year-obtained" id="year_obtained_1"
-                                        name="degrees[0][year_obtained]" min="1900" max="2099" required>
-                                    <div class="invalid-feedback">Please provide a valid year (1900-2099).</div>
-                                </div>
-                            </div>
-
-                            <button type="button" class="btn btn-danger btn-sm remove-degree">Remove</button>
-                        </div>
+                    <div class="alert alert-info mb-4">
+                        Please add all your academic degrees, starting with the highest.
                     </div>
 
-                    <button type="button" class="btn btn-warning mb-4" id="add-degree">
-                        Add Another Degree
-                    </button>
-
-                    <div class="nav-buttons">
-                        <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
-                        <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
-                            Continue</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Section 3: Publications -->
-            <div class="form-section" id="section-3">
-                <h2 class="form-header">3. Publications <span class="section-counter">(Step 3 of 5)</span></h2>
-
-                <div class="alert alert-info mb-4">
-                    Please add all your publications (journal articles, conference papers, books, etc.)
-                </div>
-
-                <form id="publications-form">
-                    <div id="publications-container">
-                        <!-- Publication entries will be added here -->
-                        <div class="publication-entry mb-4 p-3 border rounded">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="publication_type_1" class="form-label">Publication Type</label>
-                                    <select class="form-select publication-type" id="publication_type_1"
-                                        name="publications[0][publication_type]" required>
-                                        <option value="" selected disabled>Select type</option>
-                                        <option value="Journal Article">Journal Article</option>
-                                        <option value="Conference Paper">Conference Paper</option>
-                                        <option value="Book">Book</option>
-                                        <option value="Book Chapter">Book Chapter</option>
-                                        <option value="Technical Report">Technical Report</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <div class="invalid-feedback">Please select the publication type.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="role_1" class="form-label">Your Role</label>
-                                    <input type="text" class="form-control role" id="role_1"
-                                        name="publications[0][role]" placeholder="Author, Co-author, Editor, etc."
-                                        required>
-                                    <div class="invalid-feedback">Please specify your role.</div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-8">
-                                    <label for="title_1" class="form-label">Title</label>
-                                    <input type="text" class="form-control title" id="title_1"
-                                        name="publications[0][title]" required>
-                                    <div class="invalid-feedback">Please provide the publication title.</div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="publication_date_1" class="form-label">Publication Date</label>
-                                    <input type="date" class="form-control publication-date" id="publication_date_1"
-                                        name="publications[0][publication_date]" required>
-                                    <div class="invalid-feedback">Please provide the publication date.</div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="journal_name_1" class="form-label">Journal/Publisher Name</label>
-                                    <input type="text" class="form-control journal-name" id="journal_name_1"
-                                        name="publications[0][journal_name]">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="doi_1" class="form-label">DOI/ISBN (if available)</label>
-                                    <input type="text" class="form-control doi" id="doi_1" name="publications[0][doi]"
-                                        placeholder="e.g., 10.1234/abc123">
-                                </div>
-                            </div>
-
-                            <button type="button" class="btn btn-danger btn-sm remove-publication">Remove</button>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn btn-warning mb-4" id="add-publication">
-                        Add Another Publication
-                    </button>
-
-                    <div class="nav-buttons">
-                        <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
-                        <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
-                            Continue</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Section 4: Grants -->
-            <div class="form-section" id="section-4">
-                <h2 class="form-header">4. Research Grants <span class="section-counter">(Step 4 of 5)</span></h2>
-
-                <div class="alert alert-info mb-4">
-                    Please add all research grants you have received or participated in.
-                </div>
-
-                <form id="grants-form">
-                    <div id="grants-container">
-                        <!-- Grant entries will be added here -->
-                        <div class="grant-entry mb-4 p-3 border rounded">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="grant_name_1" class="form-label">Grant Name</label>
-                                    <input type="text" class="form-control grant-name" id="grant_name_1"
-                                        name="grants[0][grant_name]" required>
-                                    <div class="invalid-feedback">Please provide the grant name.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="funding_agency_1" class="form-label">Funding Agency</label>
-                                    <input type="text" class="form-control funding-agency" id="funding_agency_1"
-                                        name="grants[0][funding_agency]" required>
-                                    <div class="invalid-feedback">Please provide the funding agency.</div>
-                                </div>
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="grant_amount_1" class="form-label">Amount</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control grant-amount" id="grant_amount_1"
-                                            name="grants[0][grant_amount]" min="0" step="0.01" required>
+                    <form id="degrees-form">
+                        <div id="degrees-container">
+                            <!-- Degree entries will be added here -->
+                            <div class="degree-entry mb-4 p-3 border rounded">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="degree_name_1" class="form-label">Degree Name</label>
+                                        <input type="text" class="form-control degree-name" id="degree_name_1"
+                                            name="degrees[0][degree_name]" required>
+                                        <div class="invalid-feedback">Please provide the degree name.</div>
                                     </div>
-                                    <div class="invalid-feedback">Please provide the grant amount.</div>
+                                    <div class="col-md-6">
+                                        <label for="degree_classification_1" class="form-label">Classification</label>
+                                        <select class="form-select degree-classification" id="degree_classification_1"
+                                            name="degrees[0][degree_classification]" required>
+                                            <option value="" selected disabled>Select classification</option>
+                                            <option value="First Class">First Class</option>
+                                            <option value="Second Class Upper">Second Class Upper</option>
+                                            <option value="Second Class Lower">Second Class Lower</option>
+                                            <option value="Third Class">Third Class</option>
+                                            <option value="Pass">Pass</option>
+                                            <option value="Distinction">Distinction</option>
+                                            <option value="Merit">Merit</option>
+                                            <option value="N/A">Not Applicable</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select the degree classification.</div>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label for="grant_year_1" class="form-label">Year Awarded</label>
-                                    <input type="number" class="form-control grant-year" id="grant_year_1"
-                                        name="grants[0][grant_year]" min="1900" max="2099" required>
-                                    <div class="invalid-feedback">Please provide a valid year (1900-2099).</div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="role_1" class="form-label">Your Role</label>
-                                    <input type="text" class="form-control role" id="role_1" name="grants[0][role]"
-                                        placeholder="PI, Co-PI, Researcher, etc." required>
-                                    <div class="invalid-feedback">Please specify your role.</div>
-                                </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="description_1" class="form-label">Brief Description</label>
-                                <textarea class="form-control description" id="description_1"
-                                    name="grants[0][description]" rows="2"></textarea>
-                            </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="institution_1" class="form-label">Institution</label>
+                                        <input type="text" class="form-control institution" id="institution_1"
+                                            name="degrees[0][institution]" required>
+                                        <div class="invalid-feedback">Please provide the institution name.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="year_obtained_1" class="form-label">Year Obtained</label>
+                                        <input type="number" class="form-control year-obtained" id="year_obtained_1"
+                                            name="degrees[0][year_obtained]" min="1900" max="2099" required>
+                                        <div class="invalid-feedback">Please provide a valid year (1900-2099).</div>
+                                    </div>
+                                </div>
 
-                            <button type="button" class="btn btn-danger btn-sm remove-grant">Remove</button>
+                                <button type="button" class="btn btn-danger btn-sm remove-degree">Remove</button>
+                            </div>
                         </div>
-                    </div>
 
-                    <button type="button" class="btn btn-warning mb-4" id="add-grant">
-                        Add Another Grant
-                    </button>
+                        <button type="button" class="btn btn-warning mb-4" id="add-degree">
+                            Add Another Degree
+                        </button>
 
-                    <div class="nav-buttons">
-                        <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
-                        <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
-                            Continue</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Section 5: Academic Activities -->
-            <div class="form-section" id="section-5">
-                <h2 class="form-header">5. Academic Activities <span class="section-counter">(Step 5 of 5)</span></h2>
-
-                <div class="alert alert-info mb-4">
-                    Please add your academic activities (conferences, workshops, etc.)
+                        <div class="nav-buttons">
+                            <button type="button" class="btn btn-secondary"
+                                onclick="goToPreviousStep()">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
+                                Continue</button>
+                        </div>
+                    </form>
                 </div>
 
-                <form id="activities-form">
-                    <div id="activities-container">
-                        <!-- Activity entries will be added here -->
-                        <div class="activity-entry mb-4 p-3 border rounded">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="activity_type_1" class="form-label">Activity Type</label>
-                                    <select class="form-select activity-type" id="activity_type_1"
-                                        name="activities[0][activity_type]" required>
-                                        <option value="" selected disabled>Select type</option>
-                                        <option value="Conference">Conference</option>
-                                        <option value="Workshop">Workshop</option>
-                                        <option value="Seminar">Seminar</option>
-                                        <option value="Symposium">Symposium</option>
-                                        <option value="Invited Talk">Invited Talk</option>
-                                        <option value="Panel Discussion">Panel Discussion</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <div class="invalid-feedback">Please select the activity type.</div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="title_1" class="form-label">Title/Event Name</label>
-                                    <input type="text" class="form-control title" id="title_1"
-                                        name="activities[0][title]" required>
-                                    <div class="invalid-feedback">Please provide the activity title.</div>
-                                </div>
-                            </div>
+                <!-- Section 3: Publications -->
+                <div class="form-section" id="section-3">
+                    <h2 class="form-header">3. Publications <span class="section-counter">(Step 3 of 5)</span></h2>
 
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="date_1" class="form-label">Date</label>
-                                    <input type="date" class="form-control date" id="date_1" name="activities[0][date]"
-                                        required>
-                                    <div class="invalid-feedback">Please provide the activity date.</div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="role_1" class="form-label">Your Role</label>
-                                    <input type="text" class="form-control role" id="role_1" name="activities[0][role]"
-                                        placeholder="Speaker, Organizer, Participant, etc." required>
-                                    <div class="invalid-feedback">Please specify your role.</div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="location_1" class="form-label">Location</label>
-                                    <input type="text" class="form-control location" id="location_1"
-                                        name="activities[0][location]" required>
-                                    <div class="invalid-feedback">Please provide the activity location.</div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description_1" class="form-label">Description</label>
-                                <textarea class="form-control description" id="description_1"
-                                    name="activities[0][description]" rows="2"></textarea>
-                            </div>
-
-                            <button type="button" class="btn btn-danger btn-sm remove-activity">Remove</button>
-                        </div>
+                    <div class="alert alert-info mb-4">
+                        Please add all your publications (journal articles, conference papers, books, etc.)
                     </div>
 
-                    <button type="button" class="btn btn-warning mb-4" id="add-activity">
-                        Add Another Activity
-                    </button>
+                    <form id="publications-form">
+                        <div id="publications-container">
+                            <!-- Publication entries will be added here -->
+                            <div class="publication-entry mb-4 p-3 border rounded">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="publication_type_1" class="form-label">Publication Type</label>
+                                        <select class="form-select publication-type" id="publication_type_1"
+                                            name="publications[0][publication_type]" required>
+                                            <option value="" selected disabled>Select type</option>
+                                            <option value="Journal Article">Journal Article</option>
+                                            <option value="Conference Paper">Conference Paper</option>
+                                            <option value="Book">Book</option>
+                                            <option value="Book Chapter">Book Chapter</option>
+                                            <option value="Technical Report">Technical Report</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select the publication type.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="role_1" class="form-label">Your Role</label>
+                                        <input type="text" class="form-control role" id="role_1"
+                                            name="publications[0][role]" placeholder="Author, Co-author, Editor, etc."
+                                            required>
+                                        <div class="invalid-feedback">Please specify your role.</div>
+                                    </div>
+                                </div>
 
-                    <div class="nav-buttons">
-                        <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">Previous</button>
-                        <button type="button" class="btn btn-success" onclick="submitForm()">Submit Portfolio</button>
-                    </div>
-                </form>
-            </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-8">
+                                        <label for="title_1" class="form-label">Title</label>
+                                        <input type="text" class="form-control title" id="title_1"
+                                            name="publications[0][title]" required>
+                                        <div class="invalid-feedback">Please provide the publication title.</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="publication_date_1" class="form-label">Publication Date</label>
+                                        <input type="date" class="form-control publication-date" id="publication_date_1"
+                                            name="publications[0][publication_date]" required>
+                                        <div class="invalid-feedback">Please provide the publication date.</div>
+                                    </div>
+                                </div>
 
-            <!-- Confirmation Modal -->
-            <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="confirmationModalLabel">Submission Complete</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="journal_name_1" class="form-label">Journal/Publisher Name</label>
+                                        <input type="text" class="form-control journal-name" id="journal_name_1"
+                                            name="publications[0][journal_name]">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="doi_1" class="form-label">DOI/ISBN (if available)</label>
+                                        <input type="text" class="form-control doi" id="doi_1"
+                                            name="publications[0][doi]" placeholder="e.g., 10.1234/abc123">
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-danger btn-sm remove-publication">Remove</button>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <div class="text-center mb-4">
+
+                        <button type="button" class="btn btn-warning mb-4" id="add-publication">
+                            Add Another Publication
+                        </button>
+
+                        <div class="nav-buttons">
+                            <button type="button" class="btn btn-secondary"
+                                onclick="goToPreviousStep()">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
+                                Continue</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Section 4: Grants -->
+                <div class="form-section" id="section-4">
+                    <h2 class="form-header">4. Research Grants <span class="section-counter">(Step 4 of 5)</span></h2>
+
+                    <div class="alert alert-info mb-4">
+                        Please add all research grants you have received or participated in.
+                    </div>
+
+                    <form id="grants-form">
+                        <div id="grants-container">
+                            <!-- Grant entries will be added here -->
+                            <div class="grant-entry mb-4 p-3 border rounded">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="grant_name_1" class="form-label">Grant Name</label>
+                                        <input type="text" class="form-control grant-name" id="grant_name_1"
+                                            name="grants[0][grant_name]" required>
+                                        <div class="invalid-feedback">Please provide the grant name.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="funding_agency_1" class="form-label">Funding Agency</label>
+                                        <input type="text" class="form-control funding-agency" id="funding_agency_1"
+                                            name="grants[0][funding_agency]" required>
+                                        <div class="invalid-feedback">Please provide the funding agency.</div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="grant_amount_1" class="form-label">Amount</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control grant-amount" id="grant_amount_1"
+                                                name="grants[0][grant_amount]" min="0" step="0.01" required>
+                                        </div>
+                                        <div class="invalid-feedback">Please provide the grant amount.</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="grant_year_1" class="form-label">Year Awarded</label>
+                                        <input type="number" class="form-control grant-year" id="grant_year_1"
+                                            name="grants[0][grant_year]" min="1900" max="2099" required>
+                                        <div class="invalid-feedback">Please provide a valid year (1900-2099).</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="role_1" class="form-label">Your Role</label>
+                                        <input type="text" class="form-control role" id="role_1" name="grants[0][role]"
+                                            placeholder="PI, Co-PI, Researcher, etc." required>
+                                        <div class="invalid-feedback">Please specify your role.</div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
-                                        fill="var(--primary-green)" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
-                                        <path
-                                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                                    </svg>
+                                    <label for="description_1" class="form-label">Brief Description</label>
+                                    <textarea class="form-control description" id="description_1"
+                                        name="grants[0][description]" rows="2"></textarea>
                                 </div>
-                                <h4 class="text-success">Thank You!</h4>
-                                <p>Your academic portfolio has been successfully submitted.</p>
-                                <p>You can review and update your information at any time.</p>
+
+                                <button type="button" class="btn btn-danger btn-sm remove-grant">Remove</button>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+
+                        <button type="button" class="btn btn-warning mb-4" id="add-grant">
+                            Add Another Grant
+                        </button>
+
+                        <div class="nav-buttons">
+                            <button type="button" class="btn btn-secondary"
+                                onclick="goToPreviousStep()">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="validateAndContinue()">Save &
+                                Continue</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Section 5: Academic Activities -->
+                <div class="form-section" id="section-5">
+                    <h2 class="form-header">5. Academic Activities <span class="section-counter">(Step 5 of 5)</span>
+                    </h2>
+
+                    <div class="alert alert-info mb-4">
+                        Please add your academic activities (conferences, workshops, etc.)
+                    </div>
+
+                    <form id="activities-form">
+                        <div id="activities-container">
+                            <!-- Activity entries will be added here -->
+                            <div class="activity-entry mb-4 p-3 border rounded">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="activity_type_1" class="form-label">Activity Type</label>
+                                        <select class="form-select activity-type" id="activity_type_1"
+                                            name="activities[0][activity_type]" required>
+                                            <option value="" selected disabled>Select type</option>
+                                            <option value="Conference">Conference</option>
+                                            <option value="Workshop">Workshop</option>
+                                            <option value="Seminar">Seminar</option>
+                                            <option value="Symposium">Symposium</option>
+                                            <option value="Invited Talk">Invited Talk</option>
+                                            <option value="Panel Discussion">Panel Discussion</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <div class="invalid-feedback">Please select the activity type.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="title_1" class="form-label">Title/Event Name</label>
+                                        <input type="text" class="form-control title" id="title_1"
+                                            name="activities[0][title]" required>
+                                        <div class="invalid-feedback">Please provide the activity title.</div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="date_1" class="form-label">Date</label>
+                                        <input type="date" class="form-control date" id="date_1"
+                                            name="activities[0][date]" required>
+                                        <div class="invalid-feedback">Please provide the activity date.</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="role_1" class="form-label">Your Role</label>
+                                        <input type="text" class="form-control role" id="role_1"
+                                            name="activities[0][role]"
+                                            placeholder="Speaker, Organizer, Participant, etc." required>
+                                        <div class="invalid-feedback">Please specify your role.</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="location_1" class="form-label">Location</label>
+                                        <input type="text" class="form-control location" id="location_1"
+                                            name="activities[0][location]" required>
+                                        <div class="invalid-feedback">Please provide the activity location.</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description_1" class="form-label">Description</label>
+                                    <textarea class="form-control description" id="description_1"
+                                        name="activities[0][description]" rows="2"></textarea>
+                                </div>
+
+                                <button type="button" class="btn btn-danger btn-sm remove-activity">Remove</button>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-warning mb-4" id="add-activity">
+                            Add Another Activity
+                        </button>
+
+                        <div class="nav-buttons">
+                            <button type="button" class="btn btn-secondary"
+                                onclick="goToPreviousStep()">Previous</button>
+                            <button type="button" class="btn btn-success" onclick="submitForm()">Submit
+                                Details</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Confirmation Modal -->
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmationModalLabel">Submission Complete</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center mb-4">
+                                    <div class="mb-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+                                            fill="var(--primary-green)" class="bi bi-check-circle-fill"
+                                            viewBox="0 0 16 16">
+                                            <path
+                                                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-success">Thank You!</h4>
+                                    <p>Your academic details has been successfully submitted.</p>
+                                    <p>You can review and update your information at any time.</p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -846,7 +571,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         } else {
             showAlert(
                 "Please complete the current section before jumping ahead. You can only proceed to the next step after completing the current one."
-                );
+            );
         }
     }
 
@@ -1273,8 +998,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
         // Show confirmation dialog
         Swal.fire({
-            title: 'Submit Portfolio?',
-            text: 'Are you sure you want to submit your academic portfolio?',
+            title: 'Submit Details?',
+            text: 'Are you sure you want to submit your academic details?',
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: 'var(--primary-green)',
