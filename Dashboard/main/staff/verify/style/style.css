@@ -1,0 +1,79 @@
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shake {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    .form-header {
+        color: var(--primary-blue);
+        border-bottom: 2px solid var(--primary-green);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .section-counter {
+        font-size: 0.8em;
+        color: #6c757d;
+    }
+
+    .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .entry-container {
+        margin-bottom: 30px;
+    }
+
+    .entry-card {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background: #f8f9fa;
+        position: relative;
+    }
+
+    .progress {
+        height: 8px;
+        margin-bottom: 20px;
+    }
+
+    .step-label {
+        font-size: 0.9rem;
+        color: #495057;
+    }
+
+    .alert-danger {
+        animation: fadeIn 0.3s ease;
+    }
+
+    .required-field::after {
+        content: " *";
+        color: var(--danger-red);
+    }

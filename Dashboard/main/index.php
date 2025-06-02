@@ -41,8 +41,8 @@ include 'processes/index_process.php';
                     <p>Employee Performance Tracking System</p>
                 </div>
                 <div class="header-actions">
-                    <p class="mb-0"><i class="fas fa-calendar-alt me-1"></i><span id="current-date"></span></p>
                     <button class="btn btn-must-primary">MAIN DASHBOARD</button>
+                    <p class="mb-0"><i class="fas fa-calendar-alt me-1"></i><span id="current-date"></span></p>
                 </div>
             </div>
         </div>

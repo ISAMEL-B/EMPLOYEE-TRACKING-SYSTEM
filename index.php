@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 session_start();
-include 'Dashboard/main/head/approve/config.php'; // Your database connection file
+include 'Dashboard/main/head/approve/config.php'; 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -212,6 +212,9 @@ include 'Dashboard/main/head/approve/config.php'; // Your database connection fi
                                 <a href="Dashboard/main/upload_csv.php" class="alert-link">Click here to Continue</a>
                             <?php endif; ?>
                         </div>
+                        <div>
+                            <a style='text-decoration: none; margin: 25%; ' href="Dashboard/main/about_us_all.php">About Us</a>
+                        </div>
                     <?php else: ?>
                         <p class="text-center mb-4">
                             Please login to access the HRM Scorecard System and view your performance metrics.
@@ -227,7 +230,8 @@ include 'Dashboard/main/head/approve/config.php'; // Your database connection fi
                         <div class="text-center">
                             <p class="small">
                                 Need help accessing your account?<br>
-                                Contact the HRM Department at <a href="mailto:hrm@must.ac.ug">hrm@must.ac.ug</a>
+                                Contact the HRM Department at <a href="mailto:hrm@must.ac.ug">hrm@must.ac.ug</a> || 
+                                <a href="Dashboard/main/about_us_all.php">About Us</a>
                             </p>
                         </div>
                     <?php endif; ?>

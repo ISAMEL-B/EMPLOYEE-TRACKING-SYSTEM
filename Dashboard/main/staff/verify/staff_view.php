@@ -5,7 +5,7 @@ include '../../head/approve/config.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['staff_id'])) {
-    header("Location: ../../login.php");
+        header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit();
 }
 
@@ -59,177 +59,14 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Appraisal Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../verify3/style/style.css">
-    <style>
-    :root {
-        --primary-green: #28a745;
-        --primary-blue: #007bff;
-        --danger-red: #dc3545;
-        --warning-yellow: #ffc107;
-    }
 
-    .progress-step {
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"> -->
 
-    .progress-step.completed .step-number {
-        background-color: var(--primary-green);
-        color: white;
-    }
-
-    .progress-step.active .step-number {
-        background-color: var(--primary-blue);
-        color: white;
-        transform: scale(1.1);
-    }
-
-    .progress-step.pending .step-number {
-        background-color: #e9ecef;
-        color: #6c757d;
-    }
-
-    .step-number {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 5px;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-    .form-section {
-        display: none;
-        padding: 20px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-    }
-
-    .form-section.active {
-        display: block;
-        animation: fadeIn 0.5s ease;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .is-invalid {
-        border-color: var(--danger-red);
-        animation: shake 0.5s;
-    }
-
-    @keyframes shake {
-
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-
-        25% {
-            transform: translateX(-5px);
-        }
-
-        75% {
-            transform: translateX(5px);
-        }
-    }
-
-    .form-header {
-        color: var(--primary-blue);
-        border-bottom: 2px solid var(--primary-green);
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-
-    .section-counter {
-        font-size: 0.8em;
-        color: #6c757d;
-    }
-
-    .nav-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #dee2e6;
-    }
-
-    .entry-container {
-        margin-bottom: 30px;
-    }
-
-    .entry-card {
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-        padding: 15px;
-        margin-bottom: 15px;
-        background: #f8f9fa;
-        position: relative;
-    }
-
-    .remove-entry {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-
-    .add-entry-btn {
-        margin-bottom: 20px;
-    }
-
-    .progress-container {
-        margin-bottom: 40px;
-    }
-
-    .progress {
-        height: 8px;
-        margin-bottom: 20px;
-    }
-
-    .progress-bar {
-        background-color: var(--primary-green);
-        transition: width 0.5s ease;
-    }
-
-    .step-label {
-        font-size: 0.9rem;
-        color: #495057;
-    }
-
-    .alert-danger {
-        animation: fadeIn 0.3s ease;
-    }
-
-    .photo-preview {
-        max-width: 150px;
-        max-height: 150px;
-        display: block;
-        margin: 10px 0;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-    }
-
-    .required-field::after {
-        content: " *";
-        color: var(--danger-red);
-    }
-    </style>
+    <link rel="stylesheet" href="../../../components/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../components/src/bootstrap-icons-1.11.3/bootstrap-icons-1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style/style2.css">
+    <link rel="stylesheet" href="style/style.css">
 </head>
 
 <body>
@@ -755,7 +592,7 @@ $stmt->close();
                                         <label for="grant_amount_<?= $index ?>"
                                             class="form-label required-field">Amount</label>
                                         <div class="input-group">
-                                            <span class="input-group-text">$</span>
+                                            <span class="input-group-text">UGX</span>
                                             <input type="number" class="form-control grant-amount"
                                                 id="grant_amount_<?= $index ?>"
                                                 name="grants[<?= $index ?>][grant_amount]"
@@ -820,7 +657,7 @@ $stmt->close();
                                     <div class="col-md-4">
                                         <label for="grant_amount_0" class="form-label required-field">Amount</label>
                                         <div class="input-group">
-                                            <span class="input-group-text">$</span>
+                                            <span class="input-group-text">UGX</span>
                                             <input type="number" class="form-control grant-amount" id="grant_amount_0"
                                                 name="grants[0][grant_amount]" min="0" step="0.01" required>
                                         </div>
@@ -1061,8 +898,12 @@ mysqli_close($conn);
     </div>
 
     <!-- JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+
+    <script src="../../../components/bootstrap/js/bootstrap.bundle.js"></script>
+    <script src="../../../components/alerts/sweetalert2.js"></script>
+     
     <script>
     // Global variables
     let currentStep = <?= $current_page ?>;
