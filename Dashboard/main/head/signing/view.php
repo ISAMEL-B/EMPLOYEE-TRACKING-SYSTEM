@@ -1,7 +1,7 @@
 <?php
 session_start();
 // require_once '../approve/config.php'; // Database connection file
-require_once '../approve/configOLD.php'; // Database connection file
+require_once '../approve/config.php'; // Database connection file
 
 // Check if user is logged in
 // if (!isset($_SESSION['staff_id']) || !isset($_SESSION['role'])) {
