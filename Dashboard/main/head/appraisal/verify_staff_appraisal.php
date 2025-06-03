@@ -444,12 +444,6 @@ function getRecordOwner($table_name, $record_id) {
                 <div class="col-12">
                     <h1 class="display-5 fw-bold text-center text-primary">Staff Appraisal Review</h1>
                     <p class="text-center text-muted">Manage Staffs with approval workflow</p>
-                    <div class="text-end">
-                        <span class="badge bg-primary">Logged in as:
-                            <?php echo htmlspecialchars($_SESSION['user_role']); ?></span>
-                        <span class="badge bg-secondary ms-2">Staff ID:
-                            <?php echo htmlspecialchars($_SESSION['staff_id']); ?></span>
-                    </div>
                 </div>
             </div>
 
@@ -508,106 +502,103 @@ function getRecordOwner($table_name, $record_id) {
             <div class="tab-content" id="tableTabsContent">
                 <!-- Academic Activities Table -->
                 <div class="tab-pane fade show active" id="academic" role="tabpanel">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span>Academic Activities</span>
-                            <div class="status-filter">
-                                <select class="form-select form-select-sm" id="academicStatusFilter">
-                                    <option value="">All Statuses</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="approved">Approved</option>
-                                    <option value="rejected">Rejected</option>
-                                </select>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Academic Activities</span>
+            <div class="status-filter">
+                <select class="form-select form-select-sm" id="academicStatusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table id="academicTable" class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="select-all"></th>
+                        <th>#</th>
+                        <th>Staff Name</th>
+                        <th>Activity Type</th>
+                        <th>Status</th>
+                        <th>Verified By</th>
+                        <th>Verification Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $query = "SELECT a.*, CONCAT(s.first_name, ' ', s.last_name) as staff_name, 
+                              v.first_name as verifier_first, v.last_name as verifier_last
+                              FROM academicactivities a
+                              LEFT JOIN staff s ON a.staff_id = s.staff_id
+                              LEFT JOIN staff v ON a.verified_by = v.staff_id";
+                    $result = $conn->query($query);
+                    $counter = 1;
+
+                    while ($row = $result->fetch_assoc()):
+                        $verifier_name = $row['verifier_first'] ? $row['verifier_first'] . ' ' . $row['verifier_last'] : 'N/A';
+                        $status = strtolower($row['verification_status']);
+                        $id = $row['activity_id'];
+                    ?>
+                    <tr data-status="<?php echo $status; ?>">
+                        <td><input type="checkbox" class="record-checkbox" value="<?php echo $id; ?>"></td>
+                        <td><?php echo $counter++; ?></td>
+                        <td><?php echo htmlspecialchars($row['staff_name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['activity_type']); ?></td>
+                        <td>
+                            <?php 
+                                $badgeClass = 'badge-pending';
+                                if ($status === 'approved') $badgeClass = 'badge-approved';
+                                elseif ($status === 'rejected') $badgeClass = 'badge-rejected';
+                            ?>
+                            <span class="badge <?php echo $badgeClass; ?>">
+                                <?php echo ucfirst($status); ?>
+                            </span>
+                        </td>
+                        <td><?php echo htmlspecialchars($verifier_name); ?></td>
+                        <td><?php echo $row['verification_date'] ? date('M d, Y H:i', strtotime($row['verification_date'])) : 'N/A'; ?></td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-view view-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+
+                                <?php if ($status === 'approved'): ?>
+                                    <span class="text-success fw-bold d-flex align-items-center ms-2">
+                                        <i class="fas fa-check-circle me-1"></i> Confirmed
+                                    </span>
+                                <?php elseif ($status === 'rejected'): ?>
+                                    <span class="text-danger fw-bold d-flex align-items-center ms-2">
+                                        <i class="fas fa-times-circle me-1"></i> Confirmed
+                                    </span>
+                                <?php else: ?>
+                                    <button class="btn btn-sm btn-approve approve-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-disapprove disapprove-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                <?php endif; ?>
                             </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="academicTable" class="table table-hover table-striped">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" id="select-all"></th> <!-- NEW: checkbox header -->
-                                        <th>#</th>
-                                        <th>Staff Name</th>
-                                        <th>Activity Type</th>
-                                        <th>Status</th>
-                                        <th>Verified By</th>
-                                        <th>Verification Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                        $query = "SELECT a.*, CONCAT(s.first_name, ' ', s.last_name) as staff_name, 
-                                                    v.first_name as verifier_first, v.last_name as verifier_last
-                                                FROM academicactivities a
-                                                LEFT JOIN staff s ON a.staff_id = s.staff_id
-                                                LEFT JOIN staff v ON a.verified_by = v.staff_id";
-
-                                        $result = $conn->query($query);
-                                        $counter = 1;
-
-                                        while ($row = $result->fetch_assoc()):
-                                            $verifier_name = $row['verifier_first'] ? $row['verifier_first'] . ' ' . $row['verifier_last'] : 'N/A';
-                                            $status = strtolower($row['verification_status']);
-                                            $id = $row['activity_id'];
-                                    ?>
-                                    <tr>
-                                        <td><input type="checkbox" class="record-checkbox" value="<?php echo $id; ?>"></td>
-                                        <td><?php echo $counter++; ?></td>
-                                        <td><?php echo htmlspecialchars($row['staff_name']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['activity_type']); ?></td>
-                                        <td>
-                                            <?php 
-                                                $badgeClass = 'badge-pending';
-                                                if ($status === 'approved') $badgeClass = 'badge-approved';
-                                                elseif ($status === 'rejected') $badgeClass = 'badge-rejected';
-                                            ?>
-                                            <span class="badge <?php echo $badgeClass; ?>">
-                                                <?php echo ucfirst(htmlspecialchars($status)); ?>
-                                            </span>
-                                        </td>
-                                        <td><?php echo htmlspecialchars($verifier_name); ?></td>
-                                        <td><?php echo $row['verification_date'] ? date('M d, Y H:i', strtotime($row['verification_date'])) : 'N/A'; ?></td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <!-- View button always shown first -->
-                                                <button class="btn btn-sm btn-view view-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-
-                                                <?php if ($status === 'approved'): ?>
-                                                    <span class="text-success fw-bold d-flex align-items-center ms-2">
-                                                        <i class="fas fa-check-circle me-1"></i> Confirmed
-                                                    </span>
-                                                <?php elseif ($status === 'rejected'): ?>
-                                                    <span class="text-danger fw-bold d-flex align-items-center ms-2">
-                                                        <i class="fas fa-times-circle me-1"></i> Confirmed
-                                                    </span>
-                                                <?php else: ?>
-                                                    <!-- Show approve/disapprove if pending -->
-                                                    <button class="btn btn-sm btn-approve approve-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-disapprove disapprove-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                <?php endif; ?>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="selection-controls mb-3">
-                            <button id="select-all-btn" class="btn btn-outline-primary btn-sm me-2">Select All</button>
-                            <button id="deselect-all-btn" class="btn btn-outline-secondary btn-sm">Deselect All</button>
-                        </div>
-                        <div class="action-buttons text-end">
-                            <button class="btn btn-disapprove me-2">Disapprove Selected</button>
-                            <button class="btn btn-approve">Approve Selected</button>
-                        </div>
-                    </div>
-                </div>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="selection-controls mb-3">
+            <button id="select-all-btn" class="btn btn-outline-primary btn-sm me-2">Select All</button>
+            <button id="deselect-all-btn" class="btn btn-outline-secondary btn-sm">Deselect All</button>
+        </div>
+        <div class="action-buttons text-end">
+            <button class="btn btn-disapprove me-2">Disapprove Selected</button>
+            <button class="btn btn-approve">Approve Selected</button>
+        </div>
+    </div>
+</div>
 
                 <!-- Activity Types Table -->
                 <div class="tab-pane fade" id="activity-types" role="tabpanel">
@@ -1450,7 +1441,7 @@ $(document).ready(function() {
     $('[id$="StatusFilter"]').change(function() {
         const tablePrefix = this.id.replace('StatusFilter', '');
         const table = $(`#${tablePrefix}Table`).DataTable();
-        const columnIndex = $(this).data('column') || 3; // Default to column 3 if not specified
+        const columnIndex = $(this).data('column') || 5; // Default to column 3 if not specified
         
         table.column(columnIndex).search(this.value).draw();
     });

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 30, 2025 at 03:12 PM
+-- Generation Time: Jun 03, 2025 at 02:05 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -37,6 +37,16 @@ CREATE TABLE `academicactivities` (
   `verification_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `academicactivities`
+--
+
+INSERT INTO `academicactivities` (`activity_id`, `staff_id`, `activity_type`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`) VALUES
+(5, 1, 'External Examination', 'approved', 'Approved by system', 145, '2025-06-03 12:26:50'),
+(6, 2, 'Internal Examination', 'pending', NULL, NULL, NULL),
+(7, 3, 'Conference Presentation', 'approved', '', 145, '2025-06-03 13:40:36'),
+(8, 4, 'Journal Editor', 'rejected', 'realy', 145, '2025-06-03 13:16:30');
+
 -- --------------------------------------------------------
 
 --
@@ -49,6 +59,38 @@ CREATE TABLE `activity_types` (
   `description` text DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `appraisalstatus`
+--
+
+CREATE TABLE `appraisalstatus` (
+  `appraisal_id` int(50) NOT NULL,
+  `staff_id` int(30) DEFAULT NULL,
+  `table_name` varchar(50) DEFAULT NULL,
+  `action` varchar(100) DEFAULT NULL,
+  `reason` varchar(100) DEFAULT NULL,
+  `approved_by` int(50) DEFAULT NULL,
+  `role` varchar(10) DEFAULT NULL,
+  `date_created` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `appraisalstatus`
+--
+
+INSERT INTO `appraisalstatus` (`appraisal_id`, `staff_id`, `table_name`, `action`, `reason`, `approved_by`, `role`, `date_created`) VALUES
+(1, 1, 'academicactivities', 'approved', 'Approved by system', 145, 'hrm', '2025-06-03 12:26:50'),
+(2, 4, 'academicactivities', 'rejected', 'not real', 145, 'hrm', '2025-06-03 12:27:34'),
+(3, 4, 'academicactivities', 'approved', 'Approved by system', 145, 'hrm', '2025-06-03 13:02:40'),
+(4, 4, 'academicactivities', 'rejected', 'nooo', 145, 'hrm', '2025-06-03 13:03:04'),
+(5, 3, 'academicactivities', 'approved', '', 145, 'hrm', '2025-06-03 13:16:04'),
+(6, 4, 'academicactivities', 'approved', '', 145, 'hrm', '2025-06-03 13:16:04'),
+(7, 3, 'academicactivities', 'rejected', 'realy', 145, 'hrm', '2025-06-03 13:16:30'),
+(8, 4, 'academicactivities', 'rejected', 'realy', 145, 'hrm', '2025-06-03 13:16:30'),
+(9, 3, 'academicactivities', 'approved', '', 145, 'hrm', '2025-06-03 13:40:36');
 
 -- --------------------------------------------------------
 
@@ -72,7 +114,7 @@ CREATE TABLE `communityservice` (
 --
 
 INSERT INTO `communityservice` (`community_service_id`, `staff_id`, `description`, `beneficiaries`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`) VALUES
-(1, 1, 'Student supervision', '5', 'approved', 'trial', 145, '2025-05-30 15:57:21'),
+(1, 1, 'Student supervision', '5', 'approved', 'yes they are not mine', 145, '2025-05-30 17:22:01'),
 (2, 2, 'Free medical consultation', '15', 'pending', NULL, NULL, NULL),
 (3, 3, 'Career guidance workshop', '8', 'pending', NULL, NULL, NULL),
 (4, 4, 'Health awareness seminar', '12', 'pending', NULL, NULL, NULL),
@@ -156,7 +198,7 @@ INSERT INTO `communityservice` (`community_service_id`, `staff_id`, `description
 (82, 137, 'Student supervision', '7', 'pending', NULL, NULL, NULL),
 (83, 138, 'Safety training', '10', 'pending', NULL, NULL, NULL),
 (84, 139, 'Student supervision', '4', 'pending', NULL, NULL, NULL),
-(85, 1, 'Research mentoring', '8', 'approved', 'trial', 145, '2025-05-30 15:57:21'),
+(85, 1, 'Research mentoring', '8', 'approved', 'yes they are not mine', 145, '2025-05-30 17:22:01'),
 (86, 2, 'Patient education', '12', 'pending', NULL, NULL, NULL),
 (87, 3, 'Student supervision', '5', 'pending', NULL, NULL, NULL),
 (88, 4, 'Community health talk', '10', 'pending', NULL, NULL, NULL),
@@ -240,7 +282,7 @@ INSERT INTO `communityservice` (`community_service_id`, `staff_id`, `description
 (166, 137, 'Student supervision', '5', 'pending', NULL, NULL, NULL),
 (167, 138, 'First responder training', '12', 'pending', NULL, NULL, NULL),
 (168, 139, 'Student supervision', '4', 'pending', NULL, NULL, NULL),
-(169, 1, 'Academic advising', '8', 'approved', 'trial', 145, '2025-05-30 15:57:21'),
+(169, 1, 'Academic advising', '8', 'approved', 'yes they are not mine', 145, '2025-05-30 17:22:01'),
 (170, 2, 'Medication education', '10', 'pending', NULL, NULL, NULL),
 (171, 3, 'Student supervision', '6', 'pending', NULL, NULL, NULL),
 (172, 4, 'Disease prevention', '8', 'pending', NULL, NULL, NULL),
@@ -326,7 +368,7 @@ CREATE TABLE `criteria` (
 --
 
 INSERT INTO `criteria` (`id`, `category`, `name`, `points`, `created_at`, `updated_at`) VALUES
-(2, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Masters', 12, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
+(2, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Masters', 10, '2025-04-06 17:04:55', '2025-05-30 18:54:02'),
 (3, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Bachelor\'s (First Class)', 6, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
 (4, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Bachelor\'s (Second Upper)', 4, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
 (5, 'Academic and Professional Qualifications (Non-clinical Scholars)', 'Other Qualifications', 2, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
@@ -362,8 +404,7 @@ INSERT INTO `criteria` (`id`, `category`, `name`, `points`, `created_at`, `updat
 (35, 'Teaching Assistants', 'Teaching experience (max 3 years)', 4, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
 (36, 'Teaching Assistants', 'Research contributions', 3, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
 (37, 'Teaching Assistants', 'Participation in workshops or seminars', 1, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
-(38, 'Overall', 'Overall', 120, '2025-04-06 17:04:55', '2025-04-09 23:45:29'),
-(41, 'Academic and Professional Qualifications (Clinical Scholars)', 'masters', 6, '2025-04-14 09:58:08', '2025-04-14 09:58:08');
+(38, 'Overall', 'Overall', 120, '2025-04-06 17:04:55', '2025-04-09 23:45:29');
 
 -- --------------------------------------------------------
 
@@ -434,7 +475,7 @@ CREATE TABLE `degrees` (
 --
 
 INSERT INTO `degrees` (`degree_id`, `staff_id`, `degree_name`, `degree_classification`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`, `institution`, `year_obtained`) VALUES
-(1, 1, 'PhD in Software Engineering', 'PhD', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL),
+(1, 1, 'PhD in Software Engineering', 'PhD', 'pending', 'eeee', 145, '2025-05-30 21:29:49', NULL, NULL),
 (2, 2, 'PhD in Information Technology', 'PhD', 'pending', NULL, NULL, NULL, NULL, NULL),
 (3, 3, 'Masters in Computer Science', 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL),
 (4, 4, 'Masters in Software Systems', 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL),
@@ -661,7 +702,7 @@ CREATE TABLE `grants` (
 --
 
 INSERT INTO `grants` (`grant_id`, `staff_id`, `grant_amount`, `grant_year`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`, `grant_name`, `funding_agency`) VALUES
-(1, 1, 1250000000.00, '2023', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL),
+(1, 1, 1250000000.00, '2023', 'rejected', 'wwww', 145, '2025-05-30 17:52:16', NULL, NULL),
 (2, 2, 750000000.00, '2022', 'pending', NULL, NULL, NULL, NULL, NULL),
 (3, 3, 300000000.00, '2021', 'pending', NULL, NULL, NULL, NULL, NULL),
 (4, 4, 85000000.00, '2024', 'pending', NULL, NULL, NULL, NULL, NULL),
@@ -734,7 +775,7 @@ CREATE TABLE `innovations` (
 --
 
 INSERT INTO `innovations` (`innovation_id`, `staff_id`, `innovation_type`, `innovation_date`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`, `title`, `description`) VALUES
-(1, 1, 'Product', '2022-11-21 03:47:27.000000', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL),
+(1, 1, 'Product', '2022-11-21 03:47:27.000000', 'approved', 'yes they are not mine', 145, '2025-05-30 17:22:01', NULL, NULL),
 (2, 40, 'Patent', '2022-12-01 12:12:58.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (3, 40, 'Copyright', '2023-03-08 01:06:22.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (4, 23, 'Trademark', '2021-09-12 05:17:14.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
@@ -905,6 +946,16 @@ CREATE TABLE `professionalbodies` (
   `body_name` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `professionalbodies`
+--
+
+INSERT INTO `professionalbodies` (`professional_body_id`, `staff_id`, `body_name`) VALUES
+(5, 1, 'IEEE'),
+(6, 2, 'ACM'),
+(7, 3, 'ISTE'),
+(8, 4, 'National Engineers Society');
+
 -- --------------------------------------------------------
 
 --
@@ -930,7 +981,7 @@ CREATE TABLE `publications` (
 --
 
 INSERT INTO `publications` (`publication_id`, `staff_id`, `publication_type`, `role`, `publication_date`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`, `title`, `journal_name`) VALUES
-(1, 1, 'Book with ISBN', NULL, '2023-08-13 01:38:56.000000', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL),
+(1, 1, 'Book with ISBN', NULL, '2023-08-13 01:38:56.000000', 'approved', 'fsdfsdf', 145, '2025-05-30 21:30:52', NULL, NULL),
 (2, 2, 'Book with ISBN', NULL, '2021-10-10 02:43:11.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (3, 3, 'Book Chapter', NULL, '2021-07-11 20:39:21.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (4, 4, 'Book Chapter', NULL, '2021-01-23 18:15:31.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
@@ -1111,7 +1162,7 @@ INSERT INTO `publications` (`publication_id`, `staff_id`, `publication_type`, `r
 (179, 102, 'Journal Article', 'Corresponding Author', '2024-01-09 00:53:28.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (180, 101, 'Book Chapter', NULL, '2022-08-27 22:21:13.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (181, 30, 'Book with ISBN', NULL, '2021-06-19 14:19:31.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
-(182, 1, 'Journal Article', 'Corresponding Author', '2022-12-17 20:31:07.000000', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL),
+(182, 1, 'Journal Article', 'Corresponding Author', '2022-12-17 20:31:07.000000', 'approved', 'fsdfsdf', 145, '2025-05-30 21:30:52', NULL, NULL),
 (183, 49, 'Journal Article', 'First Author', '2022-10-14 00:01:02.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (184, 56, 'Journal Article', 'Co-author', '2022-06-22 05:37:18.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (185, 48, 'Journal Article', 'Corresponding Author', '2024-01-19 19:23:57.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
@@ -1139,7 +1190,7 @@ INSERT INTO `publications` (`publication_id`, `staff_id`, `publication_type`, `r
 (207, 106, 'Journal Article', 'Corresponding Author', '2024-08-17 11:29:49.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (208, 20, 'Book with ISBN', NULL, '2021-10-25 06:47:56.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
 (209, 104, 'Journal Article', 'Corresponding Author', '2024-12-07 22:36:52.000000', 'pending', NULL, NULL, NULL, NULL, NULL),
-(210, 1, 'Journal Article', 'First-Author', '2022-07-23 15:18:57.000000', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL);
+(210, 1, 'Journal Article', 'First-Author', '2022-07-23 15:18:57.000000', 'approved', 'fsdfsdf', 145, '2025-05-30 21:30:52', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1392,7 +1443,7 @@ CREATE TABLE `supervision` (
 INSERT INTO `supervision` (`supervision_id`, `staff_id`, `student_level`, `verification_status`, `verification_notes`, `verified_by`, `verification_date`, `student_name`, `completion_year`, `thesis_title`) VALUES
 (1, 2, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 43, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 1, 'PhD', 'approved', NULL, 145, '2025-05-30 15:57:34', NULL, NULL, NULL),
+(3, 1, 'PhD', 'approved', 'ww', 145, '2025-05-30 17:22:19', NULL, NULL, NULL),
 (4, 2, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (5, 2, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (6, 2, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -1534,8 +1585,8 @@ INSERT INTO `supervision` (`supervision_id`, `staff_id`, `student_level`, `verif
 (142, 136, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (143, 136, 'PhD', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (144, 136, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
-(145, 1, 'Masters', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL, NULL),
-(146, 1, 'PhD', 'approved', NULL, 145, '2025-05-30 15:57:21', NULL, NULL, NULL),
+(145, 1, 'Masters', 'approved', 'ww', 145, '2025-05-30 17:22:19', NULL, NULL, NULL),
+(146, 1, 'PhD', 'approved', 'ww', 145, '2025-05-30 17:22:19', NULL, NULL, NULL),
 (147, 2, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (148, 2, 'Masters', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
 (149, 3, 'PhD', 'pending', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -1634,25 +1685,29 @@ INSERT INTO `supervision` (`supervision_id`, `staff_id`, `student_level`, `verif
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users1`
+-- Table structure for table `user_progress`
 --
 
-CREATE TABLE `users1` (
-  `user_id` int(11) NOT NULL,
-  `staff_id` int(10) DEFAULT NULL,
-  `employee_id` varchar(100) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `password` varchar(100) DEFAULT NULL,
-  `role` varchar(30) DEFAULT NULL,
-  `first_name` varchar(50) DEFAULT NULL,
-  `last_name` varchar(50) DEFAULT NULL,
-  `phone_number` varchar(50) DEFAULT NULL,
-  `personal_email` varchar(50) DEFAULT NULL,
-  `date_created` datetime DEFAULT current_timestamp(),
-  `photo_path` varchar(255) DEFAULT NULL,
-  `reset_token` varchar(255) DEFAULT NULL,
-  `reset_token_expiry` datetime DEFAULT NULL
+CREATE TABLE `user_progress` (
+  `progress_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `page_number` int(11) DEFAULT NULL,
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`data`)),
+  `status` enum('incomplete','complete') DEFAULT 'incomplete',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_progress`
+--
+
+INSERT INTO `user_progress` (`progress_id`, `user_id`, `page_number`, `data`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, '{\"first_name\":\"BYARUHANGA\",\"last_name\":\"ISAMEL\",\"email\":\"godigitaltech001@gmail.com\",\"phone_number\":\"0764920075\",\"employee_id\":\"1\",\"scholar_type\":\"Assistant Professor\",\"department_id\":\"9\",\"years_of_experience\":\"7\",\"photo\":[]}', '', '2025-05-31 21:34:43', '2025-06-03 06:14:11'),
+(2, 1, 2, '{\"degrees\":[{\"degree_name\":\"bse\",\"degree_classification\":\"First Class\",\"institution\":\"must\",\"year_obtained\":\"2012\"}]}', '', '2025-05-31 22:12:07', '2025-06-03 06:12:48'),
+(3, 1, 3, '{\"publications\":[{\"publication_type\":\"Book Chapter\",\"role\":\"editor\",\"title\":\"me till\",\"publication_date\":\"2025-06-17\",\"journal_name\":\"peace\",\"doi\":\"34\"}]}', '', '2025-05-31 23:18:00', '2025-06-03 06:12:50'),
+(4, 1, 4, '{\"grants\":[{\"grant_name\":\"project\",\"funding_agency\":\"un\",\"grant_amount\":\"120000\",\"grant_year\":\"2019\",\"role\":\"pi\",\"description\":\"erty\"}]}', '', '2025-05-31 23:19:14', '2025-06-03 06:12:53'),
+(5, 1, 5, '{\"activities\":[{\"activity_type\":\"1\",\"title\":\"goo\",\"date\":\"2025-06-25\",\"role\":\"meen\",\"location\":\"mbrr\",\"description\":\"werty\"}]}', '', '2025-05-31 23:59:27', '2025-06-01 17:28:56');
 
 -- --------------------------------------------------------
 
@@ -1705,6 +1760,13 @@ ALTER TABLE `academicactivities`
 ALTER TABLE `activity_types`
   ADD PRIMARY KEY (`type_id`),
   ADD UNIQUE KEY `type_name` (`type_name`);
+
+--
+-- Indexes for table `appraisalstatus`
+--
+ALTER TABLE `appraisalstatus`
+  ADD PRIMARY KEY (`appraisal_id`),
+  ADD KEY `appraisal_ibfk_1` (`staff_id`);
 
 --
 -- Indexes for table `communityservice`
@@ -1826,11 +1888,10 @@ ALTER TABLE `supervision`
   ADD KEY `supervision_ibfk_2` (`verified_by`);
 
 --
--- Indexes for table `users1`
+-- Indexes for table `user_progress`
 --
-ALTER TABLE `users1`
-  ADD PRIMARY KEY (`user_id`),
-  ADD KEY `profile_ibfk_1` (`staff_id`);
+ALTER TABLE `user_progress`
+  ADD PRIMARY KEY (`progress_id`);
 
 --
 -- Indexes for table `verification_documents`
@@ -1856,13 +1917,19 @@ ALTER TABLE `verification_log`
 -- AUTO_INCREMENT for table `academicactivities`
 --
 ALTER TABLE `academicactivities`
-  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `activity_types`
 --
 ALTER TABLE `activity_types`
   MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `appraisalstatus`
+--
+ALTER TABLE `appraisalstatus`
+  MODIFY `appraisal_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `communityservice`
@@ -1928,7 +1995,7 @@ ALTER TABLE `performance_metrics`
 -- AUTO_INCREMENT for table `professionalbodies`
 --
 ALTER TABLE `professionalbodies`
-  MODIFY `professional_body_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `professional_body_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `publications`
@@ -1961,10 +2028,10 @@ ALTER TABLE `supervision`
   MODIFY `supervision_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=241;
 
 --
--- AUTO_INCREMENT for table `users1`
+-- AUTO_INCREMENT for table `user_progress`
 --
-ALTER TABLE `users1`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+ALTER TABLE `user_progress`
+  MODIFY `progress_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `verification_documents`
@@ -1987,6 +2054,12 @@ ALTER TABLE `verification_log`
 --
 ALTER TABLE `academicactivities`
   ADD CONSTRAINT `academicactivities_ibfk_2` FOREIGN KEY (`verified_by`) REFERENCES `staff` (`staff_id`);
+
+--
+-- Constraints for table `appraisalstatus`
+--
+ALTER TABLE `appraisalstatus`
+  ADD CONSTRAINT `appraisal_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `communityservice`
@@ -2056,12 +2129,6 @@ ALTER TABLE `staff`
 --
 ALTER TABLE `supervision`
   ADD CONSTRAINT `supervision_ibfk_2` FOREIGN KEY (`verified_by`) REFERENCES `staff` (`staff_id`);
-
---
--- Constraints for table `users1`
---
-ALTER TABLE `users1`
-  ADD CONSTRAINT `profile_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `verification_documents`
