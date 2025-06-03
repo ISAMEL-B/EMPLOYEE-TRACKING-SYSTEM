@@ -14,7 +14,7 @@ $menu_structure = [
         'icon' => 'fa-edit'
     ],
     'Appraisal' => [
-        'pages' => ['appraisal_form.php', 'appraisal_view.php', 'View_staff_appraisal.php'],
+        'pages' => ['appraisal_form.php', 'appraisal_view.php', 'verify_staff_appraisal.php'],
         'icon' => 'fa-edit'
     ],
     'Manage' => [
@@ -599,8 +599,8 @@ foreach ($menu_structure as $parent => $data) {
                         </li>
                         <?php if ($_SESSION['user_role'] !== 'staff'): ?>
                         <li>
-                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/appraisal/view_staff_appraisal.php"
-                                class="<?= ($current_pag == 'View_staff_appraisal.php') ? 'active-submenu' : '' ?>">
+                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/appraisal/verify_staff_appraisal.php"
+                                class="<?= ($current_pag == 'verify_staff_appraisal.php') ? 'active-submenu' : '' ?>">
                                 <i class="fa fa-file-upload"></i> Verify appraisal
                             </a>
                         </li>

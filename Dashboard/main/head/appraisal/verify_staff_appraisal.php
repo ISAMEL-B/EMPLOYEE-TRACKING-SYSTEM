@@ -1,6 +1,5 @@
 <?php
 session_start();
-// require_once '../approve/config.php'; // Database connection file
 require_once '../approve/config.php'; // Database connection file
 
 // Check if user is logged in
@@ -28,45 +27,126 @@ function getStaffName($staff_id) {
 
 // Handle approval/rejection actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && isset($_POST['record_id']) && isset($_POST['table_name'])) {
+    if (isset($_POST['action']) && isset($_POST['table_name'])) {
         $action = $_POST['action'];
-        $record_id = $_POST['record_id'];
         $table_name = $_POST['table_name'];
         $reason = $_POST['reason'] ?? ($action === 'approve' ? 'Approved by system' : '');
         $staff_id = $_SESSION['staff_id'];
         $role = $_SESSION['user_role'];
         
-        try {
-            // Begin transaction
-            $conn->begin_transaction();
+        // Handle bulk actions
+        if (($action === 'bulk_approve' || $action === 'bulk_reject') && isset($_POST['record_ids'])) {
+            $record_ids = is_array($_POST['record_ids']) ? $_POST['record_ids'] : explode(',', $_POST['record_ids']);
+            $status = ($action === 'bulk_approve') ? 'approved' : 'rejected';
+            $updated_records = [];
             
-            // Update the record status in the original table
-            $update_stmt = $conn->prepare("UPDATE $table_name SET verification_status = ?, verification_notes = ?, verified_by = ?, verification_date = NOW() WHERE " . getPrimaryKey($table_name) . " = ?");
+            try {
+                // Begin transaction
+                $conn->begin_transaction();
+                
+                foreach ($record_ids as $record_id) {
+                    // Update the record status in the original table
+                    $update_stmt = $conn->prepare("UPDATE $table_name SET verification_status = ?, verification_notes = ?, verified_by = ?, verification_date = NOW() WHERE " . getPrimaryKey($table_name) . " = ?");
+                    $update_stmt->bind_param("ssii", $status, $reason, $staff_id, $record_id);
+                    $update_stmt->execute();
+                    
+                    // Log the action in appraisalstatus table
+                    $record_owner = getRecordOwner($table_name, $record_id);
+                    $log_stmt = $conn->prepare("INSERT INTO appraisalstatus (staff_id, table_name, action, reason, approved_by, role) VALUES (?, ?, ?, ?, ?, ?)");
+                    $log_stmt->bind_param("isssis", $record_owner, $table_name, $status, $reason, $staff_id, $role);
+                    $log_stmt->execute();
+                    
+                    // Get updated record data for response
+                    $updated_records[] = getUpdatedRecordData($table_name, $record_id);
+                }
+                
+                // Commit transaction
+                $conn->commit();
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => count($record_ids) . " records $status successfully",
+                    'action' => $status,
+                    'updated_records' => $updated_records
+                ]);
+                exit();
+                
+            } catch (Exception $e) {
+                $conn->rollback();
+                echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+                exit();
+            }
+        }
+        // Handle single record actions
+        elseif (isset($_POST['record_id'])) {
+            $record_id = $_POST['record_id'];
             
-            $status = ($action === 'approve') ? 'approved' : 'rejected';
-            $update_stmt->bind_param("ssii", $status, $reason, $staff_id, $record_id);
-            $update_stmt->execute();
-            
-            // Log the action in appraisalstatus table
-            $log_stmt = $conn->prepare("INSERT INTO appraisalstatus (staff_id, table_name, action, reason, approved_by, role) VALUES (?, ?, ?, ?, ?, ?)");
-            
-            // Get the staff_id from the record being approved/rejected
-            $record_owner = getRecordOwner($table_name, $record_id);
-            
-            $log_stmt->bind_param("isssis", $record_owner, $table_name, $status, $reason, $staff_id, $role);
-            $log_stmt->execute();
-            
-            // Commit transaction
-            $conn->commit();
-            
-            echo json_encode(['success' => true, 'message' => "Record $status successfully"]);
-            exit();
-        } catch (Exception $e) {
-            $conn->rollback();
-            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
-            exit();
+            try {
+                // Begin transaction
+                $conn->begin_transaction();
+                
+                // Update the record status in the original table
+                $update_stmt = $conn->prepare("UPDATE $table_name SET verification_status = ?, verification_notes = ?, verified_by = ?, verification_date = NOW() WHERE " . getPrimaryKey($table_name) . " = ?");
+                
+                $status = ($action === 'approve') ? 'approved' : 'rejected';
+                $update_stmt->bind_param("ssii", $status, $reason, $staff_id, $record_id);
+                $update_stmt->execute();
+                
+                // Log the action in appraisalstatus table
+                $record_owner = getRecordOwner($table_name, $record_id);
+                $log_stmt = $conn->prepare("INSERT INTO appraisalstatus (staff_id, table_name, action, reason, approved_by, role) VALUES (?, ?, ?, ?, ?, ?)");
+                $log_stmt->bind_param("isssis", $record_owner, $table_name, $status, $reason, $staff_id, $role);
+                $log_stmt->execute();
+                
+                // Commit transaction
+                $conn->commit();
+                
+                // Get updated record data for response
+                $updated_record = getUpdatedRecordData($table_name, $record_id);
+                
+                echo json_encode([
+                    'success' => true, 
+                    'message' => "Record $status successfully",
+                    'action' => $status,
+                    'updated_records' => [$updated_record]
+                ]);
+                exit();
+            } catch (Exception $e) {
+                $conn->rollback();
+                echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+                exit();
+            }
         }
     }
+}
+
+// Helper function to get updated record data
+function getUpdatedRecordData($table_name, $record_id) {
+    global $conn;
+    
+    $primary_key = getPrimaryKey($table_name);
+    $query = "SELECT a.*, CONCAT(s.first_name, ' ', s.last_name) as verifier_name 
+              FROM $table_name a
+              LEFT JOIN staff s ON a.verified_by = s.staff_id
+              WHERE a.$primary_key = ?";
+    
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $record_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return [
+            'activity_id' => $row[$primary_key],
+            'verification_status' => $row['verification_status'],
+            'verification_notes' => $row['verification_notes'],
+            'verified_by' => $row['verified_by'],
+            'verifier_name' => $row['verifier_name'] ?? 'N/A',
+            'verification_date' => $row['verification_date']
+        ];
+    }
+    return null;
 }
 
 // Helper function to get primary key column name for a table
@@ -444,6 +524,7 @@ function getRecordOwner($table_name, $record_id) {
                             <table id="academicTable" class="table table-hover table-striped">
                                 <thead>
                                     <tr>
+                                        <th><input type="checkbox" id="select-all"></th> <!-- NEW: checkbox header -->
                                         <th>#</th>
                                         <th>Staff Name</th>
                                         <th>Activity Type</th>
@@ -456,58 +537,70 @@ function getRecordOwner($table_name, $record_id) {
                                 <tbody>
                                     <?php
                                         $query = "SELECT a.*, CONCAT(s.first_name, ' ', s.last_name) as staff_name, 
-                                                v.first_name as verifier_first, v.last_name as verifier_last
+                                                    v.first_name as verifier_first, v.last_name as verifier_last
                                                 FROM academicactivities a
                                                 LEFT JOIN staff s ON a.staff_id = s.staff_id
                                                 LEFT JOIN staff v ON a.verified_by = v.staff_id";
-                                        $result = $conn->query($query);
 
-                                        $counter = 1; // <-- start counter at 1
+                                        $result = $conn->query($query);
+                                        $counter = 1;
 
                                         while ($row = $result->fetch_assoc()):
                                             $verifier_name = $row['verifier_first'] ? $row['verifier_first'] . ' ' . $row['verifier_last'] : 'N/A';
+                                            $status = strtolower($row['verification_status']);
+                                            $id = $row['activity_id'];
                                     ?>
                                     <tr>
-                                        <td><?php echo $counter++; ?></td> <!-- <-- print counter, then increment -->
+                                        <td><input type="checkbox" class="record-checkbox" value="<?php echo $id; ?>"></td>
+                                        <td><?php echo $counter++; ?></td>
                                         <td><?php echo htmlspecialchars($row['staff_name']); ?></td>
                                         <td><?php echo htmlspecialchars($row['activity_type']); ?></td>
                                         <td>
                                             <?php 
                                                 $badgeClass = 'badge-pending';
-                                                if ($row['verification_status'] === 'approved') $badgeClass = 'badge-approved';
-                                                if ($row['verification_status'] === 'rejected') $badgeClass = 'badge-rejected';
+                                                if ($status === 'approved') $badgeClass = 'badge-approved';
+                                                elseif ($status === 'rejected') $badgeClass = 'badge-rejected';
                                             ?>
                                             <span class="badge <?php echo $badgeClass; ?>">
-                                                <?php echo ucfirst(htmlspecialchars($row['verification_status'])); ?>
+                                                <?php echo ucfirst(htmlspecialchars($status)); ?>
                                             </span>
                                         </td>
                                         <td><?php echo htmlspecialchars($verifier_name); ?></td>
-                                        <td><?php echo $row['verification_date'] ? date('M d, Y H:i', strtotime($row['verification_date'])) : 'N/A'; ?>
-                                        </td>
+                                        <td><?php echo $row['verification_date'] ? date('M d, Y H:i', strtotime($row['verification_date'])) : 'N/A'; ?></td>
                                         <td>
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-view view-record"
-                                                    data-id="<?php echo $row['activity_id']; ?>"
-                                                    data-table="academicactivities">
+                                                <!-- View button always shown first -->
+                                                <button class="btn btn-sm btn-view view-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <button class="btn btn-sm btn-approve approve-record"
-                                                    data-id="<?php echo $row['activity_id']; ?>"
-                                                    data-table="academicactivities">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-disapprove disapprove-record"
-                                                    data-id="<?php echo $row['activity_id']; ?>"
-                                                    data-table="academicactivities">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
+
+                                                <?php if ($status === 'approved'): ?>
+                                                    <span class="text-success fw-bold d-flex align-items-center ms-2">
+                                                        <i class="fas fa-check-circle me-1"></i> Confirmed
+                                                    </span>
+                                                <?php elseif ($status === 'rejected'): ?>
+                                                    <span class="text-danger fw-bold d-flex align-items-center ms-2">
+                                                        <i class="fas fa-times-circle me-1"></i> Confirmed
+                                                    </span>
+                                                <?php else: ?>
+                                                    <!-- Show approve/disapprove if pending -->
+                                                    <button class="btn btn-sm btn-approve approve-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-disapprove disapprove-record" data-id="<?php echo $id; ?>" data-table="academicactivities">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                     </tr>
                                     <?php endwhile; ?>
                                 </tbody>
-
                             </table>
+                        </div>
+                        <div class="selection-controls mb-3">
+                            <button id="select-all-btn" class="btn btn-outline-primary btn-sm me-2">Select All</button>
+                            <button id="deselect-all-btn" class="btn btn-outline-secondary btn-sm">Deselect All</button>
                         </div>
                         <div class="action-buttons text-end">
                             <button class="btn btn-disapprove me-2">Disapprove Selected</button>
@@ -1329,271 +1422,257 @@ function getRecordOwner($table_name, $record_id) {
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-    $(document).ready(function() {
-        // Initialize all DataTables
-        const academicTable = $('#academicTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
+<script>
+$(document).ready(function() {
+    // Initialize all DataTables with consistent settings
+    const tables = [
+        'academicTable', 'activityTypesTable', 'communityTable', 'degreesTable',
+        'grantsTable', 'innovationsTable', 'professionalTable', 'publicationsTable',
+        'serviceTable', 'staffTable', 'supervisionTable'
+    ];
 
-        const activityTypesTable = $('#activityTypesTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const communityTable = $('#communityTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const degreesTable = $('#degreesTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const grantsTable = $('#grantsTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const innovationsTable = $('#innovationsTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const professionalTable = $('#professionalTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const publicationsTable = $('#publicationsTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const serviceTable = $('#serviceTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const staffTable = $('#staffTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        const supervisionTable = $('#supervisionTable').DataTable({
-            responsive: true,
-            dom: '<"top"lf>rt<"bottom"ip>',
-            pageLength: 10
-        });
-
-        // Status filters
-        $('#academicStatusFilter').change(function() {
-            academicTable.column(3).search(this.value).draw();
-        });
-
-        $('#communityStatusFilter').change(function() {
-            communityTable.column(4).search(this.value).draw();
-        });
-
-        $('#degreesStatusFilter').change(function() {
-            degreesTable.column(5).search(this.value).draw();
-        });
-
-        $('#grantsStatusFilter').change(function() {
-            grantsTable.column(6).search(this.value).draw();
-        });
-
-        $('#innovationsStatusFilter').change(function() {
-            innovationsTable.column(5).search(this.value).draw();
-        });
-
-        $('#publicationsStatusFilter').change(function() {
-            publicationsTable.column(6).search(this.value).draw();
-        });
-
-        $('#supervisionStatusFilter').change(function() {
-            supervisionTable.column(6).search(this.value).draw();
-        });
-
-        // View record details
-        $(document).on('click', '.view-record', function() {
-            const recordId = $(this).data('id');
-            const tableName = $(this).data('table');
-
-            $.ajax({
-                url: 'get_record_details.php',
-                method: 'POST',
-                data: {
-                    id: recordId,
-                    table: tableName
-                },
-                success: function(response) {
-                    $('#modalBodyContent').html(response);
-                    $('#detailsModal').modal('show');
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire(
-                        'Error!',
-                        'Could not load record details: ' + error,
-                        'error'
-                    );
+    tables.forEach(tableId => {
+        if (!$.fn.DataTable.isDataTable(`#${tableId}`)) {
+            $(`#${tableId}`).DataTable({
+                responsive: true,
+                dom: '<"top"lf>rt<"bottom"ip>',
+                pageLength: 10,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search...",
+                    lengthMenu: "Show _MENU_ entries"
                 }
             });
-        });
+        }
+    });
 
-        // Approve record
-        $(document).on('click', '.approve-record', function() {
-            const recordId = $(this).data('id');
-            const tableName = $(this).data('table');
+    // Status filters - consolidated handler
+    $('[id$="StatusFilter"]').change(function() {
+        const tablePrefix = this.id.replace('StatusFilter', '');
+        const table = $(`#${tablePrefix}Table`).DataTable();
+        const columnIndex = $(this).data('column') || 3; // Default to column 3 if not specified
+        
+        table.column(columnIndex).search(this.value).draw();
+    });
 
-            Swal.fire({
-                title: 'Approve Record?',
-                text: "Are you sure you want to approve this record?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#2ecc71',
-                cancelButtonColor: '#e74c3c',
-                confirmButtonText: 'Yes, approve it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: '',
-                        method: 'POST',
-                        data: {
-                            action: 'approve',
-                            record_id: recordId,
-                            table_name: tableName
-                        },
-                        success: function(response) {
-                            const data = JSON.parse(response);
-                            if (data.success) {
-                                Swal.fire(
-                                    'Approved!',
-                                    data.message,
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    data.message,
-                                    'error'
-                                );
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire(
-                                'Error!',
-                                'There was a problem approving the record: ' +
-                                error,
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
-        });
+    // View record details - generic handler
+    $(document).on('click', '.view-record', function() {
+        const recordId = $(this).data('id');
+        const tableName = $(this).data('table');
 
-        // Disapprove record
-        $(document).on('click', '.disapprove-record', function() {
-            const recordId = $(this).data('id');
-            const tableName = $(this).data('table');
-
-            Swal.fire({
-                title: 'Reject Record',
-                input: 'textarea',
-                inputLabel: 'Reason for rejection',
-                inputPlaceholder: 'Enter the reason for rejecting this record...',
-                inputAttributes: {
-                    'aria-label': 'Enter the reason for rejecting this record'
-                },
-                showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#7f8c8d',
-                confirmButtonText: 'Reject',
-                cancelButtonText: 'Cancel',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'You need to provide a reason!';
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const reason = result.value;
-
-                    $.ajax({
-                        url: '',
-                        method: 'POST',
-                        data: {
-                            action: 'reject',
-                            record_id: recordId,
-                            table_name: tableName,
-                            reason: reason
-                        },
-                        success: function(response) {
-                            const data = JSON.parse(response);
-                            if (data.success) {
-                                Swal.fire(
-                                    'Rejected!',
-                                    data.message,
-                                    'success'
-                                ).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    data.message,
-                                    'error'
-                                );
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire(
-                                'Error!',
-                                'There was a problem rejecting the record: ' +
-                                error,
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
-        });
-
-        // Bulk approve/disapprove
-        $('.action-buttons .btn-approve').click(function() {
-            // Implement bulk approval logic
-            Swal.fire(
-                'Bulk Approval',
-                'Bulk approval functionality would be implemented here',
-                'info'
-            );
-        });
-
-        $('.action-buttons .btn-disapprove').click(function() {
-            // Implement bulk disapproval logic
-            Swal.fire(
-                'Bulk Rejection',
-                'Bulk rejection functionality would be implemented here',
-                'info'
-            );
+        $.ajax({
+            url: 'get_record_details.php',
+            method: 'POST',
+            data: { id: recordId, table: tableName },
+            beforeSend: () => {
+                $('#modalBodyContent').html('<div class="text-center my-4"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading details...</p></div>');
+                $('#detailsModal').modal('show');
+            },
+            success: (response) => {
+                $('#modalBodyContent').html(response);
+            },
+            error: (xhr, status, error) => {
+                $('#modalBodyContent').html(`<div class="alert alert-danger">Could not load record details: ${error}</div>`);
+            }
         });
     });
-    </script>
+
+    // Approve record - generic handler
+    $(document).on('click', '.approve-record', function() {
+        const recordId = $(this).data('id');
+        const tableName = $(this).data('table');
+
+        Swal.fire({
+            title: 'Approve Record?',
+            text: "Are you sure you want to approve this record?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#2ecc71',
+            cancelButtonColor: '#e74c3c',
+            confirmButtonText: 'Yes, approve it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                processApproval(recordId, tableName);
+            }
+        });
+    });
+
+    // Disapprove record - generic handler
+    $(document).on('click', '.disapprove-record', function() {
+        const recordId = $(this).data('id');
+        const tableName = $(this).data('table');
+
+        Swal.fire({
+            title: 'Reject Record',
+            input: 'textarea',
+            inputLabel: 'Reason for rejection',
+            inputPlaceholder: 'Enter the reason for rejecting this record...',
+            inputAttributes: { 'aria-label': 'Enter the reason for rejecting this record' },
+            showCancelButton: true,
+            confirmButtonColor: '#e74c3c',
+            cancelButtonColor: '#7f8c8d',
+            confirmButtonText: 'Reject',
+            cancelButtonText: 'Cancel',
+            inputValidator: (value) => !value && 'You need to provide a reason!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                processRejection(recordId, tableName, result.value);
+            }
+        });
+    });
+
+    // Bulk actions handlers
+    $('.action-buttons .btn-approve').click(() => handleBulkAction('approve'));
+    $('.action-buttons .btn-disapprove').click(() => handleBulkAction('reject'));
+
+    // Checkbox selection logic
+    initCheckboxSelection();
+
+    // ================ HELPER FUNCTIONS ================
+
+    function processApproval(recordId, tableName) {
+        $.ajax({
+            url: '',
+            method: 'POST',
+            data: { action: 'approve', record_id: recordId, table_name: tableName },
+            success: handleAjaxResponse,
+            error: handleAjaxError
+        });
+    }
+
+    function processRejection(recordId, tableName, reason) {
+        $.ajax({
+            url: '',
+            method: 'POST',
+            data: { 
+                action: 'reject', 
+                record_id: recordId, 
+                table_name: tableName, 
+                reason: reason 
+            },
+            success: handleAjaxResponse,
+            error: handleAjaxError
+        });
+    }
+
+    function handleBulkAction(actionType) {
+        const selectedIds = $('.record-checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+
+        if (selectedIds.length === 0) {
+            Swal.fire('No Selection', `Please select at least one record to ${actionType}`, 'warning');
+            return;
+        }
+
+        const actionConfig = {
+            approve: {
+                title: 'Approve Selected Records?',
+                html: `You are about to approve <b>${selectedIds.length}</b> record(s).<br>Are you sure?`,
+                confirmText: 'Yes, approve all!',
+                action: 'bulk_approve'
+            },
+            reject: {
+                title: 'Reject Selected Records',
+                html: `You are about to reject <b>${selectedIds.length}</b> record(s).`,
+                confirmText: 'Reject All',
+                action: 'bulk_reject',
+                needsReason: true
+            }
+        };
+
+        const config = actionConfig[actionType];
+
+        const swalOptions = {
+            title: config.title,
+            html: config.html,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: actionType === 'approve' ? '#2ecc71' : '#e74c3c',
+            cancelButtonColor: '#7f8c8d',
+            confirmButtonText: config.confirmText
+        };
+
+        if (config.needsReason) {
+            swalOptions.input = 'textarea';
+            swalOptions.inputLabel = 'Reason for rejection';
+            swalOptions.inputPlaceholder = 'Enter the reason for rejecting these records...';
+            swalOptions.inputAttributes = { 'aria-label': 'Enter the reason for rejecting these records' };
+            swalOptions.inputValidator = (value) => !value && 'You need to provide a reason!';
+        }
+
+        Swal.fire(swalOptions).then((result) => {
+            if (result.isConfirmed) {
+                const postData = {
+                    action: config.action,
+                    record_ids: selectedIds,
+                    table_name: 'academicactivities'
+                };
+
+                if (config.needsReason) {
+                    postData.reason = result.value;
+                }
+
+                $.ajax({
+                    url: '',
+                    method: 'POST',
+                    data: postData,
+                    success: handleAjaxResponse,
+                    error: handleAjaxError
+                });
+            }
+        });
+    }
+
+    function initCheckboxSelection() {
+        const selectAllCheckbox = $('#select-all');
+        const recordCheckboxes = $('.record-checkbox');
+        const selectAllBtn = $('#select-all-btn');
+        const deselectAllBtn = $('#deselect-all-btn');
+
+        selectAllCheckbox.change(function() {
+            recordCheckboxes.prop('checked', this.checked);
+        });
+
+        selectAllBtn.click(() => {
+            recordCheckboxes.prop('checked', true);
+            selectAllCheckbox.prop('checked', true);
+        });
+
+        deselectAllBtn.click(() => {
+            recordCheckboxes.prop('checked', false);
+            selectAllCheckbox.prop('checked', false);
+        });
+
+        recordCheckboxes.change(function() {
+            selectAllCheckbox.prop('checked', 
+                recordCheckboxes.length === recordCheckboxes.filter(':checked').length
+            );
+        });
+    }
+
+    function handleAjaxResponse(response) {
+        const data = JSON.parse(response);
+        if (data.success) {
+            Swal.fire({
+                title: data.action === 'approve' ? 'Approved!' : 'Rejected!',
+                text: data.message,
+                icon: 'success'
+            }).then(() => location.reload());
+        } else {
+            Swal.fire('Error!', data.message, 'error');
+        }
+    }
+
+    function handleAjaxError(xhr, status, error) {
+        Swal.fire(
+            'Error!',
+            `There was a problem processing your request: ${error}`,
+            'error'
+        );
+    }
+});
+</script>
 </body>
 
 </html>
