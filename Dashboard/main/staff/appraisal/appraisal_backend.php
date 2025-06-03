@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/db_config.php';
+include '../../head/approve/config.php';
 
 // Set headers for JSON response
 header('Content-Type: application/json');

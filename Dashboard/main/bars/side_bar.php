@@ -10,7 +10,11 @@ $menu_structure = [
         'icon' => 'fa-tachometer-alt'
     ],
     'Update' => [
-        'pages' => ['upload_csv.php', 'approve.php', 'staff_view.php','View_staff_appraisal.php', 'view_criteria.php', 'modify_db.php'],
+        'pages' => ['upload_csv.php', 'approve.php', 'view_criteria.php', 'modify_db.php'],
+        'icon' => 'fa-edit'
+    ],
+    'Appraisal' => [
+        'pages' => ['appraisal_form.php', 'appraisal_view.php', 'View_staff_appraisal.php'],
         'icon' => 'fa-edit'
     ],
     'Manage' => [
@@ -48,428 +52,428 @@ foreach ($menu_structure as $parent => $data) {
     <link rel="stylesheet" href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/components/src/fontawesome/css/all.min.css">
 
     <style>
-        /* Ensure active parent stays open */
-        .treeview.active .treeview-menu {
-            display: block !important;
-            max-height: 300px !important;
-            opacity: 1 !important;
+    /* Ensure active parent stays open */
+    .treeview.active .treeview-menu {
+        display: block !important;
+        max-height: 300px !important;
+        opacity: 1 !important;
+    }
+
+    /* Prevent collapse animation on page load */
+    .main-sidebar.collapsed .treeview.active .treeview-menu {
+        display: block !important;
+    }
+
+    /* ===== ACTIVE SUBMENU STYLING ===== */
+    .treeview-menu li a.active-submenu {
+        background-color: #FFF59D !important;
+        /* Lighter yellow */
+        color: #000 !important;
+        font-weight: 600;
+        border-left: 3px solid #4CAF50;
+        /* Green accent */
+        position: relative;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Arrow indicator */
+    .treeview-menu li a.active-submenu::after {
+        content: "→";
+        position: absolute;
+        right: 15px;
+        color: #4CAF50;
+        font-weight: bold;
+        animation: bounce 0.5s infinite alternate;
+    }
+
+    @keyframes bounce {
+        from {
+            transform: translateX(0);
         }
 
-        /* Prevent collapse animation on page load */
-        .main-sidebar.collapsed .treeview.active .treeview-menu {
-            display: block !important;
+        to {
+            transform: translateX(3px);
         }
+    }
 
-        /* ===== ACTIVE SUBMENU STYLING ===== */
-        .treeview-menu li a.active-submenu {
-            background-color: #FFF59D !important;
-            /* Lighter yellow */
-            color: #000 !important;
-            font-weight: 600;
-            border-left: 3px solid #4CAF50;
-            /* Green accent */
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-        }
+    /* ///===== ACTIVE SUBMENU STYLING =====/// */
 
-        /* Arrow indicator */
-        .treeview-menu li a.active-submenu::after {
-            content: "→";
-            position: absolute;
-            right: 15px;
-            color: #4CAF50;
-            font-weight: bold;
-            animation: bounce 0.5s infinite alternate;
-        }
+    /* Sidebar Styles */
+    .main-sidebar {
+        background-color: #4caf50;
+        /* Green background for sidebar */
+        color: #ffffff;
+        /* White text color */
+        width: 250px;
+        /* Fixed width for sidebar */
+        height: 100vh;
+        /* Full height */
+        position: fixed;
+        /* Fixed position */
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+        /* Scrollable if content overflows */
+        transition: width 0.3s;
+        /* Smooth transition for width */
+    }
 
-        @keyframes bounce {
-            from {
-                transform: translateX(0);
-            }
+    .main-sidebar {
+        width: 250px;
+        background-color: #4caf50;
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        top: 0;
+        transition: width 0.3s;
+        overflow-x: hidden;
+        z-index: 1000;
+    }
 
-            to {
-                transform: translateX(3px);
-            }
-        }
+    .collapsed {
+        width: 80px;
+        /* Reduced width when collapsed */
+    }
 
-        /* ///===== ACTIVE SUBMENU STYLING =====/// */
+    .logo-box {
+        display: flex;
+        /* Flexbox for alignment */
+        justify-content: space-between;
+        /* Space between logo and hamburger */
+        align-items: center;
+        /* Center items vertically */
+        padding: 2px;
+        /* Padding around the logo box */
+        background-color: #388e3c;
+        /* Darker green for logo area */
+    }
 
-        /* Sidebar Styles */
-        .main-sidebar {
-            background-color: #4caf50;
-            /* Green background for sidebar */
-            color: #ffffff;
-            /* White text color */
-            width: 250px;
-            /* Fixed width for sidebar */
-            height: 100vh;
-            /* Full height */
-            position: fixed;
-            /* Fixed position */
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-            /* Scrollable if content overflows */
-            transition: width 0.3s;
-            /* Smooth transition for width */
-        }
+    .logo {
+        margin-left: 1px;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
 
-        .main-sidebar {
-            width: 250px;
-            background-color: #4caf50;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            transition: width 0.3s;
-            overflow-x: hidden;
-            z-index: 1000;
-        }
+    .logo img {
+        height: 80px !important;
+    }
 
-        .collapsed {
-            width: 80px;
-            /* Reduced width when collapsed */
-        }
+    .logo h2 {
+        text-align: center;
+        font-size: 24px !important;
+    }
 
-        .logo-box {
-            display: flex;
-            /* Flexbox for alignment */
-            justify-content: space-between;
-            /* Space between logo and hamburger */
-            align-items: center;
-            /* Center items vertically */
-            padding: 2px;
-            /* Padding around the logo box */
-            background-color: #388e3c;
-            /* Darker green for logo area */
-        }
-
+    @media (max-widith : 600px) {
         .logo {
-            margin-left: 1px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .logo img {
-            height: 80px !important;
-        }
-
-        .logo h2 {
+            flex-direction: column;
             text-align: center;
-            font-size: 24px !important;
         }
+    }
 
-        @media (max-widith : 600px) {
-            .logo {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
+    .hamburger {
+        background: none;
+        border: none;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 24px;
+        display: none;
+        /* Hide by default */
+    }
 
+    /* Show hamburger on small screens (max-width: 768px) */
+    @media (max-width: 768px) {
         .hamburger {
-            background: none;
-            border: none;
-            color: #ffffff;
-            cursor: pointer;
-            font-size: 24px;
-            display: none;
-            /* Hide by default */
-        }
-
-        /* Show hamburger on small screens (max-width: 768px) */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: block;
-            }
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            /* Remove default list styles */
-            padding: 0;
-            /* Remove padding */
-            margin: 0;
-            /* Remove margin */
-        }
-
-        .sidebar-menu>li {
-            position: relative;
-            /* Position relative for dropdowns */
-        }
-
-        .sidebar-menu>li>a {
-            display: flex;
-            /* Flexbox for alignment */
-            align-items: center;
-            /* Center items vertically */
-            padding: 15px 20px;
-            /* Padding for links */
-            color: #ffffff;
-            /* White text color */
-            text-decoration: none;
-            /* Remove underline */
-            transition: background 0.3s;
-            /* Smooth background transition */
-        }
-
-        .collapsed .sidebar-menu>li>a {
-            justify-content: center;
-            /* Center icons when collapsed */
-        }
-
-        .collapsed .sidebar-menu>li>a span {
-            display: none;
-            /* Hide text when collapsed */
-        }
-
-        .sidebar-menu>li>a:hover {
-            background-color: #388e3c;
-            /* Darker green background on hover */
-        }
-
-        /* Submenu Styles */
-        .treeview-menu {
-            display: none;
-            /* Hide dropdowns by default */
-            list-style: none;
-            /* Remove list styles */
-            padding-left: 20px;
-            /* Indent dropdown items */
-            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
-            /* Smooth transition */
-            max-height: 0;
-            /* Start with max-height of 0 */
-            overflow: hidden;
-            /* Hide overflow */
-        }
-
-        .treeview.active .treeview-menu {
             display: block;
-            /* Show dropdown when active */
-            max-height: 300px;
-            /* Set a max-height for the dropdown */
-            opacity: 1;
-            /* Make it fully visible */
         }
+    }
 
-        /* ===== COLOR PALETTE ===== */
-        :root {
-            --primary: #2c3e50;
-            /* Dark blue-gray - for text */
-            --secondary: #3498db;
-            /* Vibrant blue - for accents */
-            --active-bg: #FFEB3B;
-            /* Yellow - active parent */
-            --active-text: #000;
-            /* Black - active text */
-            --submenu-bg: #e6e8f4;
-            /* Light gray-blue - submenu background */
-            --submenu-hover: #d1d5e8;
-            /* Slightly darker gray-blue */
-            --sidebar-bg: #4caf50;
-            /* Green - sidebar background */
-            --white: #ffffff;
-            /* Pure white */
-        }
+    .sidebar-menu {
+        list-style: none;
+        /* Remove default list styles */
+        padding: 0;
+        /* Remove padding */
+        margin: 0;
+        /* Remove margin */
+    }
 
-        /* ===== ACTIVE PARENT MENU STYLING ===== */
-        .treeview.active>a {
-            background-color: var(--active-bg) !important;
-            color: var(--active-text) !important;
-            font-weight: 600;
-        }
+    .sidebar-menu>li {
+        position: relative;
+        /* Position relative for dropdowns */
+    }
 
-        /* Dropdown arrow color */
-        .treeview.active>a .pull-right-container i {
-            color: var(--active-text) !important;
-        }
+    .sidebar-menu>li>a {
+        display: flex;
+        /* Flexbox for alignment */
+        align-items: center;
+        /* Center items vertically */
+        padding: 15px 20px;
+        /* Padding for links */
+        color: #ffffff;
+        /* White text color */
+        text-decoration: none;
+        /* Remove underline */
+        transition: background 0.3s;
+        /* Smooth background transition */
+    }
 
-        /* ===== SUBMENU STYLING ===== */
-        .treeview-menu {
-            background-color: var(--submenu-bg);
-            padding: 5px 0;
-            border-radius: 0 0 4px 4px;
-            border-left: 3px solid var(--secondary);
-            /* Blue accent border */
-        }
+    .collapsed .sidebar-menu>li>a {
+        justify-content: center;
+        /* Center icons when collapsed */
+    }
 
-        .treeview-menu li a {
-            color: var(--primary) !important;
-            padding: 8px 15px 8px 35px;
-            transition: all 0.2s;
-        }
+    .collapsed .sidebar-menu>li>a span {
+        display: none;
+        /* Hide text when collapsed */
+    }
 
-        .treeview-menu li a:hover {
-            background-color: var(--submenu-hover) !important;
-            padding-left: 38px;
-            color: var(--secondary) !important;
-            /* Blue text on hover */
-        }
+    .sidebar-menu>li>a:hover {
+        background-color: #388e3c;
+        /* Darker green background on hover */
+    }
 
-        /* Submenu animation */
-        .treeview.active .treeview-menu {
-            display: block;
-            max-height: 300px;
-            opacity: 1;
-        }
+    /* Submenu Styles */
+    .treeview-menu {
+        display: none;
+        /* Hide dropdowns by default */
+        list-style: none;
+        /* Remove list styles */
+        padding-left: 20px;
+        /* Indent dropdown items */
+        transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        /* Smooth transition */
+        max-height: 0;
+        /* Start with max-height of 0 */
+        overflow: hidden;
+        /* Hide overflow */
+    }
 
-        /* Sidebar consistency */
-        .main-sidebar {
-            background-color: var(--sidebar-bg);
-        }
+    .treeview.active .treeview-menu {
+        display: block;
+        /* Show dropdown when active */
+        max-height: 300px;
+        /* Set a max-height for the dropdown */
+        opacity: 1;
+        /* Make it fully visible */
+    }
 
-        .sidebar-menu>li>a {
-            color: var(--white);
-        }
+    /* ===== COLOR PALETTE ===== */
+    :root {
+        --primary: #2c3e50;
+        /* Dark blue-gray - for text */
+        --secondary: #3498db;
+        /* Vibrant blue - for accents */
+        --active-bg: #FFEB3B;
+        /* Yellow - active parent */
+        --active-text: #000;
+        /* Black - active text */
+        --submenu-bg: #e6e8f4;
+        /* Light gray-blue - submenu background */
+        --submenu-hover: #d1d5e8;
+        /* Slightly darker gray-blue */
+        --sidebar-bg: #4caf50;
+        /* Green - sidebar background */
+        --white: #ffffff;
+        /* Pure white */
+    }
 
-        /* ///===== SUBMENU STYLING =====/// */
+    /* ===== ACTIVE PARENT MENU STYLING ===== */
+    .treeview.active>a {
+        background-color: var(--active-bg) !important;
+        color: var(--active-text) !important;
+        font-weight: 600;
+    }
 
-        .treeview-menu li {
-            background-color: #d5d8e8;
-            /* Match sidebar background */
-            border-radius: 4px;
-            /* Rounded corners */
-            margin: 5px 0;
-            /* Spacing between items */
-            transition: background 0.3s;
-            /* Smooth background transition */
+    /* Dropdown arrow color */
+    .treeview.active>a .pull-right-container i {
+        color: var(--active-text) !important;
+    }
+
+    /* ===== SUBMENU STYLING ===== */
+    .treeview-menu {
+        background-color: var(--submenu-bg);
+        padding: 5px 0;
+        border-radius: 0 0 4px 4px;
+        border-left: 3px solid var(--secondary);
+        /* Blue accent border */
+    }
+
+    .treeview-menu li a {
+        color: var(--primary) !important;
+        padding: 8px 15px 8px 35px;
+        transition: all 0.2s;
+    }
+
+    .treeview-menu li a:hover {
+        background-color: var(--submenu-hover) !important;
+        padding-left: 38px;
+        color: var(--secondary) !important;
+        /* Blue text on hover */
+    }
+
+    /* Submenu animation */
+    .treeview.active .treeview-menu {
+        display: block;
+        max-height: 300px;
+        opacity: 1;
+    }
+
+    /* Sidebar consistency */
+    .main-sidebar {
+        background-color: var(--sidebar-bg);
+    }
+
+    .sidebar-menu>li>a {
+        color: var(--white);
+    }
+
+    /* ///===== SUBMENU STYLING =====/// */
+
+    .treeview-menu li {
+        background-color: #d5d8e8;
+        /* Match sidebar background */
+        border-radius: 4px;
+        /* Rounded corners */
+        margin: 5px 0;
+        /* Spacing between items */
+        transition: background 0.3s;
+        /* Smooth background transition */
+        transform: translateY(20px);
+        /* Start from below */
+        opacity: 0;
+        /* Start as invisible */
+        animation: slideIn 0.5s forwards;
+        /* Animation for sliding in */
+    }
+
+    .treeview.active .treeview-menu li {
+        opacity: 1;
+        /* Make it fully visible */
+    }
+
+    .treeview-menu li a {
+        display: flex;
+        /* Flexbox for alignment */
+        align-items: center;
+        /* Center items vertically */
+        padding: 10px 15px;
+        /* Padding for links */
+        color: #ffffff;
+        /* White text color */
+        text-decoration: none;
+        /* Remove underline */
+        border-radius: 4px;
+        /* Rounded corners */
+    }
+
+    .treeview-menu li a:hover {
+        background-color: #388e3c;
+        /* Darker green on hover */
+    }
+
+    .treeview>a .pull-right-container {
+        margin-left: auto;
+        /* Push right icon to the end */
+        transition: transform 0.3s ease;
+        /* Smooth rotation */
+    }
+
+    .treeview.active>a .pull-right-container {
+        transform: rotate(90deg);
+        /* Rotate icon when active */
+    }
+
+    /* Keyframe Animation for Slide In */
+    @keyframes slideIn {
+        0% {
             transform: translateY(20px);
             /* Start from below */
             opacity: 0;
             /* Start as invisible */
-            animation: slideIn 0.5s forwards;
-            /* Animation for sliding in */
         }
 
-        .treeview.active .treeview-menu li {
+        100% {
+            transform: translateY(0);
+            /* End at original position */
             opacity: 1;
-            /* Make it fully visible */
+            /* End as visible */
         }
+    }
 
-        .treeview-menu li a {
-            display: flex;
-            /* Flexbox for alignment */
-            align-items: center;
-            /* Center items vertically */
-            padding: 10px 15px;
-            /* Padding for links */
-            color: #ffffff;
-            /* White text color */
-            text-decoration: none;
-            /* Remove underline */
-            border-radius: 4px;
-            /* Rounded corners */
-        }
+    /* Adjust spacing between icons and text */
+    .treeview-menu li a i {
+        margin-right: 10px;
+        /* Space between icon and text */
+    }
 
-        .treeview-menu li a:hover {
-            background-color: #388e3c;
-            /* Darker green on hover */
-        }
-
-        .treeview>a .pull-right-container {
-            margin-left: auto;
-            /* Push right icon to the end */
-            transition: transform 0.3s ease;
-            /* Smooth rotation */
-        }
-
-        .treeview.active>a .pull-right-container {
-            transform: rotate(90deg);
-            /* Rotate icon when active */
-        }
-
-        /* Keyframe Animation for Slide In */
-        @keyframes slideIn {
-            0% {
-                transform: translateY(20px);
-                /* Start from below */
-                opacity: 0;
-                /* Start as invisible */
-            }
-
-            100% {
-                transform: translateY(0);
-                /* End at original position */
-                opacity: 1;
-                /* End as visible */
-            }
-        }
-
-        /* Adjust spacing between icons and text */
-        .treeview-menu li a i {
-            margin-right: 10px;
-            /* Space between icon and text */
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .main-sidebar {
-                width: 200px;
-                /* Adjust width for smaller screens */
-            }
-        }
-
-        /* RESPONSIVENESS */
-
-        /* Mobile-specific styles */
-        @media (max-width: 992px) {
-            .main-sidebar {
-                left: -250px;
-                transition: left 0.3s ease, width 0.3s ease;
-            }
-
-            .main-sidebar.collapsed {
-                left: -80px;
-                width: 80px;
-            }
-
-            .main-sidebar.mobile-show {
-                left: 0;
-                width: 250px;
-            }
-
-            .main-sidebar.collapsed.mobile-show {
-                left: 0;
-                width: 80px;
-            }
-        }
-
-        /* Mobile hidden state */
-        .main-sidebar.mobile-hidden {
-            left: -250px;
-            transition: left 0.3s ease;
-        }
-
-        /* Desktop collapsed state */
-        .main-sidebar.collapsed {
-            width: 80px;
-            transition: width 0.3s ease;
-        }
-
-        /* Ensure proper transitions */
+    /* Responsive Styles */
+    @media (max-width: 768px) {
         .main-sidebar {
+            width: 200px;
+            /* Adjust width for smaller screens */
+        }
+    }
+
+    /* RESPONSIVENESS */
+
+    /* Mobile-specific styles */
+    @media (max-width: 992px) {
+        .main-sidebar {
+            left: -250px;
             transition: left 0.3s ease, width 0.3s ease;
         }
 
-        @media (min-width: 993px) {
-            .main-sidebar:not(.collapsed) {
-                width: 250px;
-                left: 0;
-            }
-
-            .main-sidebar.collapsed {
-                width: 80px;
-                left: 0;
-            }
+        .main-sidebar.collapsed {
+            left: -80px;
+            width: 80px;
         }
 
-        @media (max-width: 992px) {
-            .main-sidebar:not(.mobile-hidden) {
-                left: 0;
-                width: 250px;
-            }
+        .main-sidebar.mobile-show {
+            left: 0;
+            width: 250px;
         }
+
+        .main-sidebar.collapsed.mobile-show {
+            left: 0;
+            width: 80px;
+        }
+    }
+
+    /* Mobile hidden state */
+    .main-sidebar.mobile-hidden {
+        left: -250px;
+        transition: left 0.3s ease;
+    }
+
+    /* Desktop collapsed state */
+    .main-sidebar.collapsed {
+        width: 80px;
+        transition: width 0.3s ease;
+    }
+
+    /* Ensure proper transitions */
+    .main-sidebar {
+        transition: left 0.3s ease, width 0.3s ease;
+    }
+
+    @media (min-width: 993px) {
+        .main-sidebar:not(.collapsed) {
+            width: 250px;
+            left: 0;
+        }
+
+        .main-sidebar.collapsed {
+            width: 80px;
+            left: 0;
+        }
+    }
+
+    @media (max-width: 992px) {
+        .main-sidebar:not(.mobile-hidden) {
+            left: 0;
+            width: 250px;
+        }
+    }
     </style>
 </head>
 
@@ -547,20 +551,6 @@ foreach ($menu_structure as $parent => $data) {
                     </a>
                     <ul class="treeview-menu">
                         <li>
-                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/verify/staff_view.php"
-                                class="<?= ($current_pag == 'staff_view.php') ? 'active-submenu' : '' ?>">
-                                <i class="fa fa-file-upload"></i>Appraisal Form
-                            </a>
-                        </li>
-
-                        <?php if ($_SESSION['user_role'] !== 'staff'): ?>
-                        <li>
-                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/signing/view_staff_appraisal.php"
-                                class="<?= ($current_pag == 'View_staff_appraisal.php') ? 'active-submenu' : '' ?>">
-                                <i class="fa fa-file-upload"></i> View_staff_appraisal
-                            </a>
-                        </li>
-                        <li>
                             <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/csv_receiver/upload_csv.php"
                                 class="<?= ($current_pag == 'upload_csv.php') ? 'active-submenu' : '' ?>">
                                 <i class="fa fa-file-upload"></i> CSV Upload
@@ -586,8 +576,41 @@ foreach ($menu_structure as $parent => $data) {
                                 <i class="fa fa-database"></i> Modify DB Tables
                             </a>
                         </li>
+
                         <?php endif; ?>
+                    </ul>
+                </li>
+
+                <!-- Appraisal -->
+                <li class="treeview <?= ($active_parent === 'Appraisal') ? 'active' : '' ?> ">
+                    <a href="#" class="toggle">
+                        <i class="fa fa-edit"></i>
+                        <span style="margin-left: 10px;">Appraisal</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-right pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li>
+                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/appraisal/appraisal_form.php"
+                                class="<?= ($current_pag == 'appraisal_form.php') ? 'active-submenu' : '' ?>">
+                                <i class="fa fa-file-upload"></i>Appraisal Form
+                            </a>
+                        </li>
+                        <?php if ($_SESSION['user_role'] !== 'staff'): ?>
+                        <li>
+                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/head/appraisal/view_staff_appraisal.php"
+                                class="<?= ($current_pag == 'View_staff_appraisal.php') ? 'active-submenu' : '' ?>">
+                                <i class="fa fa-file-upload"></i> Verify appraisal
+                            </a>
+                        </li>
                         <?php endif; ?>
+                        <li>
+                            <a href="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/staff/appraisal/appraisal_status.php"
+                                class="<?= ($current_pag == 'appraisal_status.php') ? 'active-submenu' : '' ?>">
+                                <i class="fa fa-file-upload"></i>Appraisal Status
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

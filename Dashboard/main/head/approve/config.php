@@ -3,7 +3,7 @@
 $dbuser = "root";
 $dbpass = "";
 $host = "localhost";
-$db = "hrm_db2";
+$db = "hrm_db";
 
 // Create connection using 'conn'
 $conn = new mysqli($host, $dbuser, $dbpass, $db);

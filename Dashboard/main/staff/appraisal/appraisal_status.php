@@ -80,6 +80,7 @@ if ($selected_staff_id) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,171 +90,197 @@ if ($selected_staff_id) {
     <!-- Font Awesome -->
     <link rel="stylesheet" href="../../components/src/fontawesome/css/all.min.css">
     <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+    }
+
+    .wrapper {
+        margin-left: 280px;
+        padding: 20px;
+        transition: all 0.3s;
+    }
+
+    #sidebar {
+        width: 280px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        transition: all 0.3s;
+    }
+
+    .appraisal-container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+    }
+
+    .staff-selector {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        background: #f9f9f9;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 30px;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .section-title {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin: 25px 0 10px 0;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #000;
+    }
+
+    .status-pending {
+        font-weight: bold;
+        color: #856404;
+    }
+
+    .status-approved {
+        font-weight: bold;
+        color: #155724;
+    }
+
+    .status-rejected {
+        font-weight: bold;
+        color: #721c24;
+    }
+
+    .print-actions {
+        text-align: right;
+        margin-bottom: 20px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+    }
+
+    .signature-area {
+        margin-top: 40px;
+    }
+
+    .signature-line {
+        display: inline-block;
+        width: 250px;
+        border-top: 1px solid #000;
+        margin-top: 50px;
+    }
+
+    /* Print specific styles */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #printable-area,
+        #printable-area * {
+            visibility: visible;
+        }
+
+        #printable-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
+            background: #fff;
+            font-size: 12pt;
         }
-        
-        .wrapper {
-            margin-left: 280px;
-            padding: 20px;
-            transition: all 0.3s;
+
+        table {
+            page-break-inside: avoid;
         }
-        
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 991.98px) {
         #sidebar {
-            width: 280px;
+            transform: translateX(-100%);
+        }
+
+        #sidebar.active {
+            transform: translateX(0);
+        }
+
+        .wrapper {
+            margin-left: 0 !important;
+            padding: 15px !important;
+        }
+
+        .sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            height: 100vh;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
         }
-        
-        .appraisal-container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        .sidebar-overlay.active {
+            display: block;
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
-        }
-        
-        .staff-selector {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            background: #f9f9f9;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        
-        .section-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 25px 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #000;
-        }
-        
-        .status-pending { font-weight: bold; color: #856404; }
-        .status-approved { font-weight: bold; color: #155724; }
-        .status-rejected { font-weight: bold; color: #721c24; }
-        
-        .print-actions {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        
-        textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-        }
-        
-        .signature-area {
-            margin-top: 40px;
-        }
-        
-        .signature-line {
-            display: inline-block;
-            width: 250px;
-            border-top: 1px solid #000;
-            margin-top: 50px;
-        }
-        
-        /* Print specific styles */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printable-area, #printable-area * {
-                visibility: visible;
-            }
-            #printable-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-            }
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background: #fff;
-                font-size: 12pt;
-            }
-            table {
-                page-break-inside: avoid;
-            }
-        }
-        
-        /* Mobile responsive */
-        @media (max-width: 991.98px) {
-            #sidebar {
-                transform: translateX(-100%);
-            }
-            #sidebar.active {
-                transform: translateX(0);
-            }
-            .wrapper {
-                margin-left: 0 !important;
-                padding: 15px !important;
-            }
-            .sidebar-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-                display: none;
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
-        }
-        .must-logo {
-            height: 80px;
-            margin-right: 10px;
-        }
-        .header-text {
-            flex: 1;
-            text-align: center;
-        }
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+    }
+
+    .must-logo {
+        height: 80px;
+        margin-right: 10px;
+    }
+
+    .header-text {
+        flex: 1;
+        text-align: center;
+    }
     </style>
 </head>
+
 <body class="d-flex">
     <!-- Sidebar Overlay (mobile) -->
     <div class="sidebar-overlay"></div>
@@ -269,7 +296,8 @@ if ($selected_staff_id) {
         <div class="appraisal-container">
             <div id="printable-area">
                 <div class="header">
-                    <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png" alt="MUST Logo" class="must-logo">
+                    <img src="/EMPLOYEE-TRACKING-SYSTEM/Dashboard/main/logo/mustlogo.png" alt="MUST Logo"
+                        class="must-logo">
                     <div class="header-text">
                         <h2>MBARARA UNIVERSITY OF SCIENCE AND TECHNOLOGY</h2>
                         <h3>STAFF PERFORMANCE APPRAISAL FORM</h3>
@@ -291,25 +319,25 @@ if ($selected_staff_id) {
 
                 <div class="staff-selector no-print">
                     <form method="POST" action="">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <label for="staff_id"><strong>Select Staff Member:</strong></label>
-                                <select name="staff_id" id="staff_id" class="form-select" required>
-                                    <option value="">-- Select Staff Member --</option>
-                                    <?php foreach ($staff_members as $id => $name): ?>
-                                    <option value="<?php echo $id; ?>"
-                                        <?php echo ($selected_staff_id == $id) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($name); ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
+                        <?php if ($_SESSION['user_role'] != 'staff'): ?>
+                            <div class="row align-items-center"> 
+                                <div class="col-md-8">
+                                    <label for="staff_id"><strong>Select Staff Member:</strong></label>
+                                    <select name="staff_id" id="staff_id" class="form-select" required>
+                                        <option value="">-- Select Staff Member --</option>
+                                        <?php foreach ($staff_members as $id => $name): ?>
+                                        <option value="<?php echo $id; ?>"
+                                            <?php echo ($selected_staff_id == $id) ? 'selected' : ''; ?>>
+                                            <?php echo htmlspecialchars($name); ?>
+                                        </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-search me-2"></i> Load Data
-                                </button>
-                            </div>
-                        </div>
+                        <?php else: ?>
+                            <input type="hidden" name="staff_id" value="<?php echo $_SESSION['user_id']; ?>">
+                        <?php endif; ?>
+                        
                     </form>
                 </div>
 
@@ -321,7 +349,9 @@ if ($selected_staff_id) {
                     </tr>
                     <tr>
                         <th width="25%">Full Name</th>
-                        <td width="25%"><?php echo htmlspecialchars($staff_data['first_name'] . ' ' . $staff_data['last_name']); ?></td>
+                        <td width="25%">
+                            <?php echo htmlspecialchars($staff_data['first_name'] . ' ' . $staff_data['last_name']); ?>
+                        </td>
                         <th width="25%">Department</th>
                         <td width="25%">
                             <?php 
@@ -351,20 +381,20 @@ if ($selected_staff_id) {
                         <th width="15%">Status</th>
                     </tr>
                     <?php if (!empty($degrees_data)): ?>
-                        <?php foreach ($degrees_data as $degree): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($degree['degree_name']); ?></td>
-                            <td><?php echo htmlspecialchars($degree['institution'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($degree['year_awarded'] ?? 'N/A'); ?></td>
-                            <td class="status-<?php echo $degree['verification_status'] ?? 'pending'; ?>">
-                                <?php echo strtoupper($degree['verification_status'] ?? 'PENDING'); ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                    <?php foreach ($degrees_data as $degree): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($degree['degree_name']); ?></td>
+                        <td><?php echo htmlspecialchars($degree['institution'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($degree['year_awarded'] ?? 'N/A'); ?></td>
+                        <td class="status-<?php echo $degree['verification_status'] ?? 'pending'; ?>">
+                            <?php echo strtoupper($degree['verification_status'] ?? 'PENDING'); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="4" style="text-align: center;">No academic qualifications recorded</td>
-                        </tr>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No academic qualifications recorded</td>
+                    </tr>
                     <?php endif; ?>
                 </table>
 
@@ -379,21 +409,21 @@ if ($selected_staff_id) {
                         <th width="10%">Status</th>
                     </tr>
                     <?php if (!empty($publications_data)): ?>
-                        <?php foreach ($publications_data as $pub): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($pub['title'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($pub['publication_type']); ?></td>
-                            <td><?php echo htmlspecialchars($pub['journal_name'] ?? $pub['publisher'] ?? 'N/A'); ?></td>
-                            <td><?php echo date('M Y', strtotime($pub['publication_date'])); ?></td>
-                            <td class="status-<?php echo $pub['verification_status'] ?? 'pending'; ?>">
-                                <?php echo strtoupper($pub['verification_status'] ?? 'PENDING'); ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                    <?php foreach ($publications_data as $pub): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($pub['title'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($pub['publication_type']); ?></td>
+                        <td><?php echo htmlspecialchars($pub['journal_name'] ?? $pub['publisher'] ?? 'N/A'); ?></td>
+                        <td><?php echo date('M Y', strtotime($pub['publication_date'])); ?></td>
+                        <td class="status-<?php echo $pub['verification_status'] ?? 'pending'; ?>">
+                            <?php echo strtoupper($pub['verification_status'] ?? 'PENDING'); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="5" style="text-align: center;">No research publications recorded</td>
-                        </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No research publications recorded</td>
+                    </tr>
                     <?php endif; ?>
                 </table>
 
@@ -408,21 +438,21 @@ if ($selected_staff_id) {
                         <th width="10%">Status</th>
                     </tr>
                     <?php if (!empty($grants_data)): ?>
-                        <?php foreach ($grants_data as $grant): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($grant['grant_title'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($grant['funding_agency'] ?? 'N/A'); ?></td>
-                            <td><?php echo number_format($grant['grant_amount'], 2); ?></td>
-                            <td><?php echo date('Y', strtotime($grant['grant_year'])); ?></td>
-                            <td class="status-<?php echo $grant['verification_status'] ?? 'pending'; ?>">
-                                <?php echo strtoupper($grant['verification_status'] ?? 'PENDING'); ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                    <?php foreach ($grants_data as $grant): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($grant['grant_title'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($grant['funding_agency'] ?? 'N/A'); ?></td>
+                        <td><?php echo number_format($grant['grant_amount'], 2); ?></td>
+                        <td><?php echo date('Y', strtotime($grant['grant_year'])); ?></td>
+                        <td class="status-<?php echo $grant['verification_status'] ?? 'pending'; ?>">
+                            <?php echo strtoupper($grant['verification_status'] ?? 'PENDING'); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="5" style="text-align: center;">No research grants recorded</td>
-                        </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No research grants recorded</td>
+                    </tr>
                     <?php endif; ?>
                 </table>
 
@@ -437,21 +467,21 @@ if ($selected_staff_id) {
                         <th width="15%">Status</th>
                     </tr>
                     <?php if (!empty($community_service_data)): ?>
-                        <?php foreach ($community_service_data as $service): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($service['description']); ?></td>
-                            <td><?php echo htmlspecialchars($service['organization'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars($service['role'] ?? 'Participant'); ?></td>
-                            <td><?php echo htmlspecialchars($service['duration'] ?? 'N/A'); ?></td>
-                            <td class="status-<?php echo $service['verification_status'] ?? 'pending'; ?>">
-                                <?php echo strtoupper($service['verification_status'] ?? 'PENDING'); ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                    <?php foreach ($community_service_data as $service): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($service['description']); ?></td>
+                        <td><?php echo htmlspecialchars($service['organization'] ?? 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($service['role'] ?? 'Participant'); ?></td>
+                        <td><?php echo htmlspecialchars($service['duration'] ?? 'N/A'); ?></td>
+                        <td class="status-<?php echo $service['verification_status'] ?? 'pending'; ?>">
+                            <?php echo strtoupper($service['verification_status'] ?? 'PENDING'); ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="5" style="text-align: center;">No community service recorded</td>
-                        </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No community service recorded</td>
+                    </tr>
                     <?php endif; ?>
                 </table>
 
@@ -460,13 +490,14 @@ if ($selected_staff_id) {
                 <table>
                     <tr>
                         <th width="20%">Verifier Notes:</th>
-                        <td><textarea rows="3"></textarea></td>
+                        <td><textarea rows="5"></textarea></td>
                     </tr>
                     <tr>
                         <th>Overall Recommendation:</th>
                         <td>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="recommendation" id="rec-approve" checked>
+                                <input class="form-check-input" type="radio" name="recommendation" id="rec-approve"
+                                    checked>
                                 <label class="form-check-label" for="rec-approve">Approve All Verified</label>
                             </div>
                             <div class="form-check">
@@ -541,13 +572,23 @@ if ($selected_staff_id) {
         const opt = {
             margin: 10,
             filename: 'Staff_Appraisal_<?php echo $selected_staff_id ? $staff_data['first_name'].'_'.$staff_data['last_name'] : ''; ?>.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            image: {
+                type: 'jpeg',
+                quality: 0.98
+            },
+            html2canvas: {
+                scale: 2
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            }
         };
 
         html2pdf().set(opt).from(element).save();
     }
     </script>
 </body>
+
 </html>

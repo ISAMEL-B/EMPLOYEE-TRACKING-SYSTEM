@@ -110,243 +110,243 @@ function getRecordOwner($table_name, $record_id) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Database Management System</title>
+    <title>Appraisal forms mgt</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-    :root {
-        --primary-color: #3498db;
-        --secondary-color: #2c3e50;
-        --success-color: #2ecc71;
-        --danger-color: #e74c3c;
-        --warning-color: #f39c12;
-        --info-color: #1abc9c;
-        --light-color: #ecf0f1;
-        --dark-color: #34495e;
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #1abc9c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
 
-        --sidebar-width: 270px;
-        --navbar-height: 60px;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f7fa;
-        color: #333;
-        margin: 0;
-        padding: 0;
-    }
-
-    .main-wrapper {
-        display: grid;
-        grid-template-columns: var(--sidebar-width) 1fr;
-        grid-template-rows: var(--navbar-height) 1fr;
-        min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar-space {
-        grid-column: 1 / 2;
-        grid-row: 1 / span 2;
-        background-color: #f8f9fa;
-        height: 100vh;
-        overflow-y: auto;
-    }
-
-    /* Navbar */
-    .navbar-space {
-        grid-column: 2 / 3;
-        grid-row: 1 / 2;
-        background-color: #e9ecef;
-        height: var(--navbar-height);
-        display: flex;
-        align-items: center;
-        padding: 0 1rem;
-    }
-
-    /* Main content */
-    .container-fluid {
-        grid-column: 2 / 3;
-        grid-row: 2 / 3;
-        padding: 1rem;
-        overflow-y: auto;
-    }
-
-    .card {
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-        border: none;
-        transition: transform 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-    }
-
-    .card-header {
-        background-color: var(--secondary-color);
-        color: white;
-        border-radius: 10px 10px 0 0 !important;
-        padding: 15px 20px;
-        font-weight: 600;
-    }
-
-    .table-responsive {
-        border-radius: 0 0 10px 10px;
-        overflow: hidden;
-    }
-
-    table.dataTable {
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-    }
-
-    .dataTables_wrapper .dataTables_filter input {
-        border-radius: 20px;
-        padding: 5px 15px;
-        border: 1px solid #ddd;
-    }
-
-    .btn-action {
-        border-radius: 20px;
-        padding: 5px 15px;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-
-    .btn-approve {
-        background-color: var(--success-color);
-        color: white;
-    }
-
-    .btn-disapprove {
-        background-color: var(--danger-color);
-        color: white;
-    }
-
-    .btn-view {
-        background-color: var(--primary-color);
-        color: white;
-    }
-
-    .badge-pending {
-        background-color: var(--warning-color);
-    }
-
-    .badge-approved {
-        background-color: var(--success-color);
-    }
-
-    .badge-rejected {
-        background-color: var(--danger-color);
-    }
-
-    .nav-tabs .nav-link.active {
-        font-weight: 600;
-        color: var(--primary-color);
-        border-bottom: 3px solid var(--primary-color);
-    }
-
-    .action-buttons {
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 0 0 10px 10px;
-        border-top: 1px solid #eee;
-    }
-
-    .status-filter {
-        margin-bottom: 15px;
-    }
-
-    .table th {
-        background-color: var(--light-color);
-        font-weight: 600;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .pagination .page-link {
-        color: var(--secondary-color);
-    }
-
-    .dataTables_length select {
-        border-radius: 20px;
-        padding: 5px;
-    }
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: var(--primary-color);
-        border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #2980b9;
-    }
-
-    /* Animation for status changes */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
+            --sidebar-width: 270px;
+            --navbar-height: 60px;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
         }
-    }
 
-    .fade-in {
-        animation: fadeIn 0.3s ease-out;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
         .main-wrapper {
-            grid-template-columns: 1fr;
-            grid-template-rows: var(--navbar-height) auto 1fr;
+            display: grid;
+            grid-template-columns: var(--sidebar-width) 1fr;
+            grid-template-rows: var(--navbar-height) 1fr;
+            min-height: 100vh;
         }
 
+        /* Sidebar */
         .sidebar-space {
             grid-column: 1 / 2;
-            grid-row: 2 / 3;
-            height: auto;
+            grid-row: 1 / span 2;
+            background-color: #f8f9fa;
+            height: 100vh;
+            overflow-y: auto;
         }
 
+        /* Navbar */
         .navbar-space {
-            grid-column: 1 / 2;
+            grid-column: 2 / 3;
             grid-row: 1 / 2;
+            background-color: #e9ecef;
+            height: var(--navbar-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
         }
 
+        /* Main content */
         .container-fluid {
-            grid-column: 1 / 2;
-            grid-row: 3 / 4;
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
         }
 
         .card-header {
-            padding: 10px 15px;
-            font-size: 16px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .table-responsive {
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+        }
+
+        table.dataTable {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            border-radius: 20px;
+            padding: 5px 15px;
+            border: 1px solid #ddd;
         }
 
         .btn-action {
-            padding: 5px 10px;
-            font-size: 14px;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-weight: 500;
+            transition: all 0.3s;
         }
-    }
+
+        .btn-approve {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-disapprove {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-view {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .badge-pending {
+            background-color: var(--warning-color);
+        }
+
+        .badge-approved {
+            background-color: var(--success-color);
+        }
+
+        .badge-rejected {
+            background-color: var(--danger-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            font-weight: 600;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .action-buttons {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 0 0 10px 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .status-filter {
+            margin-bottom: 15px;
+        }
+
+        .table th {
+            background-color: var(--light-color);
+            font-weight: 600;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-link {
+            color: var(--secondary-color);
+        }
+
+        .dataTables_length select {
+            border-radius: 20px;
+            padding: 5px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        /* Animation for status changes */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-wrapper {
+                grid-template-columns: 1fr;
+                grid-template-rows: var(--navbar-height) auto 1fr;
+            }
+
+            .sidebar-space {
+                grid-column: 1 / 2;
+                grid-row: 2 / 3;
+                height: auto;
+            }
+
+            .navbar-space {
+                grid-column: 1 / 2;
+                grid-row: 1 / 2;
+            }
+
+            .container-fluid {
+                grid-column: 1 / 2;
+                grid-row: 3 / 4;
+            }
+
+            .card-header {
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+
+            .btn-action {
+                padding: 5px 10px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -455,18 +455,18 @@ function getRecordOwner($table_name, $record_id) {
                                 </thead>
                                 <tbody>
                                     <?php
-    $query = "SELECT a.*, CONCAT(s.first_name, ' ', s.last_name) as staff_name, 
-            v.first_name as verifier_first, v.last_name as verifier_last
-            FROM academicactivities a
-            LEFT JOIN staff s ON a.staff_id = s.staff_id
-            LEFT JOIN staff v ON a.verified_by = v.staff_id";
-    $result = $conn->query($query);
+                                        $query = "SELECT a.*, CONCAT(s.first_name, ' ', s.last_name) as staff_name, 
+                                                v.first_name as verifier_first, v.last_name as verifier_last
+                                                FROM academicactivities a
+                                                LEFT JOIN staff s ON a.staff_id = s.staff_id
+                                                LEFT JOIN staff v ON a.verified_by = v.staff_id";
+                                        $result = $conn->query($query);
 
-    $counter = 1; // <-- start counter at 1
+                                        $counter = 1; // <-- start counter at 1
 
-    while ($row = $result->fetch_assoc()):
-        $verifier_name = $row['verifier_first'] ? $row['verifier_first'] . ' ' . $row['verifier_last'] : 'N/A';
-    ?>
+                                        while ($row = $result->fetch_assoc()):
+                                            $verifier_name = $row['verifier_first'] ? $row['verifier_first'] . ' ' . $row['verifier_last'] : 'N/A';
+                                    ?>
                                     <tr>
                                         <td><?php echo $counter++; ?></td> <!-- <-- print counter, then increment -->
                                         <td><?php echo htmlspecialchars($row['staff_name']); ?></td>
