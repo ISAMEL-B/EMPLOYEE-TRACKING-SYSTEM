@@ -1,83 +1,67 @@
 <?php
 session_start();
+
+// Redirect if not logged in
 if (!isset($_SESSION['staff_id'])) {
     header('Location: /EMPLOYEE-TRACKING-SYSTEM/registration/register.php');
     exit;
 }
+
 $current_pag = basename($_SERVER['PHP_SELF']);
 
-// Database connection
+// DB connection
 include '../../head/approve/config.php';
 
-// Fetch all staff for dropdown
-$staff_query = "SELECT staff_id, first_name, last_name FROM staff ORDER BY first_name";
-$staff_result = $conn->query($staff_query);
+// Fetch staff list for dropdown
 $staff_members = [];
-while ($row = $staff_result->fetch_assoc()) {
-    $staff_members[$row['staff_id']] = $row['first_name'] . ' ' . $row['last_name'];
+$staff_sql = "SELECT staff_id, first_name, last_name FROM staff ORDER BY first_name";
+if ($result = $conn->query($staff_sql)) {
+    while ($row = $result->fetch_assoc()) {
+        $staff_members[$row['staff_id']] = $row['first_name'] . ' ' . $row['last_name'];
+    }
 }
 
-// Get selected staff ID from form
-$selected_staff_id = isset($_POST['staff_id']) ? intval($_POST['staff_id']) : null;
+// Determine selected staff ID
+$user_role = $_SESSION['user_role'] ?? '';
+$session_staff_id = $_SESSION['staff_id'] ?? 0;
 
-// Initialize data arrays
-$staff_data = [];
-$degrees_data = [];
-$publications_data = [];
-$grants_data = [];
-$innovations_data = [];
-$community_service_data = [];
-$supervision_data = [];
+if ($user_role === 'staff') {
+    $selected_staff_id = $session_staff_id;
+} else {
+    $selected_staff_id = isset($_POST['staff_id']) ? intval($_POST['staff_id']) : 0;
+}
+
+// Initialize arrays
+$staff_data = $degrees_data = $publications_data = $grants_data = $innovations_data = $community_service_data = $supervision_data = [];
 
 if ($selected_staff_id) {
-    // Fetch staff basic info
-    $staff_query = "SELECT * FROM staff WHERE staff_id = $selected_staff_id";
-    $staff_result = $conn->query($staff_query);
-    $staff_data = $staff_result->fetch_assoc();
 
-    // Fetch degrees
-    $degrees_query = "SELECT * FROM degrees WHERE staff_id = $selected_staff_id";
-    $degrees_result = $conn->query($degrees_query);
-    while ($row = $degrees_result->fetch_assoc()) {
-        $degrees_data[] = $row;
+    // Helper function to fetch rows into array
+    function fetch_all($conn, $query) {
+        $data = [];
+        $result = $conn->query($query);
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $data[] = $row;
+            }
+        }
+        return $data;
     }
 
-    // Fetch publications
-    $publications_query = "SELECT * FROM publications WHERE staff_id = $selected_staff_id";
-    $publications_result = $conn->query($publications_query);
-    while ($row = $publications_result->fetch_assoc()) {
-        $publications_data[] = $row;
-    }
+    // Fetch all sections
+    $staff_data_query = "SELECT * FROM staff WHERE staff_id = $selected_staff_id";
+    $staff_result = $conn->query($staff_data_query);
+    $staff_data = $staff_result ? $staff_result->fetch_assoc() : [];
 
-    // Fetch grants
-    $grants_query = "SELECT * FROM grants WHERE staff_id = $selected_staff_id";
-    $grants_result = $conn->query($grants_query);
-    while ($row = $grants_result->fetch_assoc()) {
-        $grants_data[] = $row;
-    }
-
-    // Fetch innovations
-    $innovations_query = "SELECT * FROM innovations WHERE staff_id = $selected_staff_id";
-    $innovations_result = $conn->query($innovations_query);
-    while ($row = $innovations_result->fetch_assoc()) {
-        $innovations_data[] = $row;
-    }
-
-    // Fetch community service
-    $community_service_query = "SELECT * FROM communityservice WHERE staff_id = $selected_staff_id";
-    $community_service_result = $conn->query($community_service_query);
-    while ($row = $community_service_result->fetch_assoc()) {
-        $community_service_data[] = $row;
-    }
-
-    // Fetch supervision
-    $supervision_query = "SELECT * FROM supervision WHERE staff_id = $selected_staff_id";
-    $supervision_result = $conn->query($supervision_query);
-    while ($row = $supervision_result->fetch_assoc()) {
-        $supervision_data[] = $row;
-    }
+    $degrees_data = fetch_all($conn, "SELECT * FROM degrees WHERE staff_id = $selected_staff_id");
+    $publications_data = fetch_all($conn, "SELECT * FROM publications WHERE staff_id = $selected_staff_id");
+    $grants_data = fetch_all($conn, "SELECT * FROM grants WHERE staff_id = $selected_staff_id");
+    $innovations_data = fetch_all($conn, "SELECT * FROM innovations WHERE staff_id = $selected_staff_id");
+    $community_service_data = fetch_all($conn, "SELECT * FROM communityservice WHERE staff_id = $selected_staff_id");
+    $supervision_data = fetch_all($conn, "SELECT * FROM supervision WHERE staff_id = $selected_staff_id");
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -333,6 +317,11 @@ if ($selected_staff_id) {
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i> Load Data
+                                </button>
                             </div>
                         <?php else: ?>
                             <input type="hidden" name="staff_id" value="<?php echo $_SESSION['user_id']; ?>">
