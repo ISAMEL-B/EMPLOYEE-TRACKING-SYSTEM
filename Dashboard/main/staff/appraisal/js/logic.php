@@ -813,33 +813,33 @@
     }
 
     // Function to handle removing an entry
-    function handleRemoveEntry(entryClass, fieldName) {
-        const entry = event.target.closest(`.${entryClass}`);
-        const container = entry.parentElement;
-        const entries = container.querySelectorAll(`.${entryClass}`);
+function handleRemoveEntry(entryClass, fieldName) {
+    const entry = event.target.closest(`.${entryClass}`);
+    const container = entry.parentElement;
+    const entries = container.querySelectorAll(`.${entryClass}`);
 
-        // Always allow removal if there's more than one entry
-        if (entries.length > 1) {
-            entry.remove();
+    // Always allow removal if there's more than one entry
+    if (entries.length > 1) {
+        entry.remove();
 
-            // Re-index remaining entries
-            const updatedEntries = container.querySelectorAll(`.${entryClass}`);
-            updatedEntries.forEach((entry, index) => {
-                entry.querySelectorAll('input, select, textarea').forEach(input => {
-                    const name = input.name.replace(/\[\d+\]/, `[${index}]`);
-                    input.name = name;
-                    input.id = input.id.replace(/\d+$/, index);
-                });
+        // Re-index remaining entries
+        const updatedEntries = container.querySelectorAll(`.${entryClass}`);
+        updatedEntries.forEach((entry, index) => {
+            entry.querySelectorAll('input, select, textarea').forEach(input => {
+                const name = input.name.replace(/\[\d+\]/, `[${index}]`);
+                input.name = name;
+                input.id = input.id.replace(/\d+$/, index);
             });
-        } else {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: `You must have at least one ${fieldName} entry.`,
-                confirmButtonColor: 'var(--primary-blue)'
-            });
-        }
+        });
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: `You must have at least one ${fieldName} entry.`,
+            confirmButtonColor: 'var(--primary-blue)'
+        });
     }
+}
 
     // Function to validate email format
     function isValidEmail(email) {
