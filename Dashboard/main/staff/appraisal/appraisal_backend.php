@@ -237,18 +237,6 @@ function processFullSubmission($staff_id, $conn) {
                 throw new Exception("Failed to update staff record: " . $stmt->error);
             }
             $stmt->close();
-
-            // Handle photo upload if exists
-            if (!empty($biodata['photo_path'])) {
-                $photo_sql = "UPDATE staff SET photo_path = ? WHERE staff_id = ?";
-                $stmt = $conn->prepare($photo_sql);
-                $stmt->bind_param("si", $biodata['photo_path'], $user_id);
-                
-                if (!$stmt->execute()) {
-                    throw new Exception("Failed to update photo: " . $stmt->error);
-                }
-                $stmt->close();
-            }
         }
 
         // Process degrees (page 2)
