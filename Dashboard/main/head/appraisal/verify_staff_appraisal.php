@@ -543,7 +543,7 @@ function getRecordOwner($table_name, $record_id) {
                         $status = strtolower($row['verification_status']);
                         $id = $row['activity_id'];
                     ?>
-                    <tr data-status="<?php echo $status; ?>">
+                   <tr data-status="<?php echo strtolower($row['verification_status']); ?>">
                         <td><input type="checkbox" class="record-checkbox" value="<?php echo $id; ?>"></td>
                         <td><?php echo $counter++; ?></td>
                         <td><?php echo htmlspecialchars($row['staff_name']); ?></td>
@@ -1438,13 +1438,41 @@ $(document).ready(function() {
     });
 
     // Status filters - consolidated handler
-    $('[id$="StatusFilter"]').change(function() {
-        const tablePrefix = this.id.replace('StatusFilter', '');
-        const table = $(`#${tablePrefix}Table`).DataTable();
-        const columnIndex = $(this).data('column') || 5; // Default to column 3 if not specified
-        
-        table.column(columnIndex).search(this.value).draw();
-    });
+    // Status filters - consolidated handler
+$('[id$="StatusFilter"]').change(function() {
+    const tablePrefix = this.id.replace('StatusFilter', '');
+    const table = $(`#${tablePrefix}Table`).DataTable();
+    let columnIndex;
+    
+    // Set column index based on table
+    switch(tablePrefix) {
+        case 'academic':
+        case 'community':
+        case 'degrees':
+        case 'grants':
+        case 'innovations':
+        case 'publications':
+        case 'supervision':
+            columnIndex = 4; // Status is in column 5 (zero-based index 4)
+            break;
+        case 'activityTypes':
+            columnIndex = 3; // Adjust based on your table structure
+            break;
+        case 'professional':
+            columnIndex = 2; // Adjust based on your table structure
+            break;
+        case 'service':
+            columnIndex = 2; // Adjust based on your table structure
+            break;
+        case 'staff':
+            columnIndex = 5; // Adjust based on your table structure
+            break;
+        default:
+            columnIndex = 4; // Default to column 5 if not specified
+    }
+    
+    table.column(columnIndex).search(this.value).draw();
+});
 
     // View record details - generic handler
     $(document).on('click', '.view-record', function() {
