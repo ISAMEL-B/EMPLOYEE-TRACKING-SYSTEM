@@ -4,28 +4,30 @@
 // $current_pag = 'manage_staff';
 
 // Define menu structure with parent-child relationships
-$menu_structure = [
-    'Dashboard' => [
-        'pages' => ['index.php', 'index2.php', 'faculty.php', 'index3.php', 'department.php', 'individual_view.php', 'hrm_assistant.php'],
-        'icon' => 'fa-tachometer-alt'
-    ],
-    'Update' => [
-        'pages' => ['upload_csv.php', 'approve.php', 'view_criteria.php', 'modify_db.php'],
-        'icon' => 'fa-edit'
-    ],
-    'Appraisal' => [
-        'pages' => ['appraisal_form.php', 'appraisal_view.php', 'verify_staff_appraisal.php'],
-        'icon' => 'fa-edit'
-    ],
-    'Manage' => [
-        'pages' => ['manage_staff.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php', 'visual_assistant.php'],
-        'icon' => 'fa-info-circle'
-    ],
-    'Authentication' => [
-        'pages' => ['register.php', 'logout.php', 'lock_screen.php', 'password_recovery.php'],
-        'icon' => 'fa-lock'
-    ]
-];
+
+
+// $menu_structure = [
+//     'Dashboard' => [
+//         'pages' => ['index.php', 'index2.php', 'faculty.php', 'index3.php', 'department.php', 'individual_view.php', 'hrm_assistant.php'],
+//         'icon' => 'fa-tachometer-alt'
+//     ],
+//     'Update' => [
+//         'pages' => ['upload_csv.php', 'approve.php', 'view_criteria.php', 'modify_db.php'],
+//         'icon' => 'fa-edit'
+//     ],
+//     'Appraisal' => [
+//         'pages' => ['appraisal_form.php', 'appraisal_view.php', 'verify_staff_appraisal.php'],
+//         'icon' => 'fa-edit'
+//     ],
+//     'Manage' => [
+//         'pages' => ['manage_staff.php', 'staff_profile.php', 'for_staff_profile.php', 're_register.php', 'hrm_profile.php', 'about_us.php', 'visual_assistant.php'],
+//         'icon' => 'fa-info-circle'
+//     ],
+//     'Authentication' => [
+//         'pages' => ['register.php', 'logout.php', 'lock_screen.php', 'password_recovery.php'],
+//         'icon' => 'fa-lock'
+//     ]
+// ];
 
 // Determine active parent menu and if current page is in submenu
 $active_parent = '';
@@ -582,7 +584,7 @@ foreach ($menu_structure as $parent => $data) {
                 </li>
 
                 <!-- Appraisal -->
-                <li class="treeview <?= ($active_parent === 'Appraisal') ? 'active' : '' ?> ">
+                <!-- <li class="treeview <?= ($active_parent === 'Appraisal') ? 'active' : '' ?> ">
                     <a href="#" class="toggle">
                         <i class="fa fa-edit"></i>
                         <span style="margin-left: 10px;">Appraisal</span>
@@ -612,7 +614,7 @@ foreach ($menu_structure as $parent => $data) {
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
 
                 <!-- Manage -->
                 <li class="treeview <?= ($active_parent === 'Manage') ? 'active' : '' ?>">
